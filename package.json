@@ -1,0 +1,68 @@
+{
+  "name": "fable.-Extras",
+  "version": "0.1.0",
+  "description": "",
+  "homepage": "https://github.com/Shmew/Fable.Extras",
+  "bugs": {
+    "url": "https://github.com/Shmew/Fable.Extras/issues/new/choose"
+  },
+  "license": "MIT",
+  "author": "Cody Johnson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shmew/Fable.Extras"
+  },
+  "scripts": {
+    "build": "webpack -p",
+    "pretest": "yarn pretest-fc && yarn pretest-jest && yarn pretest-rtl",
+    "pretest-fc": "fable-splitter -c tests/Fable.FastCheck.Tests/splitter.config.js",
+    "pretest-jest": "fable-splitter -c tests/Fable.Extras.Tests/splitter.config.js",
+    "pretest-rtl": "fable-splitter -c tests/Fable.ReactTestingLibrary.Tests/splitter.config.js",
+    "publish-docs": "node publish.js",
+    "start": "live-server --port=8080 docs/",
+    "test": "jest",
+    "test-watch": "npx nodemon -e fs,fsproj,fsi --watch tests --watch src --exec yarn test",
+    "test-watch-html": "concurrently --kill-others \"yarn watch-html\" \"yarn test-watch\"",
+    "watch-html": "live-server --port=8081 bin/jest_html_reporters.html"
+  },
+  "dependencies": {
+    "react": "^16",
+    "react-dom": "^16"
+  },
+  "devDependencies": {
+    "@babel/core": "^7",
+    "@babel/plugin-transform-modules-commonjs": "^7",
+    "@babel/preset-env": "^7",
+    "@sinonjs/fake-timers": "^6",
+    "@testing-library/jest-dom": "^5",
+    "@testing-library/react": "^11",
+    "@testing-library/user-event": "^12",
+    "concurrently": "^5",
+    "core-js": "^3",
+    "fable-compiler": "^2",
+    "fable-splitter": "^2",
+    "fast-check": "^1",
+    "gh-pages": "^3",
+    "jest": "^26",
+    "jest-html-reporters": "^2",
+    "live-server": "^1",
+    "nodemon": "^2",
+    "npx": "^10",
+    "prettier": "^2"
+  },
+  "private": true,
+  "jest": {
+    "reporters": [
+      "default",
+      [
+        "jest-html-reporters",
+        {
+          "publicPath": "./bin"
+        }
+      ]
+    ],
+    "roots": [
+      "./dist/tests"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+﻿type project
+authors Cody Johnson
+description
+    A more functional construct on-top of Fable.Core.
+language
+    F#
+tags
+    fsharp, fable
+files
+    *.fsproj ==> fable
+    *.fs ==> fable

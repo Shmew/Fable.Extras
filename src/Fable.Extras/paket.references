@@ -1,0 +1,4 @@
+﻿group Fable.Extras
+    Fable.Core
+    Fable.Promise
+    FSharp.Core
