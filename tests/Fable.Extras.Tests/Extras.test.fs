@@ -30,3 +30,15 @@ Jest.describe("Object", fun () ->
         Jest.expect(JS.Object.valueOf(o)).toBe(1)
     )
 )
+
+Jest.describe("Map", fun () ->
+    Jest.test("Can create an empty Map", fun () ->
+        Jest.expect(JS.Map<int,int>()).toBeDefined()
+    )
+
+    Jest.test("Can set properties in a PropertyDescriptor", fun () ->
+        let m = JS.Map<int,int>([1,2;3,4])
+        
+        Jest.expect(JS.Map.get 1 m).toBe(Some 2)
+    )
+)
