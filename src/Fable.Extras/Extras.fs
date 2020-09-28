@@ -423,22 +423,22 @@ module JS =
     type Object =
         /// Copies all enumerable own properties from one or more source 
         /// objects to a target object. It returns the target object.
-        static member assign (target: 'T) (source: 'U) : Object = jsNative
+        static member assign (target: 'T) (source: 'U) : obj = jsNative
 
         /// Copies all enumerable own properties from one or more source 
         /// objects to a target object. It returns the target object.
         [<Emit("Object.assign($0,$1,$2)")>]
-        static member assign2 (target: 'T) (source1: 'U) (source2: 'V) : Object = jsNative
+        static member assign2 (target: 'T) (source1: 'U) (source2: 'V) : obj = jsNative
 
         /// Copies all enumerable own properties from one or more source 
         /// objects to a target object. It returns the target object.
         [<Emit("Object.assign($0,$1,$2,$3)")>]
-        static member assign3 (target: 'T) (source1: 'U) (source2: 'V) (source3: 'W) : Object = jsNative
+        static member assign3 (target: 'T) (source1: 'U) (source2: 'V) (source3: 'W) : obj = jsNative
 
         /// Copies all enumerable own properties from one or more source 
         /// objects to a target object. It returns the target object.
         [<Emit("Object.assign(...[$0,...$1])")>]
-        static member assignMany (target: 'T) (sources: seq<'U>) : Object = jsNative
+        static member assignMany (target: 'T) (sources: seq<'U>) : obj = jsNative
 
         /// Creates a new object, using an existing object as the prototype of the newly created object.
         static member create<'T when 'T : not struct> (o: 'T) : 'T = jsNative
@@ -449,11 +449,11 @@ module JS =
 
         /// Defines new or modifies existing properties directly on an object, returning the object.
         [<Emit("Object.defineProperties($1,Object.fromEntries($0))")>]
-        static member defineProperties<'T when 'T : not struct> (descriptors: seq<string * JS.PropertyDescriptor>) (o: 'T) : Object = jsNative
+        static member defineProperties<'T when 'T : not struct> (descriptors: seq<string * JS.PropertyDescriptor>) (o: 'T) : obj = jsNative
 
         /// Defines new or modifies an existing property directly on an object, returning the object.
         [<Emit("Object.defineProperties($2,$0,$1)")>]
-        static member defineProperty<'T when 'T : not struct> (propertyKey: string) (descriptor: JS.PropertyDescriptor) (o: 'T) : Object = jsNative
+        static member defineProperty<'T when 'T : not struct> (propertyKey: string) (descriptor: JS.PropertyDescriptor) (o: 'T) : obj = jsNative
 
         /// Freezes an object. 
         ///
@@ -516,11 +516,11 @@ module JS =
         static member seal (o: 'T) : 'T = jsNative
 
         /// Sets the prototype (i.e., the internal [[Prototype]] property) of a specified object to another object.
-        static member setPrototypeOf (o: 'T) (proto: 'U) : Object = jsNative
+        static member setPrototypeOf (o: 'T) (proto: 'U) : obj = jsNative
         
         /// Sets the prototype (i.e., the internal [[Prototype]] property) of a specified object to null.
         [<Emit("Object.setPrototypeOf($0, null)")>]
-        static member setPrototypeOfNull (o: 'T) : Object = jsNative
+        static member setPrototypeOfNull (o: 'T) : obj = jsNative
         
         [<Emit("Object.prototype.toLocaleString($0)")>]
         static member toLocaleString (o: 'T) : string = jsNative
@@ -530,17 +530,7 @@ module JS =
 
         /// Returns the primitive value of the specified object.
         [<Emit("Object.prototype.valueOf($0)")>]
-        static member valueOf (o: 'T) : Object = jsNative
-
-        interface JS.Object with
-            member this.hasOwnProperty (v: obj) = Object.hasOwnProperty (unbox v) this
-            member this.hasOwnProperty (v: string) = Object.hasOwnProperty v this
-            member this.isPrototypeOf (v: obj) = Object.isPrototypeOf v this
-            member this.propertyIsEnumerable (v: obj) = Object.propertyIsEnumerable (unbox<string> v) this
-            member this.propertyIsEnumerable (v: string) = Object.propertyIsEnumerable v this
-            member this.toLocaleString () = Object.toLocaleString(this)
-            member this.toString () = Object.toString(this)
-            member this.valueOf () = upcast Object.valueOf(this)
+        static member valueOf (o: 'T) : obj = jsNative
 
     [<Global>]
     type Math =
