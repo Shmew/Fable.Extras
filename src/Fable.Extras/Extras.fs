@@ -472,7 +472,7 @@ module JS =
         static member getOwnPropertyDescriptors (o: 'T) : Map<string,PropertyDescriptor<obj>> = jsNative
 
         /// Returns the prototype (i.e. the value of the internal [[Prototype]] property) of the specified object.
-        static member getPrototypeOf (o: 'T) : Object = jsNative
+        static member getPrototypeOf (o: 'T) : obj = jsNative
         
         /// Indicates whether the object has the specified property 
         /// as its own property (as opposed to inheriting it).
