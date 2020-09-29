@@ -11,10 +11,10 @@ Jest.describe("PropertyDescriptor", fun () ->
     )
 
     Jest.test("Can set properties in a PropertyDescriptor", fun () ->
-        let pd = JS.PropertyDescriptor() |> JS.PropertyDescriptor.Set.value 1
+        let pd = JS.PropertyDescriptor() |> JS.PropertyDescriptor.setValue 1
         
-        Jest.expect(pd.value).toHaveProperty(["value"])
-        Jest.expect(pd.value).toBe(1)
+        Jest.expect(pd.Value).toHaveProperty(["value"])
+        Jest.expect(pd.Value).toBe(1)
     )
 )
 

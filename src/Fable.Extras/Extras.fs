@@ -14,204 +14,228 @@ module JS =
     [<Global>]
     type Map<'K,'V> (?iterable: seq<'K * 'V>) =
         /// The number of elements.
-        member _.size: int = jsNative
+        [<Emit("$0.size")>]
+        member _.Size: int = jsNative
 
         /// Removes all elements.
-        member _.clear () : unit = jsNative
+        [<Emit("$0.clear()")>]
+        member _.Clear () : unit = jsNative
 
         /// Removes the specified element by key.
-        member _.delete (key: 'K) : bool = jsNative
+        [<Emit("$0.delete($1)")>]
+        member _.Delete (key: 'K) : bool = jsNative
 
         /// Returns a sequence of key value pairs in insertion order.
-        member _.entries () : seq<'K * 'V> = jsNative
+        [<Emit("$0.entries()")>]
+        member _.Entries () : seq<'K * 'V> = jsNative
         
         /// Applies the given function once per each key value pair in insertion order.
-        member _.forEach (callbackfn: 'V->'K->Map<'K, 'V>->unit, ?thisArg: obj) : unit = jsNative
+        [<Emit("$0.forEach($1...)")>]
+        member _.ForEach (callbackfn: 'V->'K->Map<'K, 'V>->unit, ?thisArg: obj) : unit = jsNative
 
         /// Returns the value for the specified key.
-        member _.get (key: 'K) : 'V option = jsNative
+        [<Emit("$0.get($1)")>]
+        member _.Get (key: 'K) : 'V option = jsNative
 
         /// Returns a boolean indicating whether an element with the specified key exists or not.
-        member _.has (key: 'K) : bool = jsNative
+        [<Emit("$0.has($1)")>]
+        member _.Has (key: 'K) : bool = jsNative
 
         /// Returns a sequence of keys in insertion order.
-        member _.keys () : seq<'K> = jsNative
+        [<Emit("$0.keys()")>]
+        member _.Keys () : seq<'K> = jsNative
 
         /// Adds or updates an element with the specified key.
         ///
         /// If a value is not provided the value will be removed, but the key will still exist.
-        member _.set (key: 'K, ?value: 'V) : Map<'K, 'V> = jsNative
+        [<Emit("$0.set($1...)")>]
+        member _.Set (key: 'K, ?value: 'V) : Map<'K, 'V> = jsNative
 
         /// Returns a sequence of values in insertion order.
-        member _.values () : seq<'V> = jsNative
+        [<Emit("$0.values()")>]
+        member _.Values () : seq<'V> = jsNative
 
         interface JS.Map<'K,'V> with
-            member this.size = this.size
-            member this.clear () = this.clear()
-            member this.delete k = this.delete k
-            member this.entries () = this.entries()
-            member this.forEach (callback, ?thisArg) = this.forEach(callback, ?thisArg = thisArg)
-            member this.get k = this.get k |> Option.get
-            member this.has k = this.has k
-            member this.keys () = this.keys()
-            member this.set (key, ?value) = upcast this.set(key, ?value = value)
-            member this.values () = this.values()
+            member this.size = this.Size
+            member this.clear () = this.Clear()
+            member this.delete k = this.Delete k
+            member this.entries () = this.Entries()
+            member this.forEach (callback, ?thisArg) = this.ForEach(callback, ?thisArg = thisArg)
+            member this.get k = this.Get k |> Option.get
+            member this.has k = this.Has k
+            member this.keys () = this.Keys()
+            member this.set (key, ?value) = upcast this.Set(key, ?value = value)
+            member this.values () = this.Values()
     
     [<Erase;RequireQualifiedAccess>]
     module Map =
         /// Adds or updates an element with the specified key.
         ///
         /// If a value is not provided the value will be removed, but the key will still exist.
-        let inline set (key: 'K) (value: 'V) (m: Map<'K,'V>) = m.set(key,value)
+        let inline set (key: 'K) (value: 'V) (m: Map<'K,'V>) = m.Set(key,value)
         
         /// Removes all elements.
-        let inline clear (m: Map<'K,'V>) = m.clear()
+        let inline clear (m: Map<'K,'V>) = m.Clear()
         
         /// Removes the specified element by key.
-        let inline delete (key: 'K) (m: Map<'K,'V>) = m.delete(key)
+        let inline delete (key: 'K) (m: Map<'K,'V>) = m.Delete(key)
         
         /// Returns a sequence of key value pairs in insertion order.
-        let inline entries (m: Map<'K,'V>) = m.entries()
+        let inline entries (m: Map<'K,'V>) = m.Entries()
 
         /// Returns the value for the specified key.
-        let inline get (key: 'K) (m: Map<'K,'V>) = m.get(key)
+        let inline get (key: 'K) (m: Map<'K,'V>) = m.Get(key)
 
         /// Returns a boolean indicating whether an element with the specified value exists.
-        let inline has (key: 'K) (m: Map<'K,'V>) = m.has(key)
+        let inline has (key: 'K) (m: Map<'K,'V>) = m.Has(key)
         
         /// Returns a sequence of keys in insertion order.
-        let inline keys (m: Map<'K,'V>) = m.keys()
+        let inline keys (m: Map<'K,'V>) = m.Keys()
         
         /// The number of elements.
-        let inline size (m: Map<'K,'V>) = m.size
+        let inline size (m: Map<'K,'V>) = m.Size
         
         /// Returns a sequence of values in insertion order.
-        let inline values (m: Map<'K,'V>) = m.values()
+        let inline values (m: Map<'K,'V>) = m.Values()
 
     /// Lets you store weakly held objects in a collection.
     [<Global>]
     type WeakMap<'K,'V> (?iterable: seq<'K * 'V>) =
         /// Removes all elements.
-        member _.clear () : unit = jsNative
+        [<Emit("$0.clear()")>]
+        member _.Clear () : unit = jsNative
         
         /// Removes the specified element by key.
-        member _.delete (key: 'K) : bool = jsNative
+        [<Emit("$0.delete($1)")>]
+        member _.Delete (key: 'K) : bool = jsNative
         
         /// Returns the value for the specified key.
-        member _.get (key: 'K) : 'V option = jsNative
+        [<Emit("$0.get($1)")>]
+        member _.Get (key: 'K) : 'V option = jsNative
         
         /// Returns a boolean indicating whether an element with the specified key exists or not.
-        member _.has (key: 'K) : bool = jsNative
+        [<Emit("$0.has($1)")>]
+        member _.Has (key: 'K) : bool = jsNative
         
         /// Adds or updates an element with the specified key.
         ///
         /// If a value is not provided the value will be removed, but the key will still exist.
-        member _.set (key: 'K, ?value: 'V) : WeakMap<'K, 'V> = jsNative
+        [<Emit("$0.set($1...)")>]
+        member _.Set (key: 'K, ?value: 'V) : WeakMap<'K, 'V> = jsNative
     
         interface JS.WeakMap<'K,'V> with
-            member this.clear () = this.clear()
-            member this.delete k = this.delete k
-            member this.get k = this.get k |> Option.get
-            member this.has k = this.has k
-            member this.set (key, ?value) = upcast this.set(key, ?value = value)
+            member this.clear () = this.Clear()
+            member this.delete k = this.Delete k
+            member this.get k = this.Get k |> Option.get
+            member this.has k = this.Has k
+            member this.set (key, ?value) = upcast this.Set(key, ?value = value)
 
     [<Erase;RequireQualifiedAccess>]
     module WeakMap =
         /// Adds or updates an element with the specified key.
         ///
         /// If a value is not provided the value will be removed, but the key will still exist.
-        let inline set (key: 'K) (value: 'V) (wm: WeakMap<'K,'V>) = wm.set(key,value)
+        let inline set (key: 'K) (value: 'V) (wm: WeakMap<'K,'V>) = wm.Set(key,value)
         
         /// Removes all elements.
-        let inline clear (wm: WeakMap<'K,'V>) = wm.clear()
+        let inline clear (wm: WeakMap<'K,'V>) = wm.Clear()
         
         /// Removes the specified element by key.
-        let inline delete (key: 'K) (wm: WeakMap<'K,'V>) = wm.delete(key)
+        let inline delete (key: 'K) (wm: WeakMap<'K,'V>) = wm.Delete(key)
         
         /// Returns the value for the specified key.
-        let inline get (key: 'K) (wm: WeakMap<'K,'V>) = wm.get(key)
+        let inline get (key: 'K) (wm: WeakMap<'K,'V>) = wm.Get(key)
 
         /// Returns a boolean indicating whether an element with the specified value exists.
-        let inline has (key: 'K) (wm: WeakMap<'K,'V>) = wm.has(key)
+        let inline has (key: 'K) (wm: WeakMap<'K,'V>) = wm.Has(key)
 
     /// Lets you store unique values of any type, whether primitive values or object references.
     [<Global>]
     type Set<'T> (?iterable: seq<'T>) =
         /// The number of elements.
-        member _.size: int = jsNative
+        [<Emit("$0.size")>]
+        member _.Size: int = jsNative
 
         //// Appends a new element.
-        member _.add (value: 'T) : Set<'T> = jsNative
+        [<Emit("$0.add($1)")>]
+        member _.Add (value: 'T) : Set<'T> = jsNative
         
         /// Removes all elements.
-        member _.clear () : unit = jsNative
+        [<Emit("$0.clear()")>]
+        member _.Clear () : unit = jsNative
         
         /// Removes the specified element.
-        member _.delete (value: 'T) : bool = jsNative
+        [<Emit("$0.delete($1)")>]
+        member _.Delete (value: 'T) : bool = jsNative
 
         /// Returns a sequence of values in tupled form, use the values 
         /// method to get a sequence of just the value.
-        member _.entries () : seq<'T * 'T> = jsNative
+        [<Emit("$0.entries()")>]
+        member _.Entries () : seq<'T * 'T> = jsNative
         
         /// Applies the given function once per each value.
-        member _.forEach (callbackfn: 'T -> 'T -> Set<'T> -> unit, ?thisArg: obj) : unit = jsNative
+        [<Emit("$0.forEach($1...)")>]
+        member _.ForEach (callbackfn: 'T -> 'T -> Set<'T> -> unit, ?thisArg: obj) : unit = jsNative
 
         /// Returns a boolean indicating whether an element with the specified value exists.
-        member _.has (value: 'T) : bool = jsNative
+        [<Emit("$0.has($1)")>]
+        member _.Has (value: 'T) : bool = jsNative
 
         /// Returns a sequence of values.
         ///
         /// This is an alias for the values method.
-        member _.keys () : seq<'T> = jsNative
+        [<Emit("$0.keys()")>]
+        member _.Keys () : seq<'T> = jsNative
         
         /// Returns a sequence of values.
-        member _.values () : seq<'T> = jsNative
+        [<Emit("$0.values()")>]
+        member _.Values () : seq<'T> = jsNative
     
         interface JS.Set<'T> with
-            member this.size = this.size
-            member this.add value = upcast this.add(value)
-            member this.clear () = this.clear()
-            member this.delete k = this.delete k
-            member this.entries () = this.entries()
-            member this.forEach (callback, ?thisArg) = this.forEach(callback, ?thisArg = thisArg)
-            member this.has k = this.has k
-            member this.keys () = this.keys()
-            member this.values () = this.values()
+            member this.size = this.Size
+            member this.add value = upcast this.Add(value)
+            member this.clear () = this.Clear()
+            member this.delete k = this.Delete k
+            member this.entries () = this.Entries()
+            member this.forEach (callback, ?thisArg) = this.ForEach(callback, ?thisArg = thisArg)
+            member this.has k = this.Has k
+            member this.keys () = this.Keys()
+            member this.values () = this.Values()
 
     [<Erase;RequireQualifiedAccess>]
     module Set =
         /// Appends a new element.
-        let inline add (value: 'T) (s: Set<'T>) = s.add(value)
+        let inline add (value: 'T) (s: Set<'T>) = s.Add(value)
         
         /// Removes all elements.
-        let inline clear (s: Set<'T>) = s.clear()
+        let inline clear (s: Set<'T>) = s.Clear()
         
         /// Removes the specified element.
-        let inline delete (value: 'T) (s: Set<'T>) = s.delete(value)
+        let inline delete (value: 'T) (s: Set<'T>) = s.Delete(value)
         
         /// Returns a sequence of values in tupled form, use the values 
         /// method to get a sequence of just the value.
-        let inline entries (s: Set<'T>) = s.entries()
+        let inline entries (s: Set<'T>) = s.Entries()
         
         /// Applies the given function once per each value.
-        let inline forEach (callbackFn: 'T -> 'T -> Set<'T> -> unit) (s: Set<'T>) = s.forEach(callbackFn)
+        let inline forEach (callbackFn: 'T -> 'T -> Set<'T> -> unit) (s: Set<'T>) = s.ForEach(callbackFn)
         
         /// Applies the given function once per each value.
-        let inline forEachWithThis (callbackFn: 'T -> 'T -> Set<'T> -> unit) (thisArg: obj) (s: Set<'T>) = s.forEach(callbackFn, thisArg = thisArg)
+        let inline forEachWithThis (callbackFn: 'T -> 'T -> Set<'T> -> unit) (thisArg: obj) (s: Set<'T>) = s.ForEach(callbackFn, thisArg = thisArg)
 
         /// Returns a boolean indicating whether an element with the specified value exists.
-        let inline has (value: 'T) (s: Set<'T>) = s.has(value)
+        let inline has (value: 'T) (s: Set<'T>) = s.Has(value)
         
         /// Returns a sequence of values.
         ///
         /// This is an alias for the values method.
-        let inline keys (s: Set<'T>) = s.keys()
+        let inline keys (s: Set<'T>) = s.Keys()
         
         /// The number of elements.
-        let inline size (s: Set<'T>) = s.size
+        let inline size (s: Set<'T>) = s.Size
         
         /// Returns a sequence of values.
-        let inline values (s: Set<'T>) = s.values()
+        let inline values (s: Set<'T>) = s.Values()
         
     /// Stores weakly held objects in a collection.
     [<Global>]
@@ -220,36 +244,40 @@ module JS =
         new (ws: JS.WeakSet<'T>) = WeakSet<'T>()
 
         //// Appends a new element.
-        member _.add (value: 'T) : WeakSet<'T> = jsNative
+        [<Emit("$0.add($1)")>]
+        member _.Add (value: 'T) : WeakSet<'T> = jsNative
         
         /// Removes all elements.
-        member _.clear () : unit = jsNative
+        [<Emit("$0.clear()")>]
+        member _.Clear () : unit = jsNative
         
         /// Removes the specified element.
-        member _.delete (value: 'T) : bool = jsNative
+        [<Emit("$0.delete($1)")>]
+        member _.Delete (value: 'T) : bool = jsNative
         
         /// Returns a boolean indicating whether an element with the specified value exists.
-        member _.has (value: 'T) : bool = jsNative
+        [<Emit("$0.has($1)")>]
+        member _.Has (value: 'T) : bool = jsNative
 
         interface JS.WeakSet<'T> with
-            member this.add value = upcast this.add(value)
-            member this.clear () = this.clear()
-            member this.delete k = this.delete k
-            member this.has k = this.has k
+            member this.add value = upcast this.Add(value)
+            member this.clear () = this.Clear()
+            member this.delete k = this.Delete k
+            member this.has k = this.Has k
     
     [<Erase;RequireQualifiedAccess>]
     module WeakSet =
         /// Appends a new element.
-        let inline add (value: 'T) (ws: WeakSet<'T>) = ws.add(value)
+        let inline add (value: 'T) (ws: WeakSet<'T>) = ws.Add(value)
         
         /// Removes all elements.
-        let inline clear (ws: WeakSet<'T>) = ws.clear()
+        let inline clear (ws: WeakSet<'T>) = ws.Clear()
         
         /// Removes the specified element.
-        let inline delete (value: 'T) (ws: WeakSet<'T>) = ws.delete(value)
+        let inline delete (value: 'T) (ws: WeakSet<'T>) = ws.Delete(value)
         
         /// Returns a boolean indicating whether an element with the specified value exists.
-        let inline has (value: 'T) (ws: WeakSet<'T>) = ws.has(value)
+        let inline has (value: 'T) (ws: WeakSet<'T>) = ws.Has(value)
 
 
     /// Describes the configuration of a specific property on a given object.
@@ -259,17 +287,17 @@ module JS =
         /// if the property may be deleted from the corresponding object.
         ///
         /// Defaults to false.
-        member _.configurable
-            with get () : bool option = jsNative
-            and set (x: bool option) = jsNative
+        member _.Configurable
+            with [<Emit("$0.configurable")>] get () : bool option = jsNative
+            and [<Emit("$0.configurable = $2")>] set (x: bool option) = jsNative
 
         /// True if and only if this property shows up during enumeration 
         /// of the properties on the corresponding object.
         ///
         /// Defaults to false.
-        member _.enumerable
-            with get () : bool option = jsNative
-            and set (x: bool option) = jsNative
+        member _.Enumerable
+            with [<Emit("$0.enumerable")>] get () : bool option = jsNative
+            and [<Emit("$0.enumerable = $2")>] set (x: bool option) = jsNative
 
         /// A function which serves as a getter for the property, or undefined if 
         /// there is no getter. 
@@ -281,9 +309,9 @@ module JS =
         /// The return value will be used as the value of the property.
         ///
         /// Defaults to undefined.
-        member _.get
-            with get () : (unit -> 'T) option = jsNative
-            and set (x: (unit -> 'T) option) = jsNative
+        member _.Get
+            with [<Emit("$0.get")>] get () : (unit -> 'T) option = jsNative
+            and [<Emit("$0.get = $2")>] set (x: (unit -> 'T) option) = jsNative
 
         /// A function which serves as a setter for the property, or undefined if there is no 
         /// setter. 
@@ -293,117 +321,113 @@ module JS =
         /// property is assigned.
         ///
         /// Defaults to undefined.
-        member _.set
-            with get () : ('T -> unit) option = jsNative
-            and set (x: ('T -> unit) option) = jsNative
+        member _.Set
+            with [<Emit("$0.set")>] get () : ('T -> unit) option = jsNative
+            and [<Emit("$0.set = $2")>] set (x: ('T -> unit) option) = jsNative
 
         /// The value associated with the property. Can be any valid JavaScript 
         /// value (number, object, function, etc).
         ///
         /// Defaults to None.
-        member _.value
-            with get () : 'T option  = jsNative
-            and set (x: 'T option) = jsNative
+        member _.Value
+            with [<Emit("$0.value")>] get () : 'T option  = jsNative
+            and [<Emit("$0.value = $2")>] set (x: 'T option) = jsNative
 
         /// True if the value associated with the property may be changed with 
         /// an assignment operator.
         ///
         /// Defaults to false.
-        member _.writable
-            with get () : bool option = jsNative
-            and set (x: bool option) = jsNative
+        member _.Writable
+            with [<Emit("$0.writable")>] get () : bool option = jsNative
+            and [<Emit("$0.writable = $2")>] set (x: bool option) = jsNative
 
         interface JS.PropertyDescriptor with
             member this.configurable
-                with get () = this.configurable
-                and set x = this.configurable <- x
+                with get () = this.Configurable
+                and set x = this.Configurable <- x
             member this.enumerable
-                with get () = this.enumerable
-                and set x = this.enumerable <- x
-            member this.get () = box (this.get)
-            member this.set x = this.set <- (unbox<('T -> unit) option> x)
+                with get () = this.Enumerable
+                and set x = this.Enumerable <- x
+            member this.get () = box (this.Get)
+            member this.set x = this.Set <- (unbox<('T -> unit) option> x)
             member this.value
-                with get () = unbox this.value
-                and set x = this.value <- unbox x
+                with get () = unbox this.Value
+                and set x = this.Value <- unbox x
             member this.writable
-                with get () = this.writable
-                and set x = this.writable <- x
+                with get () = this.Writable
+                and set x = this.Writable <- x
     
     [<Erase;RequireQualifiedAccess>]
     module PropertyDescriptor =
-        [<Erase;RequireQualifiedAccess>]
-        module Get =
-            /// True if the type of this property descriptor may be changed and 
-            /// if the property may be deleted from the corresponding object.
-            ///
-            /// Defaults to false.
-            let inline configurable (pd: PropertyDescriptor<'T>) = pd.configurable
+        /// True if the type of this property descriptor may be changed and 
+        /// if the property may be deleted from the corresponding object.
+        ///
+        /// Defaults to false.
+        let inline configurable (pd: PropertyDescriptor<'T>) = pd.Configurable
 
-            /// Indicates whether the specified property is enumerable 
-            /// and is the object's own property.
-            let inline enumerable (pd: PropertyDescriptor<'T>) = pd.enumerable
+        /// Indicates whether the specified property is enumerable 
+        /// and is the object's own property.
+        let inline enumerable (pd: PropertyDescriptor<'T>) = pd.Enumerable
 
-            /// Indicates whether the object has the specified property 
-            /// as its own property (as opposed to inheriting it).
-            let inline get (pd: PropertyDescriptor<'T>) = pd.get
+        /// Indicates whether the object has the specified property 
+        /// as its own property (as opposed to inheriting it).
+        let inline get (pd: PropertyDescriptor<'T>) = pd.Get
         
-            /// Checks if an object exists in another object's prototype chain.
-            let inline set (pd: PropertyDescriptor<'T>) = pd.set
+        /// Checks if an object exists in another object's prototype chain.
+        let inline set (pd: PropertyDescriptor<'T>) = pd.Set
 
-            /// Indicates whether the specified property is enumerable 
-            /// and is the object's own property.
-            ///
-            /// An integer would be used when testing against an array.
-            let inline value (pd: PropertyDescriptor<'T>) = pd.value
+        /// Indicates whether the specified property is enumerable 
+        /// and is the object's own property.
+        ///
+        /// An integer would be used when testing against an array.
+        let inline value (pd: PropertyDescriptor<'T>) = pd.Value
         
-            /// True if the value associated with the property may be changed with 
-            /// an assignment operator.
-            ///
-            /// Defaults to false.
-            let inline writable (pd: PropertyDescriptor<'T>) = pd.writable
+        /// True if the value associated with the property may be changed with 
+        /// an assignment operator.
+        ///
+        /// Defaults to false.
+        let inline writable (pd: PropertyDescriptor<'T>) = pd.Writable
 
-        [<Erase;RequireQualifiedAccess>]
-        module Set =
-            /// True if the type of this property descriptor may be changed and 
-            /// if the property may be deleted from the corresponding object.
-            ///
-            /// Defaults to false.
-            let inline configurable (b: bool) (pd: PropertyDescriptor<'T>) = 
-                pd.configurable <- Some b
-                pd
+        /// True if the type of this property descriptor may be changed and 
+        /// if the property may be deleted from the corresponding object.
+        ///
+        /// Defaults to false.
+        let inline setConfigurable (b: bool) (pd: PropertyDescriptor<'T>) = 
+            pd.Configurable <- Some b
+            pd
 
-            /// Indicates whether the specified property is enumerable 
-            /// and is the object's own property.
-            let inline enumerable (b: bool) (pd: PropertyDescriptor<'T>) = 
-                pd.enumerable <- Some b
-                pd
+        /// Indicates whether the specified property is enumerable 
+        /// and is the object's own property.
+        let inline setEnumerable (b: bool) (pd: PropertyDescriptor<'T>) = 
+            pd.Enumerable <- Some b
+            pd
 
-            /// Indicates whether the object has the specified property 
-            /// as its own property (as opposed to inheriting it).
-            let inline get (f: unit -> 'T) (pd: PropertyDescriptor<'T>) = 
-                pd.get <- Some f
-                pd
+        /// Indicates whether the object has the specified property 
+        /// as its own property (as opposed to inheriting it).
+        let inline setGet (f: unit -> 'T) (pd: PropertyDescriptor<'T>) = 
+            pd.Get <- Some f
+            pd
 
-            /// Checks if an object exists in another object's prototype chain.
-            let inline set (f: 'T -> unit) (pd: PropertyDescriptor<'T>) = 
-                pd.set <- Some f
-                pd
+        /// Checks if an object exists in another object's prototype chain.
+        let inline setSet (f: 'T -> unit) (pd: PropertyDescriptor<'T>) = 
+            pd.Set <- Some f
+            pd
 
-            /// Indicates whether the specified property is enumerable 
-            /// and is the object's own property.
-            ///
-            /// An integer would be used when testing against an array.
-            let inline value (v: 'T) (pd: PropertyDescriptor<'T>) = 
-                pd.value <- Some v
-                pd
+        /// Indicates whether the specified property is enumerable 
+        /// and is the object's own property.
+        ///
+        /// An integer would be used when testing against an array.
+        let inline setValue (v: 'T) (pd: PropertyDescriptor<'T>) = 
+            pd.Value <- Some v
+            pd
 
-            /// True if the value associated with the property may be changed with 
-            /// an assignment operator.
-            ///
-            /// Defaults to false.
-            let inline writable (b: bool) (pd: PropertyDescriptor<'T>) = 
-                pd.writable <- Some b
-                pd
+        /// True if the value associated with the property may be changed with 
+        /// an assignment operator.
+        ///
+        /// Defaults to false.
+        let inline setWritable (b: bool) (pd: PropertyDescriptor<'T>) = 
+            pd.Writable <- Some b
+            pd
 
     [<Global>]
     type Array =
@@ -772,110 +796,138 @@ module JS =
         new (year: int, month: int, ?date: int, ?hours: int, ?minutes: int, ?seconds: int, ?ms: int ) = 
             Date(box (year, month, date, hours, minutes, seconds, ms))
             
-        member _.getDate () : int = jsNative
+        [<Emit("$0.getDate()")>]
+        member _.GetDate () : int = jsNative
         
-        member _.getDay () : DayOfWeek = jsNative
+        [<Emit("$0.getDay()")>]
+        member _.GetDay () : DayOfWeek = jsNative
 
-        member _.getFullYear () : int = jsNative
+        [<Emit("$0.getFullYear()")>]
+        member _.GetFullYear () : int = jsNative
         
-        member _.getHours () : int = jsNative
+        [<Emit("$0.getHours()")>]
+        member _.GetHours () : int = jsNative
         
-        member _.getMilliseconds () : int = jsNative
+        [<Emit("$0.getMilliseconds()")>]
+        member _.GetMilliseconds () : int = jsNative
 
-        member _.getMinutes () : int = jsNative
+        [<Emit("$0.getMinutes()")>]
+        member _.GetMinutes () : int = jsNative
 
-        member _.getMonth () : int = jsNative
+        [<Emit("$0.getMonth()")>]
+        member _.GetMonth () : int = jsNative
         
-        member _.getSeconds () : int = jsNative
+        [<Emit("$0.getSeconds()")>]
+        member _.GetSeconds () : int = jsNative
 
-        member _.getTime () : int64 = jsNative
+        [<Emit("$0.getTime()")>]
+        member _.GetTime () : int64 = jsNative
         
-        member _.getTimezoneOffset () : int = jsNative
+        [<Emit("$0.getTimezoneOffset()")>]
+        member _.GetTimezoneOffset () : int = jsNative
 
-        member _.getUTCDate () : int = jsNative
+        [<Emit("$0.getUTCDate()")>]
+        member _.GetUTCDate () : int = jsNative
 
-        member _.getUTCDay () : DayOfWeek = jsNative
+        [<Emit("$0.getUTCDay()")>]
+        member _.GetUTCDay () : DayOfWeek = jsNative
 
-        member _.getUTCFullYear () : int = jsNative
+        [<Emit("$0.getUTCFullYear()")>]
+        member _.GetUTCFullYear () : int = jsNative
 
-        member _.getUTCHours () : int = jsNative
+        [<Emit("$0.getUTCHours()")>]
+        member _.GetUTCHours () : int = jsNative
         
-        member _.getUTCMilliseconds () : int = jsNative
+        [<Emit("$0.getUTCMilliseconds()")>]
+        member _.GetUTCMilliseconds () : int = jsNative
 
-        member _.getUTCMinutes () : int = jsNative
+        [<Emit("$0.getUTCMinutes()")>]
+        member _.GetUTCMinutes () : int = jsNative
 
-        member _.getUTCMonth () : int = jsNative
+        [<Emit("$0.getUTCMonth()")>]
+        member _.GetUTCMonth () : int = jsNative
         
-        member _.getUTCSeconds () : int = jsNative
+        [<Emit("$0.getUTCSeconds()")>]
+        member _.GetUTCSeconds () : int = jsNative
         
         [<Emit("new Date($0.setDate($1))")>]
-        member _.setDate (date: int) : Date = jsNative
+        member _.SetDate (date: int) : Date = jsNative
         
         [<Emit("new Date($0.setFullYear($1...))")>]
-        member _.setFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
+        member _.SetFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
         
         [<Emit("new Date($0.setHours($1...))")>]
-        member _.setHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
+        member _.SetHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setMilliseconds($1))")>]
-        member _.setMilliseconds (ms: int) : Date = jsNative
+        member _.SetMilliseconds (ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setMinutes($1...))")>]
-        member _.setMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
+        member _.SetMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setMonth($1...))")>]
-        member _.setMonth (month: int, ?date: int) : Date = jsNative
+        member _.SetMonth (month: int, ?date: int) : Date = jsNative
         
         [<Emit("new Date($0.setSeconds($1...))")>]
-        member _.setSeconds (sec: int, ?ms: int) : Date = jsNative
+        member _.SetSeconds (sec: int, ?ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setTime($1))")>]
-        member _.setTime (time: int) : Date = jsNative
+        member _.SetTime (time: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCDate($1))")>]
-        member _.setUTCDate (date: int) : Date = jsNative
+        member _.SetUTCDate (date: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCFullYear($1...))")>]
-        member _.setUTCFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
+        member _.SetUTCFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCHours($1...))")>]
-        member _.setUTCHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
+        member _.SetUTCHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCMilliseconds($1))")>]
-        member _.setUTCMilliseconds (ms: int) : Date = jsNative
+        member _.SetUTCMilliseconds (ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCMinutes($1...))")>]
-        member _.setUTCMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
+        member _.SetUTCMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCMonth($1...))")>]
-        member _.setUTCMonth (month: int, ?date: int) : Date = jsNative
+        member _.SetUTCMonth (month: int, ?date: int) : Date = jsNative
         
         [<Emit("new Date($0.setUTCSeconds($1...))")>]
-        member _.setUTCSeconds (sec: int, ?ms: int) : Date = jsNative
+        member _.SetUTCSeconds (sec: int, ?ms: int) : Date = jsNative
         
-        member _.toDateString () : string = jsNative
+        [<Emit("$0.toDateString()")>]
+        member _.ToDateString () : string = jsNative
 
-        member _.toJSON () : string = jsNative
+        [<Emit("$0.toJSON()")>]
+        member _.ToJSON () : string = jsNative
 
-        member _.toLocaleDateString () : string = jsNative
+        [<Emit("$0.toLocaleDateString()")>]
+        member _.ToLocaleDateString () : string = jsNative
 
-        member _.toLocaleString () : string = jsNative
+        [<Emit("$0.toLocaleString()")>]
+        member _.ToLocaleString () : string = jsNative
 
-        member _.toLocaleTimeString () : string = jsNative
+        [<Emit("$0.toLocaleTimeString()")>]
+        member _.ToLocaleTimeString () : string = jsNative
 
-        member _.toISOString () : string = jsNative
+        [<Emit("$0.toISOString()")>]
+        member _.ToISOString () : string = jsNative
 
-        member _.toString () : string = jsNative
+        [<Emit("$0.toString()")>]
+        override _.ToString () : string = jsNative
 
-        member _.toTimeString () : string = jsNative
+        [<Emit("$0.toTimeString()")>]
+        member _.ToTimeString () : string = jsNative
 
-        member _.toUTCString () : string = jsNative
+        [<Emit("$0.toUTCString()")>]
+        member _.ToUTCString () : string = jsNative
 
-        member _.valueOf () : int64 = jsNative
+        [<Emit("$0.valueOf()")>]
+        member _.ValueOf () : int64 = jsNative
     
         /// Like Date.now(), but returns a string value of the date.
         [<Emit("Date()")>]
-        static member Invoke () : string = jsNative
+        static member invoke () : string = jsNative
     
         /// Parses a string representation of a date and returns the ticks.
         static member parse (s: string) : int64 = jsNative
@@ -885,6 +937,114 @@ module JS =
     
         /// Returns the current time in ticks.
         static member now () : int64 = jsNative
+
+    [<Erase;RequireQualifiedAccess>]
+    module Date =
+        let inline getDate (d: Date) = d.GetDate()
+        
+        let inline getDay (d: Date) = d.GetDay()
+        
+        let inline getFullYear (d: Date) = d.GetFullYear()
+        
+        let inline getHours (d: Date) = d.GetHours()
+        
+        let inline getMilliseconds (d: Date) = d.GetMilliseconds()
+        
+        let inline getMinutes (d: Date) = d.GetMinutes()
+        
+        let inline getMonth (d: Date) = d.GetMonth()
+        
+        let inline getSeconds (d: Date) = d.GetSeconds()
+        
+        let inline getTime (d: Date) = d.GetTime()
+        
+        let inline getTimezoneOffset (d: Date) = d.GetTimezoneOffset()
+        
+        let inline getUTCDate (d: Date) = d.GetUTCDate()
+        
+        let inline getUTCDay (d: Date) = d.GetUTCDay()
+        
+        let inline getUTCFullYear (d: Date) = d.GetUTCFullYear()
+        
+        let inline getUTCHours (d: Date) = d.GetUTCHours()
+        
+        let inline getUTCMilliseconds (d: Date) = d.GetUTCMilliseconds()
+        
+        let inline getUTCMinutes (d: Date) = d.GetUTCMinutes()
+        
+        let inline getUTCMonth (d: Date) = d.GetUTCMonth()
+        
+        let inline getUTCSeconds (d: Date) = d.GetUTCSeconds()
+        
+        let inline setDate (date: int) (d: Date) = d.SetDate(date)
+        
+        let inline setFullYear (year: int) (d: Date) = d.SetFullYear(year)
+        let inline setFullYearM (year: int) (month: int) (d: Date) = d.SetFullYear(year, month = month)
+        let inline setFullYearD (year: int) (date: int) (d: Date) = d.SetFullYear(year, date = date)
+        let inline setFullYearMD (year: int) (month: int) (date: int) (d: Date) = d.SetFullYear(year, month, date)
+        
+        let inline setHours (hours: int) (d: Date) = d.SetHours(hours)
+        let inline setHoursM (hours: int) (min: int) (d: Date) = d.SetHours(hours, min = min)
+        let inline setHoursMS (hours: int) (min: int) (sec: int) (d: Date) = d.SetHours(hours, min = min, sec = sec)
+        let inline setHoursMSM (hours: int) (min: int) (sec: int) (ms: int) (d: Date) = d.SetHours(hours, min, sec, ms)
+        
+        let inline setMilliseconds (ms: int) (d: Date) = d.SetMilliseconds(ms)
+        
+        let inline setMinutes (min: int) (d: Date) = d.SetMinutes(min)
+        let inline setMinutesS (min: int) (sec: int) (d: Date) = d.SetMinutes(min, sec = sec)
+        let inline setMinutesSM (min: int) (sec: int) (ms: int) (d: Date) = d.SetMinutes(min, sec, ms)
+        
+        let inline setMonth (month: int) (d: Date) = d.SetMonth(month)
+        let inline setMonthD (month: int) (date: int) (d: Date) = d.SetMonth(month, date)
+        
+        let inline setSeconds (sec: int) (d: Date) = d.SetSeconds(sec)
+        let inline setSecondsM (sec: int) (ms: int) (d: Date) = d.SetSeconds(sec, ms)
+        
+        let inline setTime (time: int) (d: Date) = d.SetTime(time)
+        
+        let inline setUTCDate (date: int) (d: Date) = d.SetUTCDate(date)
+        
+        let inline setUTCFullYear (year: int) (d: Date) = d.SetUTCFullYear(year)
+        let inline setUTCFullYearM (year: int) (month: int) (d: Date) = d.SetUTCFullYear(year, month = month)
+        let inline setUTCFullYearD (year: int) (date: int) (d: Date) = d.SetUTCFullYear(year, date = date)
+        let inline setUTCFullYearMD (year: int) (month: int) (date: int) (d: Date) = d.SetUTCFullYear(year, month, date)
+        
+        let inline setUTCHours (hours: int) (d: Date) = d.SetUTCHours(hours)
+        let inline setUTCHoursM (hours: int) (min: int) (d: Date) = d.SetUTCHours(hours, min = min)
+        let inline setUTCHoursMS (hours: int) (min: int) (sec: int) (d: Date) = d.SetUTCHours(hours, min = min, sec = sec)
+        let inline setUTCHoursMSM (hours: int) (min: int) (sec: int) (ms: int) (d: Date) = d.SetUTCHours(hours, min, sec, ms)
+        
+        let inline setUTCMilliseconds (ms: int) (d: Date) = d.SetUTCMilliseconds(ms)
+        
+        let inline setUTCMinutes (min: int) (d: Date) = d.SetUTCMinutes(min)
+        let inline setUTCMinutesS (min: int) (sec: int) (d: Date) = d.SetUTCMinutes(min, sec = sec)
+        let inline setUTCMinutesMS (min: int) (sec: int) (ms: int) (d: Date) = d.SetUTCMinutes(min, sec, ms)
+        
+        let inline setUTCMonth (month: int) (d: Date) = d.SetUTCMonth(month)
+        let inline setUTCMonthD (month: int) (date: int) (d: Date) = d.SetUTCMonth(month, date)
+        
+        let inline setUTCSeconds (sec: int) (d: Date) = d.SetUTCSeconds(sec)
+        let inline setUTCSecondsM (sec: int) (ms: int) (d: Date) = d.SetUTCSeconds(sec, ms)
+        
+        let inline toDateString (d: Date) = d.ToDateString()
+        
+        let inline toJSON (d: Date) = d.ToJSON()
+        
+        let inline toLocaleDateString (d: Date) = d.ToLocaleDateString()
+        
+        let inline toLocaleString (d: Date) = d.ToLocaleString()
+        
+        let inline toLocaleTimeString (d: Date) = d.ToLocaleTimeString()
+        
+        let inline toISOString (d: Date) = d.ToISOString()
+        
+        let inline toString (d: Date) = d.ToString()
+        
+        let inline toTimeString (d: Date) = d.ToTimeString()
+        
+        let inline toUTCString (d: Date) = d.ToUTCString()
+        
+        let inline valueOf (d: Date) = d.ValueOf()
 
     [<Global>]
     type JSON =
@@ -954,37 +1114,39 @@ module JS =
         [<Emit("$0")>]
         new (ab: JS.ArrayBuffer) = ArrayBuffer(0)
 
-        /// The read-only size, in bytes, of the ArrayBuffer. 
-        member _.byteLength: int = jsNative
+        /// The read-only size, in bytes, of the ArrayBuffer.
+        [<Emit("$0.byteLength")>]
+        member _.ByteLength: int = jsNative
         
         /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
         /// inclusive, up to end, exclusive.
-        member _.slice (?begin': int, ?end': int) : ArrayBuffer = jsNative
+        [<Emit("$0.slice($1...)")>]
+        member _.Slice (?begin': int, ?end': int) : ArrayBuffer = jsNative
             
         /// Determines whether the passed value is one of the ArrayBuffer views, 
         /// such as typed array objects or a DataView.
         static member isView (arg: obj) : bool = jsNative
     
         interface JS.ArrayBuffer with
-            member this.byteLength = this.byteLength
-            member this.slice (begin', end') = this.slice(begin', ?end' = end') :> JS.ArrayBuffer
+            member this.byteLength = this.ByteLength
+            member this.slice (begin', end') = this.Slice(begin', ?end' = end') :> JS.ArrayBuffer
 
     [<Erase;RequireQualifiedAccess>]
     module ArrayBuffer =
         /// The read-only size, in bytes, of the ArrayBuffer. 
-        let inline byteLength (ab: ArrayBuffer) = ab.byteLength
+        let inline byteLength (ab: ArrayBuffer) = ab.ByteLength
 
         /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
         /// inclusive, up to end, exclusive.
-        let inline slice (begin': int) (end': int) (ab: ArrayBuffer) = ab.slice(begin', end')
+        let inline slice (begin': int) (end': int) (ab: ArrayBuffer) = ab.Slice(begin', end')
 
         /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
         /// inclusive, up to end, exclusive.
-        let inline sliceBegin (begin': int) (ab: ArrayBuffer) = ab.slice(begin' = begin')
+        let inline sliceBegin (begin': int) (ab: ArrayBuffer) = ab.Slice(begin' = begin')
         
         /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
         /// inclusive, up to end, exclusive.
-        let inline sliceEnd (end': int) (ab: ArrayBuffer) = ab.slice(end' = end')
+        let inline sliceEnd (end': int) (ab: ArrayBuffer) = ab.Slice(end' = end')
 
     /// Provides a low-level interface for reading and writing multiple number types in a binary 
     /// ArrayBuffer, without having to care about the platform's endianness.
@@ -994,102 +1156,136 @@ module JS =
         new (dv: JS.DataView) = DataView(unbox<ArrayBuffer> dv)
 
         /// The ArrayBuffer referenced by a DataView at construction time.
-        member _.buffer: ArrayBuffer = jsNative
+        [<Emit("$0.buffer")>]
+        member _.Buffer: ArrayBuffer = jsNative
 
         /// The read-only size, in bytes, of the ArrayBuffer. 
-        member _.byteLength: int = jsNative
+        [<Emit("$0.byteLength")>]
+        member _.ByteLength: int = jsNative
 
         /// The offset (in bytes) of this view from the start of its ArrayBuffer.
-        member _.byteOffset: int = jsNative
+        [<Emit("$0.byteOffset")>]
+        member _.ByteOffset: int = jsNative
+        
+        [<Emit("$0.getFloat32($1...)")>]
+        member _.GetFloat32 (byteOffset: int, ?littleEndian: bool) : float32 = jsNative
 
-        member _.getFloat32 (byteOffset: int, ?littleEndian: bool) : float32 = jsNative
-        member _.getFloat64 (byteOffset: int, ?littleEndian: bool) : float = jsNative
-        member _.getInt8 (byteOffset: int) : sbyte = jsNative
-        member _.getInt16 (byteOffset: int, ?littleEndian: bool) : int16 = jsNative
-        member _.getInt32 (byteOffset: int, ?littleEndian: bool) : int32 = jsNative
-        member _.getUint8 (byteOffset: int) : byte = jsNative
-        member _.getUint16 (byteOffset: int, ?littleEndian: bool) : uint16 = jsNative
-        member _.getUint32 (byteOffset: int, ?littleEndian: bool) : uint32 = jsNative
-        member _.setFloat32 (byteOffset: int, value: float32, ?littleEndian: bool) : unit = jsNative
-        member _.setFloat64 (byteOffset: int, value: float, ?littleEndian: bool) : unit = jsNative
-        member _.setInt8 (byteOffset: int, value: sbyte) : unit = jsNative
-        member _.setInt16 (byteOffset: int, value: int16, ?littleEndian: bool) : unit = jsNative
-        member _.setInt32 (byteOffset: int, value: int32, ?littleEndian: bool) : unit = jsNative
-        member _.setUint8 (byteOffset: int, value: byte) : unit = jsNative
-        member _.setUint16 (byteOffset: int, value: uint16, ?littleEndian: bool) : unit = jsNative
-        member _.setUint32 (byteOffset: int, value: uint32, ?littleEndian: bool) : unit = jsNative
+        [<Emit("$0.getFloat64($1...)")>]
+        member _.GetFloat64 (byteOffset: int, ?littleEndian: bool) : float = jsNative
+
+        [<Emit("$0.getInt8($1...)")>]
+        member _.GetInt8 (byteOffset: int) : sbyte = jsNative
+
+        [<Emit("$0.getInt16($1...)")>]
+        member _.GetInt16 (byteOffset: int, ?littleEndian: bool) : int16 = jsNative
+
+        [<Emit("$0.getInt32($1...)")>]
+        member _.GetInt32 (byteOffset: int, ?littleEndian: bool) : int32 = jsNative
+
+        [<Emit("$0.getUint8($1...)")>]
+        member _.GetUint8 (byteOffset: int) : byte = jsNative
+
+        [<Emit("$0.getUint16($1...)")>]
+        member _.GetUint16 (byteOffset: int, ?littleEndian: bool) : uint16 = jsNative
+
+        [<Emit("$0.getUint32($1...)")>]
+        member _.GetUint32 (byteOffset: int, ?littleEndian: bool) : uint32 = jsNative
+
+        [<Emit("$0.setFloat32($1...)")>]
+        member _.SetFloat32 (byteOffset: int, value: float32, ?littleEndian: bool) : unit = jsNative
+
+        [<Emit("$0.setFloat64($1...)")>]
+        member _.SetFloat64 (byteOffset: int, value: float, ?littleEndian: bool) : unit = jsNative
+
+        [<Emit("$0.setInt8($1...)")>]
+        member _.SetInt8 (byteOffset: int, value: sbyte) : unit = jsNative
+
+        [<Emit("$0.setInt16($1...)")>]
+        member _.SetInt16 (byteOffset: int, value: int16, ?littleEndian: bool) : unit = jsNative
+
+        [<Emit("$0.setInt32($1...)")>]
+        member _.SetInt32 (byteOffset: int, value: int32, ?littleEndian: bool) : unit = jsNative
+
+        [<Emit("$0.setUint8($1...)")>]
+        member _.SetUint8 (byteOffset: int, value: byte) : unit = jsNative
+
+        [<Emit("$0.setUint16($1...)")>]
+        member _.SetUint16 (byteOffset: int, value: uint16, ?littleEndian: bool) : unit = jsNative
+
+        [<Emit("$0.setUint32($1...)")>]
+        member _.SetUint32 (byteOffset: int, value: uint32, ?littleEndian: bool) : unit = jsNative
 
         interface JS.ArrayBufferView with
-            member this.buffer = upcast this.buffer
-            member this.byteLength = this.byteLength
-            member this.byteOffset = this.byteOffset
+            member this.buffer = upcast this.Buffer
+            member this.byteLength = this.ByteLength
+            member this.byteOffset = this.ByteOffset
 
     [<Erase;RequireQualifiedAccess>]
     module DataView =
         /// The ArrayBuffer referenced by a DataView at construction time.
-        let inline buffer (dv: DataView) = dv.buffer
+        let inline buffer (dv: DataView) = dv.Buffer
 
         /// The read-only size, in bytes, of the ArrayBuffer. 
-        let inline byteLength (dv: DataView) = jsNative
+        let inline byteLength (dv: DataView) = dv.ByteLength
 
         /// The offset (in bytes) of this view from the start of its ArrayBuffer.
-        let inline byteOffset (dv: DataView) = jsNative
+        let inline byteOffset (dv: DataView) = dv.ByteOffset
 
         [<Erase>]
         module LittleEndian =
-            let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.getFloat32(byteOffset, true)
+            let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.GetFloat32(byteOffset, true)
             
-            let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.getFloat64(byteOffset, true)
+            let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.GetFloat64(byteOffset, true)
             
-            let inline getInt16 (byteOffset: int) (dv: DataView) = dv.getInt16(byteOffset, true)
+            let inline getInt16 (byteOffset: int) (dv: DataView) = dv.GetInt16(byteOffset, true)
             
-            let inline getInt32 (byteOffset: int) (dv: DataView) = dv.getInt32(byteOffset, true)
+            let inline getInt32 (byteOffset: int) (dv: DataView) = dv.GetInt32(byteOffset, true)
             
-            let inline getUint16 (byteOffset: int) (dv: DataView) = dv.getUint16(byteOffset, true)
+            let inline getUint16 (byteOffset: int) (dv: DataView) = dv.GetUint16(byteOffset, true)
             
-            let inline getUint32 (byteOffset: int) (dv: DataView) = dv.getUint32(byteOffset, true)
+            let inline getUint32 (byteOffset: int) (dv: DataView) = dv.GetUint32(byteOffset, true)
             
-            let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.setFloat32(byteOffset, value, true)
+            let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.SetFloat32(byteOffset, value, true)
             
-            let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.setFloat64(byteOffset, value, true)
+            let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.SetFloat64(byteOffset, value, true)
             
-            let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.setInt16(byteOffset, value, true)
+            let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.SetInt16(byteOffset, value, true)
             
-            let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.setInt32(byteOffset, value, true)
+            let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.SetInt32(byteOffset, value, true)
             
-            let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.setUint16(byteOffset, value, true)
+            let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.SetUint16(byteOffset, value, true)
             
-            let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.setUint32(byteOffset, value, true)
+            let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.SetUint32(byteOffset, value, true)
 
-        let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.getFloat32(byteOffset)
+        let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.GetFloat32(byteOffset)
 
-        let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.getFloat64(byteOffset)
+        let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.GetFloat64(byteOffset)
         
-        let inline getInt8 (byteOffset: int) (dv: DataView) = dv.getInt8(byteOffset)
+        let inline getInt8 (byteOffset: int) (dv: DataView) = dv.GetInt8(byteOffset)
 
-        let inline getInt16 (byteOffset: int) (dv: DataView) = dv.getInt16(byteOffset)
+        let inline getInt16 (byteOffset: int) (dv: DataView) = dv.GetInt16(byteOffset)
 
-        let inline getInt32 (byteOffset: int) (dv: DataView) = dv.getInt32(byteOffset)
+        let inline getInt32 (byteOffset: int) (dv: DataView) = dv.GetInt32(byteOffset)
 
-        let inline getUint16 (byteOffset: int) (dv: DataView) = dv.getUint16(byteOffset)
+        let inline getUint16 (byteOffset: int) (dv: DataView) = dv.GetUint16(byteOffset)
 
-        let inline getUint32 (byteOffset: int) (dv: DataView) = dv.getUint32(byteOffset)
+        let inline getUint32 (byteOffset: int) (dv: DataView) = dv.GetUint32(byteOffset)
 
-        let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.setFloat32(byteOffset, value)
+        let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.SetFloat32(byteOffset, value)
 
-        let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.setFloat64(byteOffset, value)
+        let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.SetFloat64(byteOffset, value)
         
-        let inline setInt8 (byteOffset: int, value: sbyte) (dv: DataView) = dv.setInt8(byteOffset, value)
+        let inline setInt8 (byteOffset: int, value: sbyte) (dv: DataView) = dv.SetInt8(byteOffset, value)
 
-        let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.setInt16(byteOffset, value)
+        let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.SetInt16(byteOffset, value)
 
-        let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.setInt32(byteOffset, value)
+        let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.SetInt32(byteOffset, value)
         
-        let inline setUint8 (byteOffset: int, value: byte) (dv: DataView) = dv.setUint8(byteOffset, value)
+        let inline setUint8 (byteOffset: int, value: byte) (dv: DataView) = dv.SetUint8(byteOffset, value)
 
-        let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.setUint16(byteOffset, value)
+        let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.SetUint16(byteOffset, value)
 
-        let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.setUint32(byteOffset, value)
+        let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.SetUint32(byteOffset, value)
         
     /// Describes an array-like view of an underlying binary data buffer.
     [<Erase>]
@@ -1100,23 +1296,23 @@ module JS =
 
         /// Returns a sequence that contains the key/value pairs for each index in the array.
         [<Emit("$0.entries()")>]
-        member _.entries () : seq<int * 'T> = jsNative
+        member _.Entries () : seq<int * 'T> = jsNative
 
         /// The ArrayBuffer referenced by a TypedArray at construction time.
         [<Emit("$0.buffer")>]
-        member _.buffer: ArrayBuffer = jsNative
+        member _.Buffer: ArrayBuffer = jsNative
 
         /// The length (in bytes) of a typed array.
         [<Emit("$0.byteLength")>]
-        member _.byteLength: int = jsNative
+        member _.ByteLength: int = jsNative
 
         /// The offset (in bytes) of a typed array from the start of its ArrayBuffer.
         [<Emit("$0.byteOffset")>]
-        member _.byteOffset: int = jsNative
+        member _.ByteOffset: int = jsNative
 
         /// The length (in elements) of a typed array.
         [<Emit("$0.length")>]
-        member _.length: int = jsNative
+        member _.Length: int = jsNative
 
         /// Copies the sequence of array elements within the array to the position 
         /// starting at target. 
@@ -1124,192 +1320,192 @@ module JS =
         /// The copy is taken from the index positions of the second and third arguments 
         /// start and end. The end argument is optional and defaults to the length of the array.
         [<Emit("$0.copyWithin($1...)")>]
-        member _.copyWithin (targetStartIndex: int, start: int, ?end': int) : unit = jsNative
+        member _.CopyWithin (targetStartIndex: int, start: int, ?end': int) : unit = jsNative
 
         /// The keys for each index in the array.
         [<Emit("$0.keys()")>]
-        member _.keys () : seq<int> = jsNative
+        member _.Keys () : seq<int> = jsNative
 
         /// Joins all elements of an array into a string.
         [<Emit("$0.join($1)")>]
-        member _.join (separator: string) : string = jsNative
+        member _.Join (separator: string) : string = jsNative
 
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
         [<Emit("$0.fill($1...)")>]
-        member _.fill (value:'T, ?start': int, ?end': int) : TypedArray<'T> = jsNative
+        member _.Fill (value:'T, ?start': int, ?end': int) : TypedArray<'T> = jsNative
         
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
         [<Emit("$0.filter($1)")>]
-        member _.filter (f: 'T -> bool) : TypedArray<'T> = jsNative
+        member _.Filter (f: 'T -> bool) : TypedArray<'T> = jsNative
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
         [<Emit("$0.filter($1)")>]
-        member _.filter (f: 'T -> int -> bool) : TypedArray<'T> = jsNative
+        member _.Filter (f: 'T -> int -> bool) : TypedArray<'T> = jsNative
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
         [<Emit("$0.filter($1)")>]
-        member _.filter (f: 'T -> int -> TypedArray<'T> -> bool) : TypedArray<'T> = jsNative
+        member _.Filter (f: 'T -> int -> TypedArray<'T> -> bool) : TypedArray<'T> = jsNative
         
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
         [<Emit("$0.find($1)")>]
-        member _.find (f: 'T -> bool) : 'T option = jsNative
+        member _.Find (f: 'T -> bool) : 'T option = jsNative
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
         ///
         /// Provides the element and index.
         [<Emit("$0.find($1)")>]
-        member _.find (f: 'T -> int -> bool) : 'T option = jsNative
+        member _.Find (f: 'T -> int -> bool) : 'T option = jsNative
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
         ///
         /// Provides the element, index, and array.
         [<Emit("$0.find($1)")>]
-        member _.find (f: 'T -> int -> TypedArray<'T> -> bool) : 'T option = jsNative
+        member _.Find (f: 'T -> int -> TypedArray<'T> -> bool) : 'T option = jsNative
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
         [<Emit("$0.findIndex($1)")>]
-        member _.findIndex (f: 'T -> bool) : int = jsNative
+        member _.FindIndex (f: 'T -> bool) : int = jsNative
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
         ///
         /// Provides the element and index.
         [<Emit("$0.findIndex($1)")>]
-        member _.findIndex (f: 'T -> int -> bool) : int = jsNative
+        member _.FindIndex (f: 'T -> int -> bool) : int = jsNative
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
         ///
         /// Provides the element, index, and array.
         [<Emit("$0.findIndex($1)")>]
-        member _.findIndex (f: 'T -> int -> TypedArray<'T> -> bool) : int = jsNative
+        member _.FindIndex (f: 'T -> int -> TypedArray<'T> -> bool) : int = jsNative
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
-        member inline this.tryFindIndex (f: 'T -> bool) = 
-            this.findIndex(f) |> fun i -> if i < 0 then None else Some i
+        member inline this.TryFindIndex (f: 'T -> bool) = 
+            this.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
         ///
         /// Provides the element and index.
-        member inline this.tryFindIndex (f: 'T -> int -> bool) = 
-            this.findIndex(f) |> fun i -> if i < 0 then None else Some i
+        member inline this.TryFindIndex (f: 'T -> int -> bool) = 
+            this.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
         ///
         /// Provides the element, index, and array.
-        member inline this.tryFindIndex (f: 'T -> int -> TypedArray<'T> -> bool) = 
-            this.findIndex(f) |> fun i -> if i < 0 then None else Some i
+        member inline this.TryFindIndex (f: 'T -> int -> TypedArray<'T> -> bool) = 
+            this.FindIndex(f) |> fun i -> if i < 0 then None else Some i
 
         /// Executes a provided function once per array element.
         [<Emit("$0.forEach($1)")>]
-        member _.forEach (f: 'T -> bool) : unit = jsNative
+        member _.ForEach (f: 'T -> bool) : unit = jsNative
         /// Executes a provided function once per array element.
         ///
         /// Provides the element, index, and array.
         [<Emit("$0.forEach($1)")>]
-        member _.forEach (f: 'T -> int -> bool) : unit = jsNative
+        member _.ForEach (f: 'T -> int -> bool) : unit = jsNative
         /// Executes a provided function once per array element.
         ///
         /// Provides the element and index.
         [<Emit("$0.forEach($1)")>]
-        member _.forEach (f: 'T -> int -> TypedArray<'T> -> bool) : unit = jsNative
+        member _.ForEach (f: 'T -> int -> TypedArray<'T> -> bool) : unit = jsNative
 
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
         [<Emit("$0.includes($1...)")>]
-        member _.includes (searchElement:'T, ?fromIndex: int) : bool = jsNative
+        member _.Includes (searchElement:'T, ?fromIndex: int) : bool = jsNative
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
         [<Emit("$0.indexOf($1...)")>]
-        member _.indexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
+        member _.IndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
 
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
         [<Emit("$0.lastIndexOf($1...)")>]
-        member _.lastIndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
+        member _.LastIndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
         
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
         [<Emit("$0.map($1)")>]
-        member _.map (f: 'T -> 'U) : TypedArray<'U> = jsNative
+        member _.Map (f: 'T -> 'U) : TypedArray<'U> = jsNative
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
         [<Emit("$0.map($1)")>]
-        member _.mapWithIndex (f: 'T -> int -> 'U) : TypedArray<'U> = jsNative
+        member _.MapWithIndex (f: 'T -> int -> 'U) : TypedArray<'U> = jsNative
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
         [<Emit("$0.map($1)")>]
-        member _.mapWithIndexArray (f: 'T -> int -> TypedArray<'T> -> 'U) : TypedArray<'U> = jsNative
+        member _.MapWithIndexArray (f: 'T -> int -> TypedArray<'T> -> 'U) : TypedArray<'U> = jsNative
         
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
         [<Emit("$0.reduce($1,$2)")>]
-        member _.reduce (f: 'State -> 'T -> 'State, state: 'State) : 'State = jsNative
+        member _.Reduce (f: 'State -> 'T -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
         [<Emit("$0.reduce($1,$2)")>]
-        member _.reduce (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
+        member _.Reduce (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
         [<Emit("$0.reduce($1,$2)")>]
-        member _.reduce (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
+        member _.Reduce (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
         
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
         [<Emit("$0.reduceRight($1,$2)")>]
-        member _.reduceRight (f: 'State -> 'T -> 'State, state:'State) : 'State = jsNative
+        member _.ReduceRight (f: 'State -> 'T -> 'State, state:'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
         [<Emit("$0.reduceRight($1,$2)")>]
-        member _.reduceRight (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
+        member _.ReduceRight (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
         [<Emit("$0.reduceRight($1,$2)")>]
-        member _.reduceRight (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
+        member _.ReduceRight (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
 
         /// Reverses a typed array in place.
         [<Emit("$0.reverse()")>]
-        member _.reverse () : TypedArray<'T> = jsNative
+        member _.Reverse () : TypedArray<'T> = jsNative
 
         /// Stores multiple values in the typed array, reading input values from a specified array.
         [<Emit("$0.set($1...)")>]
-        member _.set (source: System.Array, ?offset: int) : unit = jsNative
+        member _.Set (source: System.Array, ?offset: int) : unit = jsNative
         /// Stores multiple values in the typed array, reading input values from a specified array.
         [<Emit("$0.set($1...)")>]
-        member _.set (source: #JS.TypedArray, ?offset: int) : unit = jsNative
+        member _.Set (source: #JS.TypedArray, ?offset: int) : unit = jsNative
         
         /// Returns a shallow copy of a portion of a typed array into a new typed array object. 
         [<Emit("$0.slice($1...)")>]
-        member _.slice (?begin': int, ?end': int) : TypedArray<'T> = jsNative
+        member _.Slice (?begin': int, ?end': int) : TypedArray<'T> = jsNative
         
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
         [<Emit("$0.some($1)")>]
-        member _.some (f: 'T -> bool) : bool = jsNative
+        member _.Some (f: 'T -> bool) : bool = jsNative
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
         [<Emit("$0.some($1)")>]
-        member _.some (f: 'T -> int -> bool) : bool = jsNative
+        member _.Some (f: 'T -> int -> bool) : bool = jsNative
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
         [<Emit("$0.some($1)")>]
-        member _.some (f: 'T -> int -> TypedArray<'T> -> bool) : bool = jsNative
+        member _.Some (f: 'T -> int -> TypedArray<'T> -> bool) : bool = jsNative
         
         /// Sorts the elements of a typed array numerically in place and returns the typed array. 
         [<Emit("$0.sort($1...)")>]
-        member _.sort (?sortFunction: 'T -> 'T -> int) : TypedArray<'T> = jsNative
+        member _.Sort (?sortFunction: 'T -> 'T -> int) : TypedArray<'T> = jsNative
         
         /// Returns a new TypedArray on the same ArrayBuffer store and with the same element types 
         /// as for this TypedArray object. 
         /// 
         /// The begin offset is inclusive and the end offset is exclusive.
         [<Emit("$0.subarray($1...)")>]
-        member _.subarray (?begin': int, ?end': int) : TypedArray<'T> = jsNative
+        member _.Subarray (?begin': int, ?end': int) : TypedArray<'T> = jsNative
         
         /// Returns a sequence that contains the values for each index in the array.
         [<Emit("$0.values()")>]
-        member _.values () : seq<'T> = jsNative
+        member _.Values () : seq<'T> = jsNative
 
         // All of the interfaces are erased, so implementation doesn't actually matter
 
@@ -1378,255 +1574,255 @@ module JS =
     [<Erase;RequireQualifiedAccess>]
     module TypedArray =
         /// Returns a sequence that contains the key/value pairs for each index in the array.
-        let inline entries (ta: TypedArray<'T>) = ta.entries()
+        let inline entries (ta: TypedArray<'T>) = ta.Entries()
         
         /// The ArrayBuffer referenced by a TypedArray at construction time.
-        let inline buffer (ta: TypedArray<'T>) = ta.buffer
+        let inline buffer (ta: TypedArray<'T>) = ta.Buffer
         
         /// The length (in bytes) of a typed array.
-        let inline byteLength (ta: TypedArray<'T>) = ta.byteLength
+        let inline byteLength (ta: TypedArray<'T>) = ta.ByteLength
         
         /// The offset (in bytes) of a typed array from the start of its ArrayBuffer.
-        let inline byteOffset (ta: TypedArray<'T>) = ta.byteOffset
+        let inline byteOffset (ta: TypedArray<'T>) = ta.ByteOffset
         
         /// The length (in elements) of a typed array.
-        let inline length (ta: TypedArray<'T>) = ta.length
+        let inline length (ta: TypedArray<'T>) = ta.Length
         
         /// Copies the sequence of array elements within the array to the position 
         /// starting at target. 
         ///
         /// The copy is taken from the index positions of the second argument start.
-        let inline copyWithin (targetStartIndex: int) (start: int) (ta: TypedArray<'T>) = ta.copyWithin(targetStartIndex, start)
+        let inline copyWithin (targetStartIndex: int) (start: int) (ta: TypedArray<'T>) = ta.CopyWithin(targetStartIndex, start)
         
         /// Copies the sequence of array elements within the array to the position 
         /// starting at target. 
         ///
         /// The copy is taken from the index positions of the second and third arguments 
         /// start and end.
-        let inline copyWithinEnd (targetStartIndex: int) (start: int) (end': int) (ta: TypedArray<'T>) = ta.copyWithin(targetStartIndex, start, end')
+        let inline copyWithinEnd (targetStartIndex: int) (start: int) (end': int) (ta: TypedArray<'T>) = ta.CopyWithin(targetStartIndex, start, end')
 
         /// The keys for each index in the array.
-        let inline keys (ta: TypedArray<'T>) = ta.keys
+        let inline keys (ta: TypedArray<'T>) = ta.Keys
         
         /// Joins all elements of an array into a string.
-        let inline join (sep: string) (ta: TypedArray<'T>) = ta.join(sep)
+        let inline join (sep: string) (ta: TypedArray<'T>) = ta.Join(sep)
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fill (value: 'T) (ta: TypedArray<'T>) = ta.fill(value)
+        let inline fill (value: 'T) (ta: TypedArray<'T>) = ta.Fill(value)
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fillStart (value: 'T) (start': int) (ta: TypedArray<'T>) = ta.fill(value, start' = start')
+        let inline fillStart (value: 'T) (start': int) (ta: TypedArray<'T>) = ta.Fill(value, start' = start')
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fillEnd (value: 'T) (end': int) (ta: TypedArray<'T>) = ta.fill(value, end' = end')
+        let inline fillEnd (value: 'T) (end': int) (ta: TypedArray<'T>) = ta.Fill(value, end' = end')
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fillStartEnd (value: 'T) (start': int) (end': int) (ta: TypedArray<'T>) = ta.fill(value, start', end')
+        let inline fillStartEnd (value: 'T) (start': int) (end': int) (ta: TypedArray<'T>) = ta.Fill(value, start', end')
 
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
-        let inline filter (f: 'T -> bool) (ta: TypedArray<'T>) = ta.filter(f)
+        let inline filter (f: 'T -> bool) (ta: TypedArray<'T>) = ta.Filter(f)
 
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
-        let inline filterWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.filter(f)
+        let inline filterWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.Filter(f)
 
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
-        let inline filterWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.filter(f)
+        let inline filterWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.Filter(f)
         
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
-        let inline find (f: 'T -> bool) (ta: TypedArray<'T>) = ta.find(f)
+        let inline find (f: 'T -> bool) (ta: TypedArray<'T>) = ta.Find(f)
 
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
         ///
         /// Provides the element and index.
-        let inline findWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.find(f)
+        let inline findWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.Find(f)
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
         ///
         /// Provides the element, index, and array.
-        let inline findWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.find(f)
+        let inline findWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.Find(f)
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
-        let inline findIndex (f: 'T -> bool) (ta: TypedArray<'T>) = ta.findIndex(f)
+        let inline findIndex (f: 'T -> bool) (ta: TypedArray<'T>) = ta.FindIndex(f)
 
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
         ///
         /// Provides the element and index.
-        let inline findIndexWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.findIndex(f)
+        let inline findIndexWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.FindIndex(f)
 
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
         ///
         /// Provides the element, index, and array.
-        let inline findIndexWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.findIndex(f)
+        let inline findIndexWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.FindIndex(f)
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
         let inline tryFindIndex (f: 'T -> bool) (ta: TypedArray<'T>) = 
-            ta.findIndex(f) |> fun i -> if i < 0 then None else Some i
+            ta.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
         ///
         /// Provides the element and index.
         let inline tryFindIndexWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = 
-            ta.findIndex(f) |> fun i -> if i < 0 then None else Some i
+            ta.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
         ///
         /// Provides the element, index, and array.
         let inline tryFindIndexWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = 
-            ta.findIndex(f) |> fun i -> if i < 0 then None else Some i
+            ta.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         
         /// Executes a provided function once per array element.
-        let inline forEach (f: 'T -> bool) (ta: TypedArray<'T>) = ta.forEach(f)
+        let inline forEach (f: 'T -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Executes a provided function once per array element.
         ///
         /// Provides the element, index, and array.
-        let inline forEachWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.forEach(f)
+        let inline forEachWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Executes a provided function once per array element.
         ///
         /// Provides the element and index.
-        let inline forEachWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.forEach(f)
+        let inline forEachWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
-        let inline includes (searchElement:'T) (ta: TypedArray<'T>) = ta.includes(searchElement)
+        let inline includes (searchElement:'T) (ta: TypedArray<'T>) = ta.Includes(searchElement)
         
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
-        let inline includesFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.includes(searchElement)
+        let inline includesFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.Includes(searchElement)
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
-        let inline indexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.indexOf(searchElement)
+        let inline indexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.IndexOf(searchElement)
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
-        let inline indexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.indexOf(searchElement, fromIndex)
+        let inline indexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.IndexOf(searchElement, fromIndex)
         
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        let inline lastIndexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.lastIndexOf(searchElement)
+        let inline lastIndexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement)
         
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        let inline lastIndexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.lastIndexOf(searchElement, fromIndex)
+        let inline lastIndexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement, fromIndex)
         
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
-        let inline map (f: 'T -> 'U) (ta: TypedArray<'T>) = ta.map(f)
+        let inline map (f: 'T -> 'U) (ta: TypedArray<'T>) = ta.Map(f)
 
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
-        let inline mapWithIndex (f: 'T -> int -> 'U) (ta: TypedArray<'T>) = ta.mapWithIndex(f)
+        let inline mapWithIndex (f: 'T -> int -> 'U) (ta: TypedArray<'T>) = ta.MapWithIndex(f)
 
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
-        let inline mapWithIndexArray (f: 'T -> int -> TypedArray<'T> -> 'U) (ta: TypedArray<'T>) = ta.mapWithIndexArray(f)
+        let inline mapWithIndexArray (f: 'T -> int -> TypedArray<'T> -> 'U) (ta: TypedArray<'T>) = ta.MapWithIndexArray(f)
         
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
-        let inline reduce (f: 'State -> 'T -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.reduce(f, state)
+        let inline reduce (f: 'State -> 'T -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
-        let inline reduceWithIndex (f: 'State -> 'T -> int -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.reduce(f, state)
+        let inline reduceWithIndex (f: 'State -> 'T -> int -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
-        let inline reduceWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.reduce(f, state)
+        let inline reduceWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
         
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
-        let inline reduceRight (f: 'State -> 'T -> 'State) (state:'State) (ta: TypedArray<'T>) = ta.reduceRight(f, state)
+        let inline reduceRight (f: 'State -> 'T -> 'State) (state:'State) (ta: TypedArray<'T>) = ta.ReduceRight(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
-        let inline reduceRightWithIndex (f: 'State -> 'T -> int -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.reduceRight(f, state)
+        let inline reduceRightWithIndex (f: 'State -> 'T -> int -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.ReduceRight(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
-        let inline reduceRightWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.reduceRight(f, state)
+        let inline reduceRightWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.ReduceRight(f, state)
         
         /// Reverses a typed array in place.
-        let inline reverse (ta: TypedArray<'T>) = ta.reverse()
+        let inline reverse (ta: TypedArray<'T>) = ta.Reverse()
         
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setArray (source: System.Array) (ta: TypedArray<'T>) = ta.set(source)
+        let inline setArray (source: System.Array) (ta: TypedArray<'T>) = ta.Set(source)
 
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setArrayOffset (source: System.Array) (offset: int) (ta: TypedArray<'T>) = ta.set(source, offset)
+        let inline setArrayOffset (source: System.Array) (offset: int) (ta: TypedArray<'T>) = ta.Set(source, offset)
 
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setTypedArray (source: #JS.TypedArray) (ta: TypedArray<'T>) = ta.set(source)
+        let inline setTypedArray (source: #JS.TypedArray) (ta: TypedArray<'T>) = ta.Set(source)
         
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setTypedArrayOffset (source: #JS.TypedArray) (offset: int) (ta: TypedArray<'T>)= ta.set(source, offset)
+        let inline setTypedArrayOffset (source: #JS.TypedArray) (offset: int) (ta: TypedArray<'T>)= ta.Set(source, offset)
 
         /// Stores multiple values in the typed array, reading input values from a given sequence.
-        let inline setSeq (source: seq<'T>) (ta: TypedArray<'T>) = ta.set(unbox<System.Array> (ResizeArray source))
+        let inline setSeq (source: seq<'T>) (ta: TypedArray<'T>) = ta.Set(unbox<System.Array> (ResizeArray source))
         
         /// Stores multiple values in the typed array, reading input values from a given sequence.
-        let inline setSeqOffset (source: seq<'T>) (offset: int) (ta: TypedArray<'T>) = ta.set(unbox<System.Array> (ResizeArray source), offset = offset)
+        let inline setSeqOffset (source: seq<'T>) (offset: int) (ta: TypedArray<'T>) = ta.Set(unbox<System.Array> (ResizeArray source), offset = offset)
         
         /// Returns a shallow copy of a portion of a typed array into a new typed array object. 
-        let inline slice (begin': int) (end': int) (ta: TypedArray<'T>) = ta.slice(begin', end')
+        let inline slice (begin': int) (end': int) (ta: TypedArray<'T>) = ta.Slice(begin', end')
 
         /// Returns a shallow copy of a portion of a typed array into a new typed array object. 
-        let inline sliceBegin (begin': int) (ta: TypedArray<'T>) = ta.slice(begin' = begin')
+        let inline sliceBegin (begin': int) (ta: TypedArray<'T>) = ta.Slice(begin' = begin')
         
         /// Returns a shallow copy of a portion of a typed array into a new typed array object. 
-        let inline sliceEnd (end': int) (ta: TypedArray<'T>) = ta.slice(end' = end')
+        let inline sliceEnd (end': int) (ta: TypedArray<'T>) = ta.Slice(end' = end')
         
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
-        let inline some (f: 'T -> bool) (ta: TypedArray<'T>) = ta.some(f)
+        let inline some (f: 'T -> bool) (ta: TypedArray<'T>) = ta.Some(f)
 
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
-        let inline someWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.some(f)
+        let inline someWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.Some(f)
 
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
-        let inline someWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.some(f)
+        let inline someWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.Some(f)
         
         /// Sorts the elements of a typed array numerically in place and returns the typed array. 
-        let inline sort (ta: TypedArray<'T>) = ta.sort()
+        let inline sort (ta: TypedArray<'T>) = ta.Sort()
         
         /// Sorts the elements of a typed array numerically in place and returns the typed array. 
-        let inline sortBy (sortFunction: 'T -> 'T -> int) (ta: TypedArray<'T>) = ta.sort(sortFunction)
+        let inline sortBy (sortFunction: 'T -> 'T -> int) (ta: TypedArray<'T>) = ta.Sort(sortFunction)
 
         /// Returns a new TypedArray on the same ArrayBuffer store and with the same element types 
         /// as for this TypedArray object. 
         /// 
         /// The begin offset is inclusive and the end offset is exclusive.
-        let inline subarray (begin': int) (end': int) (ta: TypedArray<'T>) = ta.subarray(begin', end')
+        let inline subarray (begin': int) (end': int) (ta: TypedArray<'T>) = ta.Subarray(begin', end')
         
         /// Returns a new TypedArray on the same ArrayBuffer store and with the same element types 
         /// as for this TypedArray object. 
         /// 
         /// The begin offset is inclusive and the end offset is exclusive.
-        let inline subarrayBegin (begin': int) (ta: TypedArray<'T>) = ta.subarray(begin' = begin')
+        let inline subarrayBegin (begin': int) (ta: TypedArray<'T>) = ta.Subarray(begin' = begin')
         
         /// Returns a new TypedArray on the same ArrayBuffer store and with the same element types 
         /// as for this TypedArray object. 
         /// 
         /// The begin offset is inclusive and the end offset is exclusive.
-        let inline subarrayEnd (end': int) (ta: TypedArray<'T>) = ta.subarray(end' = end')
+        let inline subarrayEnd (end': int) (ta: TypedArray<'T>) = ta.Subarray(end' = end')
         
         /// Returns a sequence that contains the values for each index in the array.
-        let inline values (ta: TypedArray<'T>) = ta.values()
+        let inline values (ta: TypedArray<'T>) = ta.Values()
 
     [<Erase>]
     type Int8Array private () = 
@@ -2614,7 +2810,7 @@ module JSExtensions =
     
     type JS.TypedArray<'T> with
         /// Stores multiple values in the typed array, reading input values from a given sequence.
-        member inline this.set (source: seq<'T>, ?offset: int) : unit = this.set(unbox<System.Array> (ResizeArray source), ?offset = offset)
+        member inline this.Set (source: seq<'T>, ?offset: int) : unit = this.Set(unbox<System.Array> (ResizeArray source), ?offset = offset)
 
     type Promise.PromiseBuilder with
         member inline this.Bind(a: Async<'T>, f: 'T -> Fable.Core.JS.Promise<'R>) = this.Bind(Async.StartAsPromise a, f)
