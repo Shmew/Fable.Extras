@@ -484,14 +484,14 @@ module JS =
         /// A frozen object can no longer be changed; freezing an object prevents new properties from 
         /// being added to it, existing properties from being removed, prevents changing the enumerability, 
         /// configurability, or writability of existing properties, and prevents the values of existing 
-        /// properties from being changed
+        /// properties from being changed.
         static member freeze<'T when 'T : not struct> (o: 'T) : 'T = jsNative
 
         /// Returns an object describing the configuration of a specific property on a given object 
         /// (that is, one directly present on an object and not in the object's prototype chain).
         static member getOwnPropertyDescriptor<'T> (o: obj) (p: string) : PropertyDescriptor<'T> option = jsNative
 
-        /// Returns all own property descriptors of a given object..
+        /// Returns all own property descriptors of a given object.
         [<Emit("new Map(Object.entries(Object.getOwnPropertyDescriptors($0)))")>]
         static member getOwnPropertyDescriptors (o: 'T) : Map<string,PropertyDescriptor<obj>> = jsNative
 
