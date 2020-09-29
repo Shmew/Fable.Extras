@@ -8,6 +8,24 @@ open System.Text.RegularExpressions
 
 [<Erase;RequireQualifiedAccess>]
 module JS =
+    [<Emit("arguments")>]
+    let arguments : obj [] = jsNative
+
+    [<RequireQualifiedAccess;StringEnum(CaseRules.LowerFirst)>]
+    type Types =
+        | Bigint
+        | Boolean
+        | Function
+        | Null
+        | Number
+        | Object
+        | String
+        | Symbol
+        | Undefined
+
+    [<Emit("typeof $0")>]
+    let typeof (o: obj) : Types = jsNative
+
     /// Holds key-value pairs and remembers the original insertion order of the keys.
     ///
     /// Any value (both objects and primitive values) may be used as either a key or a value.
@@ -479,6 +497,11 @@ module JS =
         [<Emit("Object.defineProperties($2,$0,$1)")>]
         static member defineProperty<'T when 'T : not struct> (propertyKey: string) (descriptor: JS.PropertyDescriptor) (o: 'T) : obj = jsNative
 
+        /// Returns a sequence of key value pairs representing the object's own enumerable properties.
+        ///
+        /// The order is not guaranteed, and should be sorted first if that matters.
+        static member entries (o: 'T) : (string * obj) [] = jsNative
+
         /// Freezes an object. 
         ///
         /// A frozen object can no longer be changed; freezing an object prevents new properties from 
@@ -486,6 +509,9 @@ module JS =
         /// configurability, or writability of existing properties, and prevents the values of existing 
         /// properties from being changed.
         static member freeze<'T when 'T : not struct> (o: 'T) : 'T = jsNative
+
+        /// Transforms a sequence of key-value pairs into an object.
+        static member fromEntries<'T when 'T : not struct> (entries: seq<string * obj>) : 'T = jsNative
 
         /// Returns an object describing the configuration of a specific property on a given object 
         /// (that is, one directly present on an object and not in the object's prototype chain).
@@ -1422,7 +1448,7 @@ module JS =
 
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        [<Emit("$0.lastIndexOf($1...)")>]
+        [<Emit("$0.LastIndexOf($1...)")>]
         member _.LastIndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
         
         /// Creates a new typed array with the results of calling a provided 
@@ -1713,11 +1739,11 @@ module JS =
         
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        let inline lastIndexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement)
+        let inline LastIndexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement)
         
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        let inline lastIndexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement, fromIndex)
+        let inline LastIndexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement, fromIndex)
         
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
@@ -2756,39 +2782,436 @@ module JS =
 
     [<Global>]
     type console =
-        [<Emit("$0.assert($1...)")>]
-        member _.assert' (test: bool, [<ParamArray>] optionalParams: obj []) : unit = jsNative
-        [<Emit("$0.assert($1...)")>]
-        member _.assert' (test: bool, message: string, [<ParamArray>] optionalParams: obj []) : unit = jsNative
-        member _.clear () : unit = jsNative
-        member _.count (?countTitle: string) : unit = jsNative
-        member _.debug ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.dir (value: obj, [<ParamArray>] optionalParams: obj []) : unit = jsNative
-        member _.dirxml (value: obj) : unit = jsNative
-        member _.error ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.group (?groupTitle: string) : unit = jsNative
-        member _.groupCollapsed (?groupTitle: string) : unit = jsNative
-        member _.groupEnd () : unit = jsNative
-        member _.info ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.log ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.profile (?reportName: string) : unit = jsNative
-        member _.profileEnd () : unit = jsNative
-        member _.time (?timerName: string) : unit = jsNative
-        member _.timeEnd (?timerName: string) : unit = jsNative
-        member _.trace ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.warn ([<ParamArray>] items: obj []) : unit = jsNative
-        member _.table (?data: obj) : unit = jsNative
+        /// Writes an error message to the console if the assertion is false. 
+        /// If the assertion is true, nothing happens.
+        [<Emit("console.assert($0...)")>]
+        static member assert' (test: bool, [<ParamArray>] optionalParams: obj []) : unit = jsNative
+        /// Writes an error message to the console if the assertion is false. 
+        /// If the assertion is true, nothing happens.
+        [<Emit("console.assert($0...)")>]
+        static member assert' (test: bool, message: string, [<ParamArray>] optionalParams: obj []) : unit = jsNative
 
-[<Erase>]
-type JS =
-    [<Emit("new RegExp($0...)")>] 
-    static member RegExp (pattern: string, ?flags: string) : Regex = jsNative
+        /// Clears the console if the environment allows it.
+        static member clear () : unit = jsNative
+
+        /// Logs the number of times that this particular call to count() has been called.
+        static member count (?countLabel: string) : unit = jsNative
+
+        /// Resets the counter used with console.count()
+        ///
+        /// If the count label is supplied, countReset() resets the count for that label to 0. 
+        /// If omitted, countReset() resets the default counter to 0.
+        static member countReset (?countLabel: string) : unit = jsNative
+        
+        /// Outputs a message to the web console at the "debug" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display debug output.
+        static member debug ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console at the "debug" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display debug output.
+        static member debug (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+
+        /// Displays an interactive list of the properties of the specified JavaScript object. 
+        ///
+        /// The output is presented as a hierarchical listing with disclosure triangles that let you see 
+        /// the contents of child objects.
+        static member dir (value: obj) : unit = jsNative
+
+        /// Displays an interactive tree of the descendant elements of the specified XML/HTML element. 
+        ///
+        /// If it is not possible to display as an element the JavaScript Object view is shown instead. 
+        /// The output is presented as a hierarchical listing of expandable nodes that let you see the 
+        /// contents of child nodes.
+        static member dirxml (value: obj) : unit = jsNative
+        
+        /// Outputs a message to the web console at the "error" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display error output.
+        static member error ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console at the "error" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display error output.
+        static member error (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+
+        /// Creates a new inline group in the web console log. This indents following console messages by an 
+        /// additional level, until console.groupEnd() is called.
+        static member group (?groupTitle: string) : unit = jsNative
+
+        /// Creates a new inline group in the web console log. Unlike console.group(), however, the new group is 
+        /// created collapsed. The user will need to use the disclosure button next to it to expand it, revealing 
+        /// the entries created in the group.
+        ///
+        /// Call console.groupEnd() to back out to the parent group.
+        static member groupCollapsed (?groupTitle: string) : unit = jsNative
+
+        /// Exits the current inline group in the web console log.
+        static member groupEnd () : unit = jsNative
+        
+        /// Outputs a message to the web console at the "info" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display info output.
+        static member info ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console at the "info" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display info output.
+        static member info (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+
+        /// Outputs a message to the web console log.
+        ///
+        /// Specifically, console.log gives special treatment to DOM elements, whereas console.dir does not. 
+        /// This is often useful when trying to see the full representation of the DOM JS object.
+        static member log ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console log.
+        ///
+        /// Specifically, console.log gives special treatment to DOM elements, whereas console.dir does not. 
+        /// This is often useful when trying to see the full representation of the DOM JS object.
+        static member log (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+
+        /// Starts recording a performance profile (for example, the Firefox performance tool).
+        ///
+        /// You can optionally supply an argument to name the profile and this then enables you to stop only 
+        /// that profile if multiple profiles are being recorded.
+        ///
+        /// To stop recording call Console.profileEnd().
+        /// 
+        /// This is a *Non-standard* API, DO NOT use it in production!
+        static member profile (?reportLabel: string) : unit = jsNative
+        
+        /// The profileEnd method stops recording a profile previously started with Console.profile().
+        ///
+        /// You can optionally supply an argument to name the profile. Doing so enables you to stop only 
+        /// that profile if you have multiple profiles being recorded.
+        ///
+        /// If passed a profile name, and it matches the name of a profile being recorded, then that profile 
+        /// is stopped.
+        ///
+        /// If passed a profile name and it does not match the name of a profile being recorded, no changes 
+        /// will be made.
+        ///
+        /// If is not passed a profile name, the most recently started profile is stopped.
+        /// 
+        /// This is a *Non-standard* API, DO NOT use it in production!
+        static member profileEnd (?reportLabel: string) : unit = jsNative
+        
+        /// takes one mandatory argument data, which must be an array or an object, 
+        /// and one additional optional parameter columns.
+        ///
+        /// It logs data as a table. Each element in the array (or enumerable property 
+        /// if data is an object) will be a row in the table.
+        ///        
+        /// The first column in the table will be labeled (index). If data is an array, 
+        /// then its values will be the array indices. If data is an object, then its 
+        /// values will be the property names.
+        static member table<'T when 'T : not struct> (data: 'T, ?columns: seq<string>) : unit = jsNative
+
+        /// Starts a timer you can use to track how long an operation takes. 
+        ///
+        /// You give each timer a unique name, and may have up to 10,000 timers running on a given page. 
+        /// When you call console.timeEnd() with the same name, the browser will output the time, in 
+        /// milliseconds, that elapsed since the timer was started.
+        static member time (?timerLabel: string) : unit = jsNative
+        
+        /// Stops a timer that was previously started by calling console.time().
+        ///
+        /// If given a name it will stop only that timer and the elapsed time is automatically displayed in 
+        /// the web console along with an indicator that the time has ended.
+        static member timeEnd (?timerLabel: string) : unit = jsNative
+
+        /// Logs the current value of a timer that was previously started by calling console.time() to the 
+        /// web console.
+        static member timeLog (?timerLabel: string) : unit = jsNative
+        
+        /// Adds a single marker to the browser's Performance or Waterfall tool. This lets you correlate a 
+        /// point in your code with the other events recorded in the timeline, such as layout and paint events.
+        ///
+        /// You can optionally supply an argument to label the timestamp, and this label will then be shown 
+        /// alongside the marker.
+        /// 
+        /// This is a *Non-standard* API, DO NOT use it in production!
+        static member timeStamp (?timerLabel: string) : unit = jsNative
+
+        /// Outputs a message to the web console at the "trace" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display trace output.
+        static member trace ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console at the "trace" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display trace output.
+        static member trace (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+        
+        /// Outputs a message to the web console at the "warn" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display warn output.
+        static member warn ([<ParamArray>] items: obj []) : unit = jsNative
+        /// Outputs a message to the web console at the "warn" log level. 
+        ///
+        /// The message is only displayed to the user if the console is configured to display warn output.
+        static member warn (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
+
+    [<Erase>]
+    type RegExpFlag =
+        /// Global match
+        ///
+        /// Find all matches rather than stopping after the first match.
+        member inline this.g = unbox<RegExpFlag>(unbox<string>(this) + "g")
+        
+        /// Ignore case
+        ///
+        /// If u flag is also enabled, usees Unicode case folding.
+        member inline this.i = unbox<RegExpFlag>(unbox<string>(this) + "i")
+
+        /// Multiline
+        ///
+        /// Treat beginning and end characters (^ and $) as working over multiple 
+        /// lines. 
+        ///
+        /// In other words, match the beginning or end of each line (delimited by \n 
+        /// or \r), not only the very beginning or end of the whole input string.
+        member inline this.m = unbox<RegExpFlag>(unbox<string>(this) + "m")
+        
+        /// Dot All
+        ///
+        /// Allows . to match newlines.
+        member inline this.s = unbox<RegExpFlag>(unbox<string>(this) + "s")
+        
+        /// Unicode
+        ///
+        /// Treat pattern as a sequence of Unicode code points.
+        member inline this.u = unbox<RegExpFlag>(unbox<string>(this) + "u")
+        
+        /// Sticky
+        ///
+        /// Matches only from the index indicated by the LastIndex property of this 
+        /// regular expression in the target string. 
+        ///
+        /// Does not attempt to match from any later indexes.
+        member inline this.y = unbox<RegExpFlag>(unbox<string>(this) + "y")
+
+    [<Global>]
+    type RegExpReplacer =
+        member _.match' : string = jsNative
+        member _.captures : string [] = jsNative
+        member _.offset : int = jsNative
+        member _.string : string = jsNative
+        member _.groups : (string * string) [] option = jsNative
+
+    [<Erase>]
+    type RegExp private (pattern: string, ?flags: obj) =
+        [<Emit("new RegExp($0...)")>]
+        new (pattern: string, ?flags: string) = RegExp(pattern, ?flags = flags)
+        [<Emit("new RegExp($0...)")>]
+        new (pattern: string, ?flags: RegExpFlag) = RegExp(pattern, ?flags = flags)
+
+        /// Converts this object to the System.Text.RegularExpressions representation.
+        ///
+        /// No runtime cost.
+        member inline this.AsRegex () = unbox<Regex> this
+
+        /// Indicates whether or not the "s" flag is used with this regular expression.
+        [<Emit("$0.dotAll")>]
+        member _.DotAll : bool = jsNative
+
+        /// Executes a search for a match in a specified string.
+        ///
+        /// Be aware that JS regular expressions are *stateful* when using the global 
+        /// or sticky flags.
+        [<Emit("$0.exec($1)")>]
+        member _.Exec (value: string) : seq<string> option = jsNative
+
+        /// Returns a string consisting of the flags used with this regular expression.
+        [<Emit("$0.flags")>]
+        member _.Flags : string = jsNative
+        
+        /// Indicates whether or not the "g" flag is used with this regular expression.
+        [<Emit("$0.global")>]
+        member _.Global : bool = jsNative
+
+        /// Indicates whether or not the "i" flag is used with this regular expression.
+        [<Emit("$0.ignoreCase")>]
+        member _.IgnoreCase : bool = jsNative
+        
+        /// A mutable integer property that specifies the index at which to start the next match.
+        ///
+        /// This property is set only if the regular expression instance used the g flag to 
+        /// indicate a global search, or the y flag to indicate a sticky search.
+        ///
+        /// If LastIndex is greater than the length of the string, test() and exec() fail, then 
+        /// LastIndex is set to 0.
+        ///
+        /// If LastIndex is equal to or less than the length of the string and if the regular expression 
+        /// matches the empty string, then the regular expression matches input starting from LastIndex.
+        ///
+        /// If LastIndex is equal to the length of the string and if the regular expression does not match 
+        /// the empty string, then the regular expression mismatches input, and LastIndex is reset to 0.
+        ///
+        /// Otherwise, LastIndex is set to the next position following the most recent match.
+        member _.LastIndex
+            with [<Emit("$0.lastIndex")>] get () = 1
+            and [<Emit("$0.lastIndex = $1")>] set (x: int) = ()
+
+        /// Retrieves the matches when matching a string against the regular expression.
+        [<Emit("$1.match($0)")>]
+        member _.Match (value: string) : seq<string> = jsNative
+        
+        /// Retrieves all matches when matching a string against the regular expression.
+        [<Emit("$1.matchAll($0)")>]
+        member _.MatchAll (value: string) : seq<seq<string>> = jsNative
+
+        /// Indicates whether or not the "m" flag is used with this regular expression.
+        [<Emit("$0.multiline")>]
+        member _.Multiline : bool = jsNative
+        
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        [<Emit("$1.replace($0, $2)")>]
+        member _.Replace (source: string, newSubString: string) : string = jsNative
+        
+        [<Emit("$1.replace($0, $2)"); EditorBrowsable(EditorBrowsableState.Never)>]
+        member _.ReplaceFun (source: string, replacer: obj -> string) : string = jsNative
+
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        member inline this.Replace (source: string, replacer: RegExpReplacer -> string) =
+            fun _ ->
+                match arguments.[arguments.Length - 1] with
+                | arg when typeof arg = Types.Object -> 
+                    {| match' = arguments.[0]
+                       captures = arguments.[arguments.Length - 3]
+                       string = arguments.[arguments.Length - 2]
+                       captures = arguments.[1 .. arguments.Length - 4]
+                       groups = Some (unbox<(string * string) []> (Object.entries(arg))) |}
+                | _ ->
+                    {| match' = arguments.[0]
+                       captures = arguments.[arguments.Length - 3]
+                       string = arguments.[arguments.Length - 2]
+                       captures = arguments.[1 .. arguments.Length - 4]
+                       groups = None |}
+                |> unbox<RegExpReplacer>
+                |> replacer
+            |> fun replacer -> this.ReplaceFun(source, replacer)
+        
+        /// Returns the number of matches found in a given string.
+        [<Emit("$1.search($0)")>]
+        member _.Search (source: string) : int = jsNative
+
+        /// Pattern of the regular expression without any forward slashes or flags.
+        [<Emit("$0.source")>]
+        member _.Source : string = jsNative
+        
+        /// Indicates whether or not the "y" flag is used with this regular expression.
+        [<Emit("$0.sticky")>]
+        member _.Sticky : bool = jsNative
+        
+        /// Executes a search for a match in a specified string and returns if it was successful or not.
+        ///
+        /// Be aware that JS regular expressions are *stateful* when using the global 
+        /// or sticky flags.
+        [<Emit("$0.test($1)")>]
+        member _.Test (value: string) : bool = jsNative
+
+        /// Returns a string representing the regular expression.
+        [<Emit("$0.toString()")>]
+        override _.ToString () : string = jsNative
+
+        /// Indicates whether or not the "u" flag is used with this regular expression.
+        [<Emit("$0.unicode")>]
+        member _.Unicode : bool = jsNative
+
+    [<Erase;RequireQualifiedAccess>]
+    module RegExp =
+        /// Creates an empty RegExpFlag
+        [<Emit("''")>]
+        let flag = unbox<RegExpFlag> ""
+
+        /// Converts a JS regular expression to the System.Text.RegularExpressions representation.
+        ///
+        /// No runtime cost.
+        let inline asRegex (re: RegExp) = re.AsRegex
+
+        /// Indicates whether or not the "s" flag is used with a regular expression.
+        let inline dotAll (re: RegExp) = re.DotAll
+
+        /// Executes a search for a match in a specified string.
+        ///
+        /// Be aware that JS regular expressions are *stateful* when using the global 
+        /// or sticky flags.
+        let inline exec (value: string) (re: RegExp) = re.Exec(value)
+
+        /// Returns a string consisting of the flags used with this regular expression.
+        let inline flags (re: RegExp) = re.Flags
+        
+        /// Converts this object to the System.Text.RegularExpressions representation.
+        ///
+        /// No runtime cost.
+        let inline fromRegex (regex: Regex) = unbox<RegExp>(regex)
+
+        /// Indicates whether or not the "g" flag is used with a regular expression.
+        let inline global' (re: RegExp) = re.Global
+
+        /// Indicates whether or not the "i" flag is used with a regular expression.
+        let inline ignoreCase (re: RegExp) = re.IgnoreCase
+
+        /// A mutable integer property that specifies the index at which to start the next match.
+        ///
+        /// This property is set only if the regular expression instance used the g flag to 
+        /// indicate a global search, or the y flag to indicate a sticky search.
+        ///
+        /// If LastIndex is greater than the length of the string, test() and exec() fail, then 
+        /// LastIndex is set to 0.
+        ///
+        /// If LastIndex is equal to or less than the length of the string and if the regular expression 
+        /// matches the empty string, then the regular expression matches input starting from LastIndex.
+        ///
+        /// If LastIndex is equal to the length of the string and if the regular expression does not match 
+        /// the empty string, then the regular expression mismatches input, and LastIndex is reset to 0.
+        ///
+        /// Otherwise, LastIndex is set to the next position following the most recent match.
+        let inline lastIndex (re: RegExp) = re.LastIndex
+
+        let inline setLastIndex (value: int) (re: RegExp) = 
+            re.LastIndex <- value
+            re
+
+        /// Retrieves the matches when matching a string against a regular expression.
+        let inline match' (value: string) (re: RegExp) = re.Match(value)
+
+        /// Retrieves all matches when matching a string against a regular expression.
+        let inline matchAll (value: string) (re: RegExp) = re.MatchAll(value)
+
+        /// Indicates whether or not the "m" flag is used with a regular expression.
+        let inline multiline (re: RegExp) = re.Multiline
+
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        let inline replace (source: string) (newSubString: string) (re: RegExp) = re.Replace(source, newSubString)
+
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        let inline replaceFun (source: string) (replacer: RegExpReplacer -> string) (re: RegExp) = re.Replace(source, replacer)
+
+        /// Returns the number of matches found in a given string.
+        let inline search (source: string) (re: RegExp) = re.Search(source)
+
+        /// Pattern of the regular expression without any forward slashes or flags.
+        let inline source (re: RegExp) = re.Source
+
+        /// Indicates whether or not the "y" flag is used with a regular expression.
+        let inline sticky (re: RegExp) = re.Sticky
+
+        /// Executes a search for a match in a specified string and returns if it was successful or not.
+        ///
+        /// Be aware that JS regular expressions are *stateful* when using the global 
+        /// or sticky flags.
+        let inline test (value: string) (re: RegExp) = re.Test(value)
+
+        /// Returns a string representing the regular expression.
+        let inline toString () (re: RegExp) = re.ToString()
+
+        /// Indicates whether or not the "u" flag is used with a regular expression.
+        let inline unicode (re: RegExp) = re.Unicode
 
 [<AutoOpen;Erase;EditorBrowsable(EditorBrowsableState.Never)>]
 module JSExtensions =
     type JS.Object with
         /// Casts an object to a type.
-        member inline this.as'<'T> () = unbox<'T> this
+        static member inline as'<'T> (o: obj) = unbox<'T> o
 
         /// Returns a list of all properties (including non-enumerable properties except for 
         /// those which use Symbol) found directly in a given object.
@@ -2825,3 +3248,34 @@ module JSExtensions =
         member inline this.Bind (p: Fable.Core.JS.Promise<'T>, f: 'T -> Fable.Core.JS.Promise<'T>) = this.Bind(Async.AwaitPromise p, f >> Async.AwaitPromise)
         
         member inline this.ReturnFrom (p: JS.Promise<unit>) = this.ReturnFrom(Async.AwaitPromise p)
+
+    type System.String with
+        /// Retrieves the matches when matching a string against a regular expression.
+        member inline this.Match (regExp: JS.RegExp) = regExp.Match(this)
+        /// Retrieves the matches when matching a string against a regular expression.
+        member inline this.Match (regex: Regex) = JS.RegExp.fromRegex(regex).Match(this)
+
+        /// Retrieves all matches when matching a string against a regular expression.
+        member inline this.MatchAll (regExp: JS.RegExp) = regExp.MatchAll(this)
+        /// Retrieves all matches when matching a string against a regular expression.
+        member inline this.MatchAll (regex: Regex) = JS.RegExp.fromRegex(regex).MatchAll(this)
+        
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        member inline this.Replace (regExp: JS.RegExp, newSubString: string) = regExp.Replace(this, newSubString)
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        member inline this.Replace (regex: Regex, newSubString: string) = JS.RegExp.fromRegex(regex).Replace(this, newSubString)
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        member inline this.Replace (regExp: JS.RegExp, replacer: JS.RegExpReplacer -> string) = regExp.Replace(this, replacer)
+        /// Returns a new string with some or all matches of a pattern replaced by a replacement.
+        member inline this.Replace (regex: Regex, replacer: JS.RegExpReplacer -> string) = JS.RegExp.fromRegex(regex).Replace(this, replacer)
+        
+        /// Returns the number of matches found in a given string.
+        member inline this.Search (regExp: JS.RegExp) = regExp.Search(this)
+        /// Returns the number of matches found in a given string.
+        member inline this.Search (regex: Regex) = JS.RegExp.fromRegex(regex).Search(this)
+
+        /// Splits a string into substrings based on regular expression matches.
+        [<Emit("$0.split($1)")>]
+        member _.Split (regExp: JS.RegExp) = jsNative
+        /// Splits a string into substrings based on regular expression matches.
+        member inline this.Split (regex: Regex) = this.Split(JS.RegExp.fromRegex regex)
