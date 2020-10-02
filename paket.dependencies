@@ -7,7 +7,9 @@ group Fable.Extras
 	source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core ~> 3
+    nuget Fable.Fetch ~> 2
     nuget Fable.Promise ~> 2
+    nuget Fable.SimpleHttp ~> 3
     nuget FSharp.Core ~> 4.7
 
 group Fable.Extras.Tests

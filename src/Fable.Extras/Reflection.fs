@@ -5,7 +5,7 @@ open Fable.Extras
 open FSharp.Core
 
 [<Erase;RequireQualifiedAccess>]
-module JS =
+module JSe =
     type Proxy<'T> = 'T
 
     [<Erase>]
@@ -40,8 +40,8 @@ module JS =
         ///
         /// The arguments are the target, property name, and property descriptor.
         member _.DefineProperty
-            with [<Emit("$0.defineProperty")>] get () : ('T -> string -> JS.PropertyDescriptor<_> -> bool) option = jsNative
-            and [<Emit("$0.defineProperty = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor<_> -> bool) option) = jsNative
+            with [<Emit("$0.defineProperty")>] get () : ('T -> string -> JS.PropertyDescriptor -> bool) option = jsNative
+            and [<Emit("$0.defineProperty = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor -> bool) option) = jsNative
 
         /// A trap for the delete operator.
         ///
@@ -61,8 +61,8 @@ module JS =
         ///
         /// The arguments are the target and property name.
         member _.GetOwnPropertyDescriptor
-            with [<Emit("$0.getOwnPropertyDescriptor")>] get () : ('T -> string -> JS.PropertyDescriptor<_> option) option = jsNative
-            and [<Emit("$0.getOwnPropertyDescriptor = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor<_> option) option) = jsNative
+            with [<Emit("$0.getOwnPropertyDescriptor")>] get () : ('T -> string -> JS.PropertyDescriptor option) option = jsNative
+            and [<Emit("$0.getOwnPropertyDescriptor = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor option) option) = jsNative
 
         /// A trap for Object.getPrototypeOf.
         ///
@@ -385,7 +385,7 @@ module JS =
         static member getWithReceiver<'T,'U when 'T : not struct> (target: 'T) (propertyName: string) (receiver: obj) : 'U = jsNative
 
         /// Returns a property descriptor of the given property if it exists on the object or None.
-        static member getOwnPropertyDescriptor<'T,'U when 'T : not struct> (target: 'T) (propertyName: string) : JS.PropertyDescriptor<'U> option = jsNative
+        static member getOwnPropertyDescriptor<'T,'U when 'T : not struct> (target: 'T) (propertyName: string) : JSe.PropertyDescriptor<'U> option = jsNative
 
         /// Returns the prototype (i.e. the value of the internal [[Prototype]] property) of the specified object.
         static member getPrototypeOf<'T,'U when 'T : not struct and 'U : not struct> (target: 'T) : 'U = jsNative

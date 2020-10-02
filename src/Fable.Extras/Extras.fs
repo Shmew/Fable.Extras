@@ -7,12 +7,7 @@ open System.ComponentModel
 open System.Text.RegularExpressions
 
 [<Erase;RequireQualifiedAccess>]
-module JS =
-    /// An Array-like object accessible inside functions that contains 
-    /// the values of the arguments passed to that function.
-    [<Emit("arguments")>]
-    let arguments : obj [] = jsNative
-
+module JSe =
     [<RequireQualifiedAccess;StringEnum(CaseRules.LowerFirst)>]
     type Types =
         | Bigint
@@ -25,21 +20,33 @@ module JS =
         | Symbol
         | Undefined
     
-    /// Returns a Types union case indicating the type of the unevaluated operand.
-    [<Emit("typeof $0")>]
-    let typeof (o: obj) : Types = jsNative
+    /// Calls the object's apply prototype and spreads the arguments.
+    [<Emit("$0.apply(...$1)")>]
+    let apply (f: 'T -> 'U) (arguments: obj []) = jsNative
 
-    [<Emit("new $0")>]
-    let new'<'T when 'T : not struct> (o: 'T) : 'T = jsNative
-
-    [<Emit("this")>]
-    let this' : obj = jsNative
+    /// An Array-like object accessible inside functions that contains 
+    /// the values of the arguments passed to that function.
+    [<Emit("arguments")>]
+    let arguments : obj [] = jsNative
+    
+    /// Checks if cross origin isolation has been successful.
+    [<Emit("crossOriginIsolated")>]
+    let crossOriginIsolated : bool = jsNative
+    
+    /// Checks if the session is considered secure.
+    [<Emit("isSecureContext")>]
+    let isSecureContext : bool = jsNative
 
     [<Emit("globalThis")>]
     let globalThis : obj = jsNative
 
-    [<Emit("$0.apply(...$1)")>]
-    let apply (f: 'T -> 'U) (arguments: obj []) = jsNative
+    /// The Javascript || operator to collect the first non-None option
+    [<Emit("$0 || $1")>]
+    let or' (lh: 'T option) (rh: 'T option) : 'T option = jsNative
+    
+    /// Returns a Types union case indicating the type of the unevaluated operand.
+    [<Emit("typeof $0")>]
+    let typeof (o: obj) : Types = jsNative
 
     /// <summary>
     /// Encodes a URI by replacing each instance of certain characters by 
@@ -141,7 +148,6 @@ module JS =
 
     [<Emit("clearTimeout($0)")>]
     let clearTimeout (id: int) : unit = jsNative
-
     
     [<Emit("setInterval($0, $1)")>]
     let setInterval (f: unit -> unit) (timeout: int) : int = jsNative
@@ -3393,7 +3399,7 @@ module JS =
 
 [<AutoOpen;Erase;EditorBrowsable(EditorBrowsableState.Never)>]
 module JSExtensions =
-    type JS.Object with
+    type JSe.Object with
         /// Casts an object to a type.
         static member inline as'<'T> (o: obj) = unbox<'T> o
 
@@ -3404,7 +3410,7 @@ module JSExtensions =
         #else
         static member getOwnPropertyNames (o: obj) = 
         #endif
-            JS.Object.getOwnPropertyNames(o) |> List.ofSeq
+            JSe.Object.getOwnPropertyNames(o) |> List.ofSeq
 
         /// Returns a list of a given object's own enumerable property names, 
         /// iterated in the same order that a normal loop would.
@@ -3413,9 +3419,9 @@ module JSExtensions =
         #else
         static member keys (o: obj) =
         #endif
-            JS.Object.keys(o) |> List.ofSeq
+            JSe.Object.keys(o) |> List.ofSeq
 
-    type JS.Promise<'T> with
+    type JSe.Promise<'T> with
         /// Returns a Promise object that is resolved with a given value. 
         ///
         /// If the value is a promise, that promise is returned; if the value is a thenable (i.e. has a "then" 
@@ -3425,7 +3431,7 @@ module JSExtensions =
         [<Emit("Promise.resolve($0)")>]
         static member resolve (value: 'T) : JS.Promise<'T> = jsNative
     
-    type JS.TypedArray<'T> with
+    type JSe.TypedArray<'T> with
         /// Stores multiple values in the typed array, reading input values from a given sequence.
         member inline this.Set (source: seq<'T>, ?offset: int) : unit = this.Set(unbox<System.Array> (ResizeArray source), ?offset = offset)
 
@@ -3445,31 +3451,31 @@ module JSExtensions =
 
     type System.String with
         /// Retrieves the matches when matching a string against a regular expression.
-        member inline this.Match (regExp: JS.RegExp) = regExp.Match(this)
+        member inline this.Match (regExp: JSe.RegExp) = regExp.Match(this)
         /// Retrieves the matches when matching a string against a regular expression.
-        member inline this.Match (regex: Regex) = JS.RegExp.fromRegex(regex).Match(this)
+        member inline this.Match (regex: Regex) = JSe.RegExp.fromRegex(regex).Match(this)
 
         /// Retrieves all matches when matching a string against a regular expression.
-        member inline this.MatchAll (regExp: JS.RegExp) = regExp.MatchAll(this)
+        member inline this.MatchAll (regExp: JSe.RegExp) = regExp.MatchAll(this)
         /// Retrieves all matches when matching a string against a regular expression.
-        member inline this.MatchAll (regex: Regex) = JS.RegExp.fromRegex(regex).MatchAll(this)
+        member inline this.MatchAll (regex: Regex) = JSe.RegExp.fromRegex(regex).MatchAll(this)
         
         /// Returns a new string with some or all matches of a pattern replaced by a replacement.
-        member inline this.Replace (regExp: JS.RegExp, newSubString: string) = regExp.Replace(this, newSubString)
+        member inline this.Replace (regExp: JSe.RegExp, newSubString: string) = regExp.Replace(this, newSubString)
         /// Returns a new string with some or all matches of a pattern replaced by a replacement.
-        member inline this.Replace (regex: Regex, newSubString: string) = JS.RegExp.fromRegex(regex).Replace(this, newSubString)
+        member inline this.Replace (regex: Regex, newSubString: string) = JSe.RegExp.fromRegex(regex).Replace(this, newSubString)
         /// Returns a new string with some or all matches of a pattern replaced by a replacement.
-        member inline this.Replace (regExp: JS.RegExp, replacer: JS.RegExpReplacer -> string) = regExp.Replace(this, replacer)
+        member inline this.Replace (regExp: JSe.RegExp, replacer: JSe.RegExpReplacer -> string) = regExp.Replace(this, replacer)
         /// Returns a new string with some or all matches of a pattern replaced by a replacement.
-        member inline this.Replace (regex: Regex, replacer: JS.RegExpReplacer -> string) = JS.RegExp.fromRegex(regex).Replace(this, replacer)
+        member inline this.Replace (regex: Regex, replacer: JSe.RegExpReplacer -> string) = JSe.RegExp.fromRegex(regex).Replace(this, replacer)
         
         /// Returns the number of matches found in a given string.
-        member inline this.Search (regExp: JS.RegExp) = regExp.Search(this)
+        member inline this.Search (regExp: JSe.RegExp) = regExp.Search(this)
         /// Returns the number of matches found in a given string.
-        member inline this.Search (regex: Regex) = JS.RegExp.fromRegex(regex).Search(this)
+        member inline this.Search (regex: Regex) = JSe.RegExp.fromRegex(regex).Search(this)
 
         /// Splits a string into substrings based on regular expression matches.
         [<Emit("$0.split($1)")>]
-        member _.Split (regExp: JS.RegExp) : string [] = jsNative
+        member _.Split (regExp: JSe.RegExp) : string [] = jsNative
         /// Splits a string into substrings based on regular expression matches.
-        member inline this.Split (regex: Regex) = this.Split(JS.RegExp.fromRegex regex)
+        member inline this.Split (regex: Regex) = this.Split(JSe.RegExp.fromRegex regex)

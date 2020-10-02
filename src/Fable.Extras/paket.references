@@ -1,4 +1,6 @@
 ﻿group Fable.Extras
     Fable.Core
+    Fable.Fetch
     Fable.Promise
+    Fable.SimpleHttp
     FSharp.Core
