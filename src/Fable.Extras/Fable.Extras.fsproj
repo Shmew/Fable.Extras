@@ -6,6 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extras.fs" />
+    <Compile Include="Reflection.fs" />
+    <Compile Include="WebAssembly.fs" />
     <None Include="paket.references" />
     <None Include="paket.template" />
   </ItemGroup>

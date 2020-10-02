@@ -8,6 +8,8 @@ open System.Text.RegularExpressions
 
 [<Erase;RequireQualifiedAccess>]
 module JS =
+    /// An Array-like object accessible inside functions that contains 
+    /// the values of the arguments passed to that function.
     [<Emit("arguments")>]
     let arguments : obj [] = jsNative
 
@@ -22,15 +24,139 @@ module JS =
         | String
         | Symbol
         | Undefined
-
+    
+    /// Returns a Types union case indicating the type of the unevaluated operand.
     [<Emit("typeof $0")>]
     let typeof (o: obj) : Types = jsNative
+
+    [<Emit("new $0")>]
+    let new'<'T when 'T : not struct> (o: 'T) : 'T = jsNative
+
+    [<Emit("this")>]
+    let this' : obj = jsNative
+
+    [<Emit("globalThis")>]
+    let globalThis : obj = jsNative
+
+    [<Emit("$0.apply(...$1)")>]
+    let apply (f: 'T -> 'U) (arguments: obj []) = jsNative
+
+    /// <summary>
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    ///
+    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
+    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
+    /// however, does encode these characters.
+    /// </summary>
+    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
+    /// exception when encodedURI contains invalid character sequences.</exception>
+    [<Emit("encodeURI($0)")>]
+    let encodeURI (s: string) : string = jsNative
+    
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    let inline tryEncodeURI (s: string) =
+        try encodeURI s |> Ok
+        with e -> Error e
+        
+    /// <summary>
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    ///
+    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
+    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
+    /// however, does encode these characters.
+    /// </summary>
+    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
+    /// exception when encodedURI contains invalid character sequences.</exception>
+    [<Emit("encodeURI($0).replace(/%5B/g, '[').replace(/%5D/g, ']')")>]
+    let encodeURIIPv6 (s: string) : string = jsNative
+    
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    let inline tryEncodeURIIPv6 (s: string) =
+        try encodeURIIPv6 s |> Ok
+        with e -> Error e
+
+    /// <summary>
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    /// </summary>
+    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
+    /// exception when encodedURI contains invalid character sequences.</exception>
+    [<Emit("encodeURIComponent($0)")>]
+    let encodeURIComponent (s: string) : string = jsNative
+    
+    /// Encodes a URI by replacing each instance of certain characters by 
+    /// one, two, three, or four escape sequences representing the UTF-8 
+    /// encoding of the character (will only be four escape sequences for 
+    /// characters composed of two "surrogate" characters).
+    let inline tryEncodeURIComponent (s: string) =
+        try encodeURIComponent s |> Ok
+        with e -> Error e
+
+    /// <summary>
+    /// Decodes a Uniform Resource Identifier (URI) previously created by 
+    /// encodeURI() or by a similar routine.
+    /// </summary>
+    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
+    /// exception when encodedURI contains invalid character sequences.</exception>
+    [<Emit("decodeURI($0)")>]
+    let decodeURI (s: string) : string = jsNative
+    
+    /// Decodes a Uniform Resource Identifier (URI) component previously 
+    /// created by encodeURIComponent or by a similar routine.
+    let inline tryDecodeURI (s: string) =
+        try decodeURI s |> Ok
+        with e -> Error e
+        
+    /// <summary>
+    /// Decodes a Uniform Resource Identifier (URI) component previously 
+    /// created by encodeURIComponent or by a similar routine.
+    /// </summary>
+    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
+    /// exception when encodedURI contains invalid character sequences.</exception>
+    [<Emit("decodeURIComponent($0)")>]
+    let decodeURIComponent (s: string) : string = jsNative
+    
+    /// Decodes a Uniform Resource Identifier (URI) component previously 
+    /// created by encodeURIComponent or by a similar routine.
+    let inline tryDecodeURIComponent (s: string) =
+        try decodeURIComponent s |> Ok
+        with e -> Error e
+
+    [<Emit("setTimeout($0, $1)")>]
+    let setTimeout (f: unit -> unit) (timeout: int) : int = jsNative
+
+    [<Emit("clearTimeout($0)")>]
+    let clearTimeout (id: int) : unit = jsNative
+
+    
+    [<Emit("setInterval($0, $1)")>]
+    let setInterval (f: unit -> unit) (timeout: int) : int = jsNative
+
+    [<Emit("clearTimeout($0)")>]
+    let clearInterval (id: int) : unit = jsNative
 
     /// Holds key-value pairs and remembers the original insertion order of the keys.
     ///
     /// Any value (both objects and primitive values) may be used as either a key or a value.
-    [<Global>]
-    type Map<'K,'V> (?iterable: seq<'K * 'V>) =
+    [<Erase>]
+    type Map<'K,'V> [<Emit("new Map($0...)")>] (?iterable: seq<'K * 'V>) =
+        [<Emit("$0")>]
+        new (m: Map<'K,'V>) = Map()
+
         /// The number of elements.
         [<Emit("$0.size")>]
         member _.Size: int = jsNative
@@ -43,13 +169,15 @@ module JS =
         [<Emit("$0.delete($1)")>]
         member _.Delete (key: 'K) : bool = jsNative
 
-        /// Returns a sequence of key value pairs in insertion order.
-        [<Emit("$0.entries()")>]
-        member _.Entries () : seq<'K * 'V> = jsNative
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.entries()")>]
+        member _.Entries' () : seq<'K * 'V> = jsNative
         
+        /// Returns a sequence of key value pairs in insertion order.
+        member inline this.Entries () = this.Entries'() |> List.ofSeq
+
         /// Applies the given function once per each key value pair in insertion order.
         [<Emit("$0.forEach($1...)")>]
-        member _.ForEach (callbackfn: 'V->'K->Map<'K, 'V>->unit, ?thisArg: obj) : unit = jsNative
+        member _.ForEach (action: 'V -> 'K -> Map<'K, 'V> -> unit, ?thisArg: obj) : unit = jsNative
 
         /// Returns the value for the specified key.
         [<Emit("$0.get($1)")>]
@@ -60,8 +188,11 @@ module JS =
         member _.Has (key: 'K) : bool = jsNative
 
         /// Returns a sequence of keys in insertion order.
-        [<Emit("$0.keys()")>]
-        member _.Keys () : seq<'K> = jsNative
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.keys()")>]
+        member _.Keys' () : seq<'K> = jsNative
+        
+        /// Returns a sequence of keys in insertion order.
+        member inline this.Keys () = this.Keys'() |> List.ofSeq
 
         /// Adds or updates an element with the specified key.
         ///
@@ -70,28 +201,29 @@ module JS =
         member _.Set (key: 'K, ?value: 'V) : Map<'K, 'V> = jsNative
 
         /// Returns a sequence of values in insertion order.
-        [<Emit("$0.values()")>]
-        member _.Values () : seq<'V> = jsNative
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.values()")>]
+        member _.Values' () : seq<'V> = jsNative
+        
+        /// Returns a sequence of values in insertion order.
+        member inline this.Values () = this.Values'() |> List.ofSeq
 
         interface JS.Map<'K,'V> with
             member this.size = this.Size
             member this.clear () = this.Clear()
             member this.delete k = this.Delete k
-            member this.entries () = this.Entries()
+            member this.entries () = unbox (this.Entries())
             member this.forEach (callback, ?thisArg) = this.ForEach(callback, ?thisArg = thisArg)
             member this.get k = this.Get k |> Option.get
             member this.has k = this.Has k
-            member this.keys () = this.Keys()
+            member this.keys () = unbox (this.Keys())
             member this.set (key, ?value) = upcast this.Set(key, ?value = value)
-            member this.values () = this.Values()
+            member this.values () = unbox (this.Values())
     
+    /// Holds key-value pairs and remembers the original insertion order of the keys.
+    ///
+    /// Any value (both objects and primitive values) may be used as either a key or a value.
     [<Erase;RequireQualifiedAccess>]
     module Map =
-        /// Adds or updates an element with the specified key.
-        ///
-        /// If a value is not provided the value will be removed, but the key will still exist.
-        let inline set (key: 'K) (value: 'V) (m: Map<'K,'V>) = m.Set(key,value)
-        
         /// Removes all elements.
         let inline clear (m: Map<'K,'V>) = m.Clear()
         
@@ -100,7 +232,13 @@ module JS =
         
         /// Returns a sequence of key value pairs in insertion order.
         let inline entries (m: Map<'K,'V>) = m.Entries()
+        
+        /// Applies the given function once per each key value pair in insertion order.
+        let inline forEach (action: 'V -> 'K -> Map<'K, 'V> -> unit) (m: Map<'K,'V>) = m.ForEach(action)
 
+        /// Applies the given function once per each key value pair in insertion order.
+        let inline forEachThis (action: 'V -> 'K -> Map<'K, 'V> -> unit) (thisArg: obj) (m: Map<'K,'V>) = m.ForEach(action, thisArg)
+        
         /// Returns the value for the specified key.
         let inline get (key: 'K) (m: Map<'K,'V>) = m.Get(key)
 
@@ -110,6 +248,11 @@ module JS =
         /// Returns a sequence of keys in insertion order.
         let inline keys (m: Map<'K,'V>) = m.Keys()
         
+        /// Adds or updates an element with the specified key.
+        ///
+        /// If a value is not provided the value will be removed, but the key will still exist.
+        let inline set (key: 'K) (value: 'V) (m: Map<'K,'V>) = m.Set(key,value)
+
         /// The number of elements.
         let inline size (m: Map<'K,'V>) = m.Size
         
@@ -118,11 +261,10 @@ module JS =
 
     /// Lets you store weakly held objects in a collection.
     [<Global>]
-    type WeakMap<'K,'V> (?iterable: seq<'K * 'V>) =
-        /// Removes all elements.
-        [<Emit("$0.clear()")>]
-        member _.Clear () : unit = jsNative
-        
+    type WeakMap<'K,'V when 'K : not struct> (?iterable: seq<'K * 'V>) =
+        [<Emit("$0")>]
+        new (wm: JS.WeakMap<'K,'V>) = WeakMap()
+
         /// Removes the specified element by key.
         [<Emit("$0.delete($1)")>]
         member _.Delete (key: 'K) : bool = jsNative
@@ -142,22 +284,15 @@ module JS =
         member _.Set (key: 'K, ?value: 'V) : WeakMap<'K, 'V> = jsNative
     
         interface JS.WeakMap<'K,'V> with
-            member this.clear () = this.Clear()
+            member _.clear () = ()
             member this.delete k = this.Delete k
             member this.get k = this.Get k |> Option.get
             member this.has k = this.Has k
             member this.set (key, ?value) = upcast this.Set(key, ?value = value)
-
+    
+    /// Lets you store weakly held objects in a collection.
     [<Erase;RequireQualifiedAccess>]
     module WeakMap =
-        /// Adds or updates an element with the specified key.
-        ///
-        /// If a value is not provided the value will be removed, but the key will still exist.
-        let inline set (key: 'K) (value: 'V) (wm: WeakMap<'K,'V>) = wm.Set(key,value)
-        
-        /// Removes all elements.
-        let inline clear (wm: WeakMap<'K,'V>) = wm.Clear()
-        
         /// Removes the specified element by key.
         let inline delete (key: 'K) (wm: WeakMap<'K,'V>) = wm.Delete(key)
         
@@ -166,10 +301,18 @@ module JS =
 
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (key: 'K) (wm: WeakMap<'K,'V>) = wm.Has(key)
+        
+        /// Adds or updates an element with the specified key.
+        ///
+        /// If a value is not provided the value will be removed, but the key will still exist.
+        let inline set (key: 'K) (value: 'V) (wm: WeakMap<'K,'V>) = wm.Set(key,value)
 
     /// Lets you store unique values of any type, whether primitive values or object references.
-    [<Global>]
-    type Set<'T> (?iterable: seq<'T>) =
+    [<Erase>]
+    type Set<'T> [<Emit("new Set($0...)")>] (?iterable: seq<'T>) =
+        [<Emit("$0")>]
+        new (set: JS.Set<'T>) = Set()
+
         /// The number of elements.
         [<Emit("$0.size")>]
         member _.Size: int = jsNative
@@ -186,40 +329,47 @@ module JS =
         [<Emit("$0.delete($1)")>]
         member _.Delete (value: 'T) : bool = jsNative
 
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.entries()")>]
+        member _.Entries' () : seq<'T * 'T> = jsNative
+        
         /// Returns a sequence of values in tupled form, use the values 
         /// method to get a sequence of just the value.
-        [<Emit("$0.entries()")>]
-        member _.Entries () : seq<'T * 'T> = jsNative
-        
+        member inline this.Entries () = this.Entries'() |> List.ofSeq
+
         /// Applies the given function once per each value.
         [<Emit("$0.forEach($1...)")>]
-        member _.ForEach (callbackfn: 'T -> 'T -> Set<'T> -> unit, ?thisArg: obj) : unit = jsNative
+        member _.ForEach (action: 'T -> 'T -> Set<'T> -> unit, ?thisArg: obj) : unit = jsNative
 
         /// Returns a boolean indicating whether an element with the specified value exists.
         [<Emit("$0.has($1)")>]
         member _.Has (value: 'T) : bool = jsNative
 
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.keys()")>]
+        member _.Keys' () : seq<'T> = jsNative
+        
         /// Returns a sequence of values.
         ///
         /// This is an alias for the values method.
-        [<Emit("$0.keys()")>]
-        member _.Keys () : seq<'T> = jsNative
-        
+        member inline this.Keys () = this.Keys'() |> List.ofSeq
+
+        [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.values()")>]
+        member _.Values' () : seq<'T> = jsNative
+
         /// Returns a sequence of values.
-        [<Emit("$0.values()")>]
-        member _.Values () : seq<'T> = jsNative
+        member inline this.Values () = this.Values'() |> List.ofSeq
     
         interface JS.Set<'T> with
             member this.size = this.Size
             member this.add value = upcast this.Add(value)
             member this.clear () = this.Clear()
             member this.delete k = this.Delete k
-            member this.entries () = this.Entries()
+            member this.entries () = unbox (this.Entries())
             member this.forEach (callback, ?thisArg) = this.ForEach(callback, ?thisArg = thisArg)
             member this.has k = this.Has k
-            member this.keys () = this.Keys()
-            member this.values () = this.Values()
-
+            member this.keys () = unbox (this.Keys())
+            member this.values () = unbox (this.Values())
+    
+    /// Lets you store unique values of any type, whether primitive values or object references.
     [<Erase;RequireQualifiedAccess>]
     module Set =
         /// Appends a new element.
@@ -236,10 +386,10 @@ module JS =
         let inline entries (s: Set<'T>) = s.Entries()
         
         /// Applies the given function once per each value.
-        let inline forEach (callbackFn: 'T -> 'T -> Set<'T> -> unit) (s: Set<'T>) = s.ForEach(callbackFn)
+        let inline forEach (action: 'T -> 'T -> Set<'T> -> unit) (s: Set<'T>) = s.ForEach(action)
         
         /// Applies the given function once per each value.
-        let inline forEachWithThis (callbackFn: 'T -> 'T -> Set<'T> -> unit) (thisArg: obj) (s: Set<'T>) = s.ForEach(callbackFn, thisArg = thisArg)
+        let inline forEachThis (action: 'T -> 'T -> Set<'T> -> unit) (thisArg: obj) (s: Set<'T>) = s.ForEach(action, thisArg = thisArg)
 
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (value: 'T) (s: Set<'T>) = s.Has(value)
@@ -265,10 +415,6 @@ module JS =
         [<Emit("$0.add($1)")>]
         member _.Add (value: 'T) : WeakSet<'T> = jsNative
         
-        /// Removes all elements.
-        [<Emit("$0.clear()")>]
-        member _.Clear () : unit = jsNative
-        
         /// Removes the specified element.
         [<Emit("$0.delete($1)")>]
         member _.Delete (value: 'T) : bool = jsNative
@@ -279,35 +425,35 @@ module JS =
 
         interface JS.WeakSet<'T> with
             member this.add value = upcast this.Add(value)
-            member this.clear () = this.Clear()
+            member _.clear () = ()
             member this.delete k = this.Delete k
             member this.has k = this.Has k
     
+    /// Stores weakly held objects in a collection.
     [<Erase;RequireQualifiedAccess>]
     module WeakSet =
         /// Appends a new element.
         let inline add (value: 'T) (ws: WeakSet<'T>) = ws.Add(value)
-        
-        /// Removes all elements.
-        let inline clear (ws: WeakSet<'T>) = ws.Clear()
-        
+                
         /// Removes the specified element.
         let inline delete (value: 'T) (ws: WeakSet<'T>) = ws.Delete(value)
         
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (value: 'T) (ws: WeakSet<'T>) = ws.Has(value)
 
-
     /// Describes the configuration of a specific property on a given object.
     [<Global>]
-    type PropertyDescriptor<'T> [<Emit("{}")>] () =
+    type PropertyDescriptor<'T> [<Emit("Object.create(null)")>] () =
+        [<Emit("$0")>]
+        new (pd: JS.PropertyDescriptor) = PropertyDescriptor<'T>()
+
         /// True if the type of this property descriptor may be changed and 
         /// if the property may be deleted from the corresponding object.
         ///
         /// Defaults to false.
         member _.Configurable
             with [<Emit("$0.configurable")>] get () : bool option = jsNative
-            and [<Emit("$0.configurable = $2")>] set (x: bool option) = jsNative
+            and [<Emit("$0.configurable = $1")>] set (x: bool option) = jsNative
 
         /// True if and only if this property shows up during enumeration 
         /// of the properties on the corresponding object.
@@ -315,7 +461,7 @@ module JS =
         /// Defaults to false.
         member _.Enumerable
             with [<Emit("$0.enumerable")>] get () : bool option = jsNative
-            and [<Emit("$0.enumerable = $2")>] set (x: bool option) = jsNative
+            and [<Emit("$0.enumerable = $1")>] set (x: bool option) = jsNative
 
         /// A function which serves as a getter for the property, or undefined if 
         /// there is no getter. 
@@ -329,7 +475,7 @@ module JS =
         /// Defaults to undefined.
         member _.Get
             with [<Emit("$0.get")>] get () : (unit -> 'T) option = jsNative
-            and [<Emit("$0.get = $2")>] set (x: (unit -> 'T) option) = jsNative
+            and [<Emit("$0.get = $1")>] set (x: (unit -> 'T) option) = jsNative
 
         /// A function which serves as a setter for the property, or undefined if there is no 
         /// setter. 
@@ -341,7 +487,7 @@ module JS =
         /// Defaults to undefined.
         member _.Set
             with [<Emit("$0.set")>] get () : ('T -> unit) option = jsNative
-            and [<Emit("$0.set = $2")>] set (x: ('T -> unit) option) = jsNative
+            and [<Emit("$0.set = $1")>] set (x: ('T -> unit) option) = jsNative
 
         /// The value associated with the property. Can be any valid JavaScript 
         /// value (number, object, function, etc).
@@ -349,7 +495,7 @@ module JS =
         /// Defaults to None.
         member _.Value
             with [<Emit("$0.value")>] get () : 'T option  = jsNative
-            and [<Emit("$0.value = $2")>] set (x: 'T option) = jsNative
+            and [<Emit("$0.value = $1")>] set (x: 'T option) = jsNative
 
         /// True if the value associated with the property may be changed with 
         /// an assignment operator.
@@ -357,7 +503,7 @@ module JS =
         /// Defaults to false.
         member _.Writable
             with [<Emit("$0.writable")>] get () : bool option = jsNative
-            and [<Emit("$0.writable = $2")>] set (x: bool option) = jsNative
+            and [<Emit("$0.writable = $1")>] set (x: bool option) = jsNative
 
         interface JS.PropertyDescriptor with
             member this.configurable
@@ -375,6 +521,7 @@ module JS =
                 with get () = this.Writable
                 and set x = this.Writable <- x
     
+    /// Describes the configuration of a specific property on a given object.
     [<Erase;RequireQualifiedAccess>]
     module PropertyDescriptor =
         /// True if the type of this property descriptor may be changed and 
@@ -482,20 +629,26 @@ module JS =
         [<Emit("Object.assign(...[$0,...$1])")>]
         static member assignMany (target: 'T) (sources: seq<'U>) : obj = jsNative
 
-        /// Creates a new object, using an existing object as the prototype of the newly created object.
+        /// Creates a new object using an existing object as the prototype of the newly created object.
+        ///
+        /// Using an option type will throw errors at runtime if the passed value is ever None.
         static member create<'T when 'T : not struct> (o: 'T) : 'T = jsNative
+
+        /// Creates a new empty object.
+        [<Emit("Object.create(null)")>]
+        static member createEmpty<'T when 'T : not struct> () : 'T = jsNative
         
         /// Creates a new object, using an existing object as the prototype of the newly created object.
         [<Emit("Object.create($1,Object.fromEntries($0))")>]
-        static member createWithDescriptors<'T when 'T : not struct> (descriptors: seq<string * JS.PropertyDescriptor>) (o: 'T) : 'T = jsNative
+        static member createWithDescriptors<'T, 'U when 'T : not struct and 'U :> JS.PropertyDescriptor> (descriptors: seq<string * 'U>) (o: 'T) : 'T = jsNative
 
         /// Defines new or modifies existing properties directly on an object, returning the object.
         [<Emit("Object.defineProperties($1,Object.fromEntries($0))")>]
-        static member defineProperties<'T when 'T : not struct> (descriptors: seq<string * JS.PropertyDescriptor>) (o: 'T) : obj = jsNative
+        static member defineProperties<'T, 'U when 'T : not struct and 'U :> JS.PropertyDescriptor> (descriptors: seq<string * 'U>) (o: 'T) : obj = jsNative
 
         /// Defines new or modifies an existing property directly on an object, returning the object.
         [<Emit("Object.defineProperties($2,$0,$1)")>]
-        static member defineProperty<'T when 'T : not struct> (propertyKey: string) (descriptor: JS.PropertyDescriptor) (o: 'T) : obj = jsNative
+        static member defineProperty<'T, 'U when 'T : not struct and 'U :> JS.PropertyDescriptor> (propertyKey: string) (descriptor: 'U) (o: 'T) : obj = jsNative
 
         /// Returns a sequence of key value pairs representing the object's own enumerable properties.
         ///
@@ -522,11 +675,11 @@ module JS =
         static member getOwnPropertyDescriptors (o: 'T) : Map<string,PropertyDescriptor<obj>> = jsNative
 
         /// Returns the prototype (i.e. the value of the internal [[Prototype]] property) of the specified object.
-        static member getPrototypeOf (o: 'T) : obj = jsNative
+        static member getPrototypeOf<'T,'U when 'T : not struct and 'U : not struct> (o: 'T) : 'U = jsNative
         
         /// Indicates whether the object has the specified property 
         /// as its own property (as opposed to inheriting it).
-        [<Emit("Object.prototype.hasOwnProperty($0,$1)")>]
+        [<Emit("$1.hasOwnProperty($0)")>]
         static member hasOwnProperty (property: string) (o: 'T) : bool = jsNative
 
         /// Determines whether two values are the same value.
@@ -539,7 +692,7 @@ module JS =
         static member isFrozen (o: 'T) : bool = jsNative
         
         /// Checks if an object exists in another object's prototype chain.
-        [<Emit("Object.prototype.isPrototypeOf($0,$1)")>]
+        [<Emit("$1.isPrototypeOf($0)")>]
         static member isPrototypeOf (proto: 'T) (o: 'U) : bool = jsNative
         
         /// Determines if an object is sealed.
@@ -552,13 +705,13 @@ module JS =
         /// and is the object's own property.
         ///
         /// An integer would be used when testing against an array.
-        [<Emit("x => Object.prototype.propertyIsEnumerable($0,x)")>]
+        [<Emit("x => x.propertyIsEnumerable($0)")>]
         static member propertyIsEnumerable (property: int) : 'T -> bool = jsNative
         /// Indicates whether the specified property is enumerable 
         /// and is the object's own property.
         ///
         /// An integer would be used when testing against an array.
-        [<Emit("x => Object.prototype.propertyIsEnumerable($0,x)")>]
+        [<Emit("x => x.propertyIsEnumerable($0)")>]
         static member propertyIsEnumerable (property: string) : 'T -> bool = jsNative
 
         /// Seals an object, preventing new properties from being added to it and marking all existing properties as 
@@ -572,16 +725,16 @@ module JS =
         [<Emit("Object.setPrototypeOf($0, null)")>]
         static member setPrototypeOfNull (o: 'T) : obj = jsNative
         
-        [<Emit("Object.prototype.toLocaleString($0)")>]
+        [<Emit("$0.toLocaleString()")>]
         static member toLocaleString (o: 'T) : string = jsNative
         
-        [<Emit("Object.prototype.toString($0)")>]
+        [<Emit("$0.toString()")>]
         static member toString (o: 'T) : string = jsNative
 
         /// Returns the primitive value of the specified object.
-        [<Emit("Object.prototype.valueOf($0)")>]
+        [<Emit("$0.valueOf()")>]
         static member valueOf (o: 'T) : obj = jsNative
-
+        
     [<Global>]
     type Math =
         /// Represents the base of natural logarithms, e, approximately 2.718.
@@ -809,7 +962,7 @@ module JS =
         static member trunc (x: decimal) : int = jsNative
         /// Returns the integer part of a number by removing any fractional digits.
         static member trunc (x: float) : int = jsNative
-    
+
     /// Represents a single moment in time in a platform-independent format.
     [<Global>]
     type Date private (?inp: obj) =
@@ -821,7 +974,12 @@ module JS =
             Date(box (year, month, date, hours, minutes, seconds, ms))
         new (year: int, month: int, ?date: int, ?hours: int, ?minutes: int, ?seconds: int, ?ms: int ) = 
             Date(box (year, month, date, hours, minutes, seconds, ms))
+        [<Emit("$0")>]
+        new (d: JS.Date) = Date()
             
+        [<Emit("$0")>]
+        member _.AsDateTime () : DateTime = jsNative
+
         [<Emit("$0.getDate()")>]
         member _.GetDate () : int = jsNative
         
@@ -963,9 +1121,12 @@ module JS =
     
         /// Returns the current time in ticks.
         static member now () : int64 = jsNative
-
+        
+    /// Represents a single moment in time in a platform-independent format.
     [<Erase;RequireQualifiedAccess>]
     module Date =
+        let inline asDateTime (d: Date) = d.AsDateTime()
+
         let inline getDate (d: Date) = d.GetDate()
         
         let inline getDay (d: Date) = d.GetDay()
@@ -1245,7 +1406,9 @@ module JS =
             member this.buffer = upcast this.Buffer
             member this.byteLength = this.ByteLength
             member this.byteOffset = this.ByteOffset
-
+            
+    /// Provides a low-level interface for reading and writing multiple number types in a binary 
+    /// ArrayBuffer, without having to care about the platform's endianness.
     [<Erase;RequireQualifiedAccess>]
     module DataView =
         /// The ArrayBuffer referenced by a DataView at construction time.
@@ -1597,6 +1760,7 @@ module JS =
         interface Collections.IEnumerable with
             member _.GetEnumerator () = unbox<Collections.IEnumerator>()
 
+    /// Describes an array-like view of an underlying binary data buffer.
     [<Erase;RequireQualifiedAccess>]
     module TypedArray =
         /// Returns a sequence that contains the key/value pairs for each index in the array.
@@ -1860,6 +2024,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Int8Array()
         [<Emit("new Int8Array($0)")>]
         new (typedArray: TypedArray<int8>) = Int8Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<int8>) = Int8Array()
         [<Emit("new Int8Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Int8Array()
         [<Emit("new Int8Array($0...)")>]
@@ -1953,6 +2119,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Uint8Array()
         [<Emit("new Uint8Array($0)")>]
         new (typedArray: TypedArray<uint8>) = Uint8Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<uint8>) = Uint8Array()
         [<Emit("new Uint8Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Uint8Array()
         [<Emit("new Uint8Array($0...)")>]
@@ -2046,6 +2214,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Uint8ClampedArray()
         [<Emit("new Uint8ClampedArray($0)")>]
         new (typedArray: TypedArray<uint8>) = Uint8ClampedArray()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<uint8>) = Uint8ClampedArray()
         [<Emit("new Uint8ClampedArray($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Uint8ClampedArray()
         [<Emit("new Uint8ClampedArray($0...)")>]
@@ -2139,6 +2309,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Int16Array()
         [<Emit("new Int16Array($0)")>]
         new (typedArray: TypedArray<int16>) = Int16Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<int16>) = Int16Array()
         [<Emit("new Int16Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Int16Array()
         [<Emit("new Int16Array($0...)")>]
@@ -2232,6 +2404,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Uint16Array()
         [<Emit("new Uint16Array($0)")>]
         new (typedArray: TypedArray<uint16>) = Uint16Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<uint16>) = Uint16Array()
         [<Emit("new Uint16Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Uint16Array()
         [<Emit("new Uint16Array($0...)")>]
@@ -2325,6 +2499,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Int32Array()
         [<Emit("new Int32Array($0)")>]
         new (typedArray: TypedArray<int>) = Int32Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<int32>) = Int32Array()
         [<Emit("new Int32Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Int32Array()
         [<Emit("new Int32Array($0...)")>]
@@ -2418,6 +2594,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Uint32Array()
         [<Emit("new Uint32Array($0)")>]
         new (typedArray: TypedArray<uint32>) = Uint32Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<uint32>) = Uint32Array()
         [<Emit("new Uint32Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Uint32Array()
         [<Emit("new Uint32Array($0...)")>]
@@ -2511,6 +2689,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Float32Array()
         [<Emit("new Float32Array($0)")>]
         new (typedArray: TypedArray<float32>) = Float32Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<float32>) = Float32Array()
         [<Emit("new Float32Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Float32Array()
         [<Emit("new Float32Array($0...)")>]
@@ -2604,6 +2784,8 @@ module JS =
         new (typedArray: JS.TypedArray) = Float64Array()
         [<Emit("new Float64Array($0)")>]
         new (typedArray: TypedArray<float>) = Float64Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<float>) = Float64Array()
         [<Emit("new Float64Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Float64Array()
         [<Emit("new Float64Array($0...)")>]
@@ -2697,6 +2879,8 @@ module JS =
         new (typedArray: JS.TypedArray) = BigInt64Array()
         [<Emit("new BigInt64Array($0)")>]
         new (typedArray: TypedArray<bigint>) = BigInt64Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<bigint>) = BigInt64Array()
         [<Emit("new BigInt64Array($0...)")>]
         new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = BigInt64Array()
         [<Emit("new BigInt64Array($0...)")>]
@@ -3215,11 +3399,21 @@ module JSExtensions =
 
         /// Returns a list of all properties (including non-enumerable properties except for 
         /// those which use Symbol) found directly in a given object.
-        static member inline getOwnPropertyNames (o: obj) = JS.Object.getOwnPropertyNames(o) |> List.ofSeq
+        #if FABLE_COMPILER
+        static member inline getOwnPropertyNames (o: obj) = 
+        #else
+        static member getOwnPropertyNames (o: obj) = 
+        #endif
+            JS.Object.getOwnPropertyNames(o) |> List.ofSeq
 
         /// Returns a list of a given object's own enumerable property names, 
         /// iterated in the same order that a normal loop would.
-        static member inline keys (o: obj) = JS.Object.keys(o) |> List.ofSeq
+        #if FABLE_COMPILER
+        static member inline keys (o: obj) =
+        #else
+        static member keys (o: obj) =
+        #endif
+            JS.Object.keys(o) |> List.ofSeq
 
     type JS.Promise<'T> with
         /// Returns a Promise object that is resolved with a given value. 
@@ -3276,6 +3470,6 @@ module JSExtensions =
 
         /// Splits a string into substrings based on regular expression matches.
         [<Emit("$0.split($1)")>]
-        member _.Split (regExp: JS.RegExp) = jsNative
+        member _.Split (regExp: JS.RegExp) : string [] = jsNative
         /// Splits a string into substrings based on regular expression matches.
         member inline this.Split (regex: Regex) = this.Split(JS.RegExp.fromRegex regex)

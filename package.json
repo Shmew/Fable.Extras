@@ -1,7 +1,7 @@
 {
-  "name": "fable.-Extras",
+  "name": "fable.-extras",
   "version": "0.1.0",
-  "description": "",
+  "description": "Fable bindings for jest and friends",
   "homepage": "https://github.com/Shmew/Fable.Extras",
   "bugs": {
     "url": "https://github.com/Shmew/Fable.Extras/issues/new/choose"
@@ -14,10 +14,7 @@
   },
   "scripts": {
     "build": "webpack -p",
-    "pretest": "yarn pretest-fc && yarn pretest-jest && yarn pretest-rtl",
-    "pretest-fc": "fable-splitter -c tests/Fable.FastCheck.Tests/splitter.config.js",
-    "pretest-jest": "fable-splitter -c tests/Fable.Extras.Tests/splitter.config.js",
-    "pretest-rtl": "fable-splitter -c tests/Fable.ReactTestingLibrary.Tests/splitter.config.js",
+    "pretest": "fable-splitter -c tests/Fable.Extras.Tests/splitter.config.js",
     "publish-docs": "node publish.js",
     "start": "live-server --port=8080 docs/",
     "test": "jest",

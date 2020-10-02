@@ -118,36 +118,6 @@ Target.create "ConfigRelease" <| fun _ ->
     FakeVar.set "configuration" "Release"
 
 // --------------------------------------------------------------------------------------
-// Generate assembly info files with the right version & up-to-date information
-
-Target.create "AssemblyInfo" <| fun _ ->
-    let getAssemblyInfoAttributes projectName =
-        [ AssemblyInfo.Title (projectName)
-          AssemblyInfo.Product project
-          AssemblyInfo.Description summary
-          AssemblyInfo.Version release.AssemblyVersion
-          AssemblyInfo.FileVersion release.AssemblyVersion
-          AssemblyInfo.Configuration <| configuration()
-          AssemblyInfo.InternalsVisibleTo (sprintf "%s.Tests" projectName) ]
-
-    let getProjectDetails projectPath =
-        let projectName = Path.GetFileNameWithoutExtension(projectPath)
-        ( projectPath,
-          projectName,
-          Path.GetDirectoryName(projectPath),
-          (getAssemblyInfoAttributes projectName)
-        )
-
-    !! srcGlob
-    |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, _, folderName, attributes) ->
-        match projFileName with
-        | Fsproj -> AssemblyInfoFile.createFSharp (folderName </> "AssemblyInfo.fs") attributes
-        | Csproj -> AssemblyInfoFile.createCSharp ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        | Vbproj -> AssemblyInfoFile.createVisualBasic ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        | Shproj -> () )
-
-// --------------------------------------------------------------------------------------
 // Copies binaries from default VS location to expected bin folder
 // But keeps a subdirectory structure for each project in the
 // src folder to support multiple project outputs
@@ -301,37 +271,6 @@ Target.create "RunTests" <| fun _ ->
     Yarn.exec "test" id
 
 // --------------------------------------------------------------------------------------
-// Generate Paket load scripts
-Target.create "LoadScripts" <| fun _ ->
-    let frameworks =
-        __SOURCE_DIRECTORY__ @@ "bin"
-        |> Directory.EnumerateDirectories
-        |> Seq.map (fun d ->
-            Directory.EnumerateDirectories d
-            |> Seq.map (fun f -> DirectoryInfo(f).Name)
-            |> List.ofSeq)
-        |> List.ofSeq
-        |> List.reduce List.append
-        |> List.distinct
-        |> List.reduce (fun acc elem -> sprintf "%s --framework %s" elem acc)
-        |> function
-        | e when e.Length > 0 ->
-            Some (sprintf "--framework %s" e)
-        | _ -> None
-
-    let arguments =
-        [Some("generate-load-scripts"); frameworks]
-        |> List.choose id
-        |> List.reduce (fun acc elem -> sprintf "%s %s" acc elem)
-
-    arguments
-    |> CreateProcess.fromRawCommandLine ((__SOURCE_DIRECTORY__ @@ ".paket") @@ "paket.exe")
-    |> CreateProcess.withTimeout (TimeSpan.MaxValue)
-    |> CreateProcess.ensureExitCodeWithMessage "Failed to generate paket load scripts."
-    |> Proc.run
-    |> ignore
-
-// --------------------------------------------------------------------------------------
 // Update package.json version & name    
 
 Target.create "PackageJson" <| fun _ ->
@@ -419,7 +358,6 @@ Target.create "Release" ignore
 Target.create "Publish" ignore
 
 "Clean"
-  ==> "AssemblyInfo"
   ==> "Restore"
   ==> "PackageJson"
   ==> "YarnInstall"
@@ -441,8 +379,6 @@ Target.create "Publish" ignore
   ?=> "Build"
   ?=> "RunTests"
   ?=> "CleanDocs"
-
-"Restore" ==> "LoadScripts"
 
 "All"
   ==> "GitPush"
