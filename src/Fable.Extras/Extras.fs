@@ -21,24 +21,23 @@ module JSe =
         | Undefined
     
     /// Calls the object's apply prototype and spreads the arguments.
-    [<Emit("$0.apply(...$1)")>]
-    let apply (f: 'T -> 'U) (arguments: obj []) = jsNative
+    [<Emit("$0.apply(this, $1)")>]
+    let apply<'T,'U> (f: 'T) (arguments: obj []) : 'U = jsNative
 
     /// An Array-like object accessible inside functions that contains 
     /// the values of the arguments passed to that function.
     [<Emit("arguments")>]
     let arguments : obj [] = jsNative
-    
-    /// Checks if cross origin isolation has been successful.
-    [<Emit("crossOriginIsolated")>]
-    let crossOriginIsolated : bool = jsNative
-    
+
     /// Checks if the session is considered secure.
     [<Emit("isSecureContext")>]
     let isSecureContext : bool = jsNative
 
     [<Emit("globalThis")>]
     let globalThis : obj = jsNative
+
+    [<Emit("this")>]
+    let this' : obj = jsNative
 
     /// The Javascript || operator to collect the first non-None option
     [<Emit("$0 || $1")>]
@@ -143,17 +142,50 @@ module JSe =
         try decodeURIComponent s |> Ok
         with e -> Error e
 
+    /// Decodes a string of data which has been encoded using Base64 encoding.
+    [<Emit("atob($0)")>]
+    let atob (encodedData: string) : string = jsNative
+
+    /// Creates a Base64-encoded ASCII string from a binary string (i.e., a 
+    /// String object in which each character in the string is treated as a 
+    /// byte of binary data).
+    [<Emit("btoa($0)")>]
+    let btoa (stringToEncode: string) : string = jsNative
+
+    /// Queues a microtask to be executed at a safe time prior to control returning 
+    /// to the browser's event loop. The microtask is a short function which will 
+    /// run after the current task has completed its work and when there is no other 
+    /// code waiting to be run before control of the execution context is returned 
+    /// to the browser's event loop.
+    ///
+    /// This lets your code run without interfering with any other, potentially higher 
+    /// priority, code that is pending, but before the browser regains control over 
+    /// the execution context, potentially depending on work you need to complete.
+    [<Emit("queueMicrotask($0)")>]
+    let queueMicrotask (f: unit -> unit) : unit = jsNative
+
+    [<Measure>]
+    type TimeoutId
+
+    [<Measure>]
+    type IntervalId
+
+    /// Schedules a function to execute in a given amount of time (in miliseconds).
     [<Emit("setTimeout($0, $1)")>]
-    let setTimeout (f: unit -> unit) (timeout: int) : int = jsNative
+    let setTimeout (f: unit -> unit) (timeout: int) : int<TimeoutId> = jsNative
 
+    /// Cancels the delayed execution set using setTimeout.
     [<Emit("clearTimeout($0)")>]
-    let clearTimeout (id: int) : unit = jsNative
+    let clearTimeout (id: int<TimeoutId>) : unit = jsNative
     
+    /// Schedules a function to execute every time a given number 
+    /// of milliseconds elapses.
     [<Emit("setInterval($0, $1)")>]
-    let setInterval (f: unit -> unit) (timeout: int) : int = jsNative
+    let setInterval (f: unit -> unit) (delay: int) : int<IntervalId> = jsNative
 
+    /// Cancels the repeated execution set using setInterval.
     [<Emit("clearTimeout($0)")>]
-    let clearInterval (id: int) : unit = jsNative
+    let clearInterval (id: int<IntervalId>) : unit = jsNative
 
     /// Holds key-value pairs and remembers the original insertion order of the keys.
     ///
@@ -3140,7 +3172,7 @@ module JSe =
         static member warn (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
 
     [<Erase>]
-    type RegExpFlag =
+    type RegExpFlag [<Emit("''")>] () =
         /// Global match
         ///
         /// Find all matches rather than stopping after the first match.
@@ -3189,9 +3221,11 @@ module JSe =
     [<Erase>]
     type RegExp private (pattern: string, ?flags: obj) =
         [<Emit("new RegExp($0...)")>]
-        new (pattern: string, ?flags: string) = RegExp(pattern, ?flags = flags)
+        new (pattern: string) = RegExp(pattern)
         [<Emit("new RegExp($0...)")>]
-        new (pattern: string, ?flags: RegExpFlag) = RegExp(pattern, ?flags = flags)
+        new (pattern: string, flags: string) = RegExp(pattern, flags = flags)
+        [<Emit("new RegExp($0...)")>]
+        new (pattern: string, flags: RegExpFlag) = RegExp(pattern, flags = flags)
 
         /// Converts this object to the System.Text.RegularExpressions representation.
         ///

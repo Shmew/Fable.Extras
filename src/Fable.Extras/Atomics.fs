@@ -1,11 +1,33 @@
 ﻿namespace Fable.Extras.Atomics
 
 open Fable.Core
-open Fable.Extras
 open FSharp.Core
+open System.ComponentModel
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =
+    [<EditorBrowsable(EditorBrowsableState.Never);Erase>]
+    module Internal =
+        [<EditorBrowsable(EditorBrowsableState.Never);Erase>]
+        type ToInt =
+            static member ToInt (x: JS.TypedArray<int8>) = unbox<int8> x
+            static member ToInt (x: JS.TypedArray<uint8>) = unbox<uint8> x
+            static member ToInt (x: JS.TypedArray<int16>) = unbox<int16> x
+            static member ToInt (x: JS.TypedArray<uint16>) = unbox<uint16> x
+            static member ToInt (x: JS.TypedArray<int>) = unbox<int> x
+            static member ToInt (x: JS.TypedArray<uint32>) = unbox<uint32> x
+            static member ToInt (x: JS.TypedArray<bigint>) = unbox<bigint> x
+
+            static member inline Invoke (x: 'TypedArray) : 'IntType =
+                let inline call2 (_: ^a, b: ^b) =
+                    ((^a or ^b) : (static member ToInt : _ -> _) b)
+                call2 (Unchecked.defaultof<ToInt>, x)
+        
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
+        let inline whenInt x y = let _ = if false then ToInt.Invoke x else y in ()
+
+    open Internal
+
     /// Used to represent a generic, fixed-length raw binary data buffer, 
     /// similar to the ArrayBuffer object, but in a way that they can be 
     /// used to create views on shared memory. 
@@ -25,6 +47,10 @@ module JSe =
         [<Emit("$0.slice($1...)")>]
         member _.Slice (?begin': int, ?end': int) : JS.ArrayBuffer = jsNative
 
+        interface JS.ArrayBuffer with
+            member this.byteLength = this.ByteLength
+            member this.slice (begin', end') = this.Slice(begin', ?end' = end')
+
     [<RequireQualifiedAccess;StringEnum(CaseRules.KebabCase)>]
     type AtomicWait =
         | Ok
@@ -42,13 +68,17 @@ module JSe =
         /// This atomic operation guarantees that no other write happens until the 
         /// modified value is written back.
         [<Emit("Atomics.add($0, $1, $2)")>]
-        static member Add (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Add (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType =
+            whenInt typedArray value
+            jsNative
 
         /// Computes a bitwise AND with a given value at a given position in the 
         /// array, and returns the old value at that position. This atomic operation 
         /// guarantees that no other write happens until the modified value is written back.
         [<Emit("Atomics.and($0, $1, $2)")>]
-        static member And (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline And (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
         
         /// Exchanges a given replacement value at a given position in the array, if a given expected 
         /// value equals the old value. It returns the old value at that position whether it was equal 
@@ -56,14 +86,18 @@ module JSe =
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
         [<Emit("Atomics.compareExchange($0, $1, $2, $3)")>]
-        static member CompareExchange (typedArray: JS.TypedArray<'T>, index: int, expectedValue: 'T, replacementValue: 'T) : 'T = jsNative        
+        static member inline CompareExchange (typedArray: 'TypedArray, index: int, expectedValue: 'IntType, replacementValue: 'IntType) : 'IntType = 
+            whenInt typedArray expectedValue
+            jsNative
 
         /// Stores a given value at a given position in the array and returns the old value at that position. 
         ///
         /// This atomic operation guarantees that no other write happens between the read of the old value 
         /// and the write of the new value.
         [<Emit("Atomics.exchange($0, $1, $2)")>]
-        static member Exchange (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Exchange (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
 
         /// Used to determine whether to use locks or atomic operations. 
         ///
@@ -74,7 +108,9 @@ module JSe =
 
         /// Returns a value at a given position in the array.
         [<Emit("Atomics.load($0, $1)")>]
-        static member Load (typedArray: JS.TypedArray<'T>, index: int) : 'T = jsNative
+        static member inline Load (typedArray: 'TypedArray, index: int) : 'IntType = 
+            whenInt typedArray (unbox<'IntType>())
+            jsNative
 
         /// Notifies up some agents that are sleeping in the wait queue.
         ///
@@ -87,20 +123,26 @@ module JSe =
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
         [<Emit("Atomics.or($0, $1, $2)")>]
-        static member Or (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Or (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
         
         /// Stores a given value at the given position in the array and returns that value.
         ///
         /// Returns the value that was stored
         [<Emit("Atomics.store($0, $1, $2)")>]
-        static member Store (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Store (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
 
         /// Substracts a given value at a given position in the array and returns the old value at that 
         /// position. 
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
         [<Emit("Atomics.sub($0, $1, $2)")>]
-        static member Sub (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Sub (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
         
         /// Verifies that a given position in an Int32Array still contains a given value and if so sleeps, awaiting a wakeup or a timeout.
         [<Emit("Atomics.wait($0...)")>]
@@ -110,7 +152,9 @@ module JSe =
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
         [<Emit("Atomics.xor($0, $1, $2)")>]
-        static member Xor (typedArray: JS.TypedArray<'T>, index: int, value: 'T) : 'T = jsNative
+        static member inline Xor (typedArray: 'TypedArray, index: int, value: 'IntType) : 'IntType = 
+            whenInt typedArray value
+            jsNative
         
     /// Provides atomic operations as static functions.
     ///
@@ -122,14 +166,14 @@ module JSe =
         ///
         /// This atomic operation guarantees that no other write happens until the 
         /// modified value is written back.
-        let inline add (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) = 
+        let inline add (index: int) (value: 'IntType) (typedArray: 'TypedArray) = 
             Atomics.Add(typedArray, index, value) |> ignore 
             typedArray
 
         /// Computes a bitwise AND with a given value at a given position in the 
         /// array, and returns the old value at that position. This atomic operation 
         /// guarantees that no other write happens until the modified value is written back.
-        let inline and' (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
+        let inline and' (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
             Atomics.And(typedArray, index, value) |> ignore
             typedArray
         
@@ -138,20 +182,18 @@ module JSe =
         /// to the expected value or not. 
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
-        let inline compareExchange (index: int) (expectedValue: 'T) (replacementValue: 'T) (typedArray: JS.TypedArray<'T>) =
-            Atomics.CompareExchange(typedArray, index, expectedValue, replacementValue) |> ignore
-            typedArray
+        let inline compareExchange (index: int) (expectedValue: 'IntType) (replacementValue: 'IntType) (typedArray: 'TypedArray) =
+            Atomics.CompareExchange(typedArray, index, expectedValue, replacementValue)
 
         /// Stores a given value at a given position in the array and returns the old value at that position. 
         ///
         /// This atomic operation guarantees that no other write happens between the read of the old value 
         /// and the write of the new value.
-        let inline exchange (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
-            Atomics.Exchange(typedArray, index, value) |> ignore
-            typedArray
+        let inline exchange (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
+            Atomics.Exchange(typedArray, index, value)
 
         /// Returns a value at a given position in the array.
-        let inline load (index: int) (typedArray: JS.TypedArray<'T>) = 
+        let inline load (index: int) (typedArray: 'TypedArray) = 
             Atomics.Load(typedArray, index)
 
         /// Notifies up some agents that are sleeping in the wait queue.
@@ -164,12 +206,12 @@ module JSe =
         /// value at that position. 
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
-        let inline or' (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
+        let inline or' (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
             Atomics.Or(typedArray, index, value) |> ignore
             typedArray
         
         /// Stores a given value at the given position in the array and returns that value.
-        let inline store (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
+        let inline store (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
             Atomics.Store(typedArray, index, value) |> ignore
             typedArray
 
@@ -177,7 +219,7 @@ module JSe =
         /// position. 
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
-        let inline sub (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
+        let inline sub (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
             Atomics.Sub(typedArray, index, value) |> ignore
             typedArray
         
@@ -192,6 +234,6 @@ module JSe =
         /// Computes a bitwise XOR with a given value at a given position in the array, and returns the old value at that position. 
         ///
         /// This atomic operation guarantees that no other write happens until the modified value is written back.
-        let inline xor (index: int) (value: 'T) (typedArray: JS.TypedArray<'T>) =
+        let inline xor (index: int) (value: 'IntType) (typedArray: 'TypedArray) =
             Atomics.Xor(typedArray, index, value) |> ignore
             typedArray

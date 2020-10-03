@@ -5,6 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extras.test.fs" />
+    <Compile Include="Atomics.test.fs" />
+    <Compile Include="Reflection.test.fs" />
     <None Include="paket.references" />
     <None Include="splitter.config.js" />
   </ItemGroup>

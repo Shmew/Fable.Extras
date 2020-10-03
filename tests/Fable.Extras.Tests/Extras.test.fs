@@ -1,7 +1,7 @@
 ﻿module ExtrasTests
 
-open Fable.Core.JsInterop
 open Fable.Extras
+open Fable.Extras.Operators
 open Fable.Jester
 open Fable.FastCheck
 open Fable.FastCheck.Jest
@@ -343,6 +343,9 @@ Jest.describe("Date", fun () ->
         Jest.useFakeTimers()
         Jest.setSystemTime(0)
 
+    Jest.afterAll <| fun () ->
+        Jest.clearAllTimers()
+
     Jest.test("Can create an empty Date", fun () ->
         let d = JSe.Date()
 
@@ -376,6 +379,12 @@ Jest.describe("JSON", fun () ->
 )
 
 Jest.describe("Promise", fun () ->
+    Jest.beforeAll <| fun () ->
+        Jest.useFakeTimers()
+        
+    Jest.afterAll <| fun () ->
+        Jest.clearAllTimers()
+
     Jest.test("Can create", promise {
         let p = JSe.Promise(fun resolve _ -> resolve 1)
 
@@ -398,4 +407,90 @@ Jest.describe("Promise", fun () ->
 
         do! Jest.expect(JSe.Promise.all promises).resolves.toEqual(expect.arrayContaining [0 .. 9])
     })
+
+    Jest.test("Can race", promise {
+        let promI i = 
+            JSe.Promise<int>(fun resolve _ ->
+                JSe.setTimeout (fun () -> resolve i) ((i + 1) * 100) |> ignore
+            )
+        
+        let promises = List.init 10 promI
+
+        Jest.advanceTimersToNextTimer 10
+
+        do! Jest.expect(JSe.Promise.race promises).resolves.toBe(0)
+    })
+)
+
+Jest.describe("JS or operator", fun () ->
+    Jest.test("Can flatten arguments of options", fun () ->
+        Jest.expect(None ?| Some 1 ?| None ?| Some 2).toBe(1)
+        Jest.expect(Some 3 ?| Some 1 ?| None).toBe(3)
+        Jest.expect(None ?| None ?| None ?| Some 2).toBe(2)
+    )
+)
+
+Jest.describe("ArrayBuffer", fun () ->
+    Jest.test("Can create", fun () ->
+        let ab = JSe.ArrayBuffer(10)
+
+        Jest.expect(ab.ByteLength).toBe(10)
+    )
+
+    Jest.test("Can slice", fun () ->
+        let ab = JSe.ArrayBuffer(10)
+
+        Jest.expect(ab |> JSe.ArrayBuffer.slice 0 2 |> JSe.ArrayBuffer.byteLength).toBe(2)
+    )
+)
+
+Jest.describe("TypedArray", fun () ->
+    Jest.test("Can create", fun () ->
+        let ta = JSe.Int32Array([1;2;3;4])
+
+        Jest.expect(ta.ByteLength).toBe(4 * JSe.Int32Array.bytesPerElement)
+        Jest.expect(ta.Length).toBe(4)
+    )
+
+    Jest.test("Can use operations", fun () ->
+        let ta = JSe.Int32Array([1;2;3;4])
+
+        Jest.expect(ta.Reverse() |> JSe.TypedArray.values).toEqual(expect.arrayContaining [4;3;2;1])
+        Jest.expect(ta.Values()).toEqual(expect.arrayContaining [4;3;2;1])
+        Jest.expect(ta.Sort().Values()).toEqual(expect.arrayContaining [1;2;3;4])
+        Jest.expect(ta.Map ((+) 1) |> JSe.TypedArray.values).toEqual(expect.arrayContaining [2;3;4;5])
+    )
+
+    Jest.test("Can use for syntax", fun () ->
+        let ta = JSe.Int32Array([1;2;3;4])
+
+        let mutable res = []
+
+        for i in ta do
+            res <- i::res
+
+        Jest.expect(res).toEqual(expect.arrayContaining [|4;3;2;1|])
+    )
+)
+
+Jest.describe("RegExp", fun () ->
+    Jest.test("Can create", fun () ->
+        let re = JSe.RegExp("", JSe.RegExpFlag().g.i)
+
+        Jest.expect(re).toBeDefined()
+    )
+
+    Jest.test("Can match", fun () ->
+        let re = JSe.RegExp(@"\w\w\d\d")
+
+        Jest.expect(re.Test("aa11")).toBe(true)
+        Jest.expect(re |> JSe.RegExp.match' "aa11").toEqual(expect.arrayContaining ["aa11"])
+    )
+    
+    Jest.test("String extensions work", fun () ->
+        let re = JSe.RegExp(@"\w\w\d\d")
+
+        Jest.expect("aa11".Match(re)).toEqual(expect.arrayContaining ["aa11"])
+        Jest.expect("aa11".Replace(re, "")).toBe("")
+    )
 )

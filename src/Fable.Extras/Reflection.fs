@@ -189,14 +189,14 @@ module JSe =
         ///
         /// The arguments are the target, the `this` keyword scoped to the fuction call, and the function arguments.   
         let inline setApply f (ph: ProxyHandler<'T>) = 
-            ph.Apply <- Some f
+            ph.Apply <- Some (fun pFun this' args -> f pFun this' args |> box)
             ph
         
         /// A trap for the new operator.
         ///
         /// The arguments are the target, and the constructor arguments.
         let inline setConstruct f (ph: ProxyHandler<'T>) = 
-            ph.Construct <- Some f
+            ph.Construct <- Some (fun pFun args -> f pFun args |> box)
             ph
 
         /// A trap for Object.defineProperty.
@@ -217,7 +217,7 @@ module JSe =
         ///
         /// The arguments are the target, property name, and proxy.
         let inline setGet f (ph: ProxyHandler<'T>) = 
-            ph.Get <- Some f
+            ph.Get <- Some (fun pFun this' proxy -> f pFun this' proxy |> box)
             ph
         
         /// A trap for Object.getOwnPropertyDescriptor.
@@ -281,7 +281,7 @@ module JSe =
     [<Erase>]
     type Proxy =
         [<Emit("new Proxy($0, $1)")>]
-        static member create<'T when 'T : not struct> (target: 'T, ph: ProxyHandler<'T>) = unbox<Proxy<'T>>()
+        static member create<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) = unbox<Proxy<'T>>()
 
         [<Emit("new Proxy($0, $1)")>]
         static member inline createRevocable<'T> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
