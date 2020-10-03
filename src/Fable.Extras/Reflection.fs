@@ -284,7 +284,7 @@ module JSe =
         static member create<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) = unbox<Proxy<'T>>()
 
         [<Emit("new Proxy($0, $1)")>]
-        static member inline createRevocable<'T> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
+        static member createRevocable<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
 
     [<Global>]
     type Reflect =
