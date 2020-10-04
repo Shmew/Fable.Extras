@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Schema.csv" />
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\application.csv">
+      <Paket>True</Paket>
+      <Link>Types/application.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\audio.csv">
+      <Paket>True</Paket>
+      <Link>Types/audio.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\font.csv">
+      <Paket>True</Paket>
+      <Link>Types/font.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\image.csv">
+      <Paket>True</Paket>
+      <Link>Types/image.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\message.csv">
+      <Paket>True</Paket>
+      <Link>Types/message.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\model.csv">
+      <Paket>True</Paket>
+      <Link>Types/model.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\multipart.csv">
+      <Paket>True</Paket>
+      <Link>Types/multipart.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\text.csv">
+      <Paket>True</Paket>
+      <Link>Types/text.csv</Link>
+    </Content>
+    <Content Include="..\..\paket-files\fable.generator.mime\www.iana.org\video.csv">
+      <Paket>True</Paket>
+      <Link>Types/video.csv</Link>
+    </Content>
+    <Compile Include="Utils.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Render.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

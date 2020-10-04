@@ -15,6 +15,9 @@ NUGET
     Fable.Browser.Event (1.2.1) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.7) - restriction: >= netstandard2.0
+    Fable.Browser.Url (1.0)
+      Fable.Core (>= 3.0) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     Fable.Browser.WebStorage (1.0) - restriction: >= netstandard2.0
       Fable.Browser.Event (>= 1.0) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
@@ -100,6 +103,29 @@ NUGET
       FSharp.Core (>= 4.7.2) - restriction: >= netstandard2.0
     FSharp.Core (4.7.2)
 
+GROUP Fable.Generator.MIME
+NUGET
+  remote: https://www.nuget.org/api/v2
+    Fake.Core.String (5.20.3) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.7.2) - restriction: >= netstandard2.0
+    Fake.IO.FileSystem (5.20.3)
+      Fake.Core.String (>= 5.20.3) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.7.2) - restriction: >= netstandard2.0
+    FSharp.Core (4.7.2)
+    FSharp.Data (3.3.3)
+      FSharp.Core (>= 4.0.0.1) - restriction: >= net45
+      FSharp.Core (>= 4.3.4) - restriction: && (< net45) (>= netstandard2.0)
+HTTP
+  remote: https://www.iana.org
+    application.csv (/assignments/media-types/application.csv)
+    audio.csv (/assignments/media-types/audio.csv)
+    font.csv (/assignments/media-types/font.csv)
+    image.csv (/assignments/media-types/image.csv)
+    message.csv (/assignments/media-types/message.csv)
+    model.csv (/assignments/media-types/model.csv)
+    multipart.csv (/assignments/media-types/multipart.csv)
+    text.csv (/assignments/media-types/text.csv)
+    video.csv (/assignments/media-types/video.csv)
 GROUP FakeBuild
 NUGET
   remote: https://api.nuget.org/v3/index.json

@@ -1,4 +1,5 @@
 ﻿group Fable.Extras
+    Fable.Browser.Url
     Fable.Core
     Fable.Fetch
     Fable.Promise

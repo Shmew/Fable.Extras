@@ -1,0 +1,14 @@
+﻿group Fable.Generator.MIME
+    Fake.IO.FileSystem
+    FSharp.Core
+    FSharp.Data
+
+    File: application.csv Types
+    File: audio.csv Types
+    File: font.csv Types
+    File: image.csv Types
+    File: message.csv Types
+    File: model.csv Types
+    File: multipart.csv Types
+    File: text.csv Types
+    File: video.csv Types

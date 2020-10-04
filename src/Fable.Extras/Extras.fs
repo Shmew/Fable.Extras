@@ -47,101 +47,6 @@ module JSe =
     [<Emit("typeof $0")>]
     let typeof (o: obj) : Types = jsNative
 
-    /// <summary>
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    ///
-    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
-    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
-    /// however, does encode these characters.
-    /// </summary>
-    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
-    /// exception when encodedURI contains invalid character sequences.</exception>
-    [<Emit("encodeURI($0)")>]
-    let encodeURI (s: string) : string = jsNative
-    
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    let inline tryEncodeURI (s: string) =
-        try encodeURI s |> Ok
-        with e -> Error e
-        
-    /// <summary>
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    ///
-    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
-    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
-    /// however, does encode these characters.
-    /// </summary>
-    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
-    /// exception when encodedURI contains invalid character sequences.</exception>
-    [<Emit("encodeURI($0).replace(/%5B/g, '[').replace(/%5D/g, ']')")>]
-    let encodeURIIPv6 (s: string) : string = jsNative
-    
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    let inline tryEncodeURIIPv6 (s: string) =
-        try encodeURIIPv6 s |> Ok
-        with e -> Error e
-
-    /// <summary>
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    /// </summary>
-    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
-    /// exception when encodedURI contains invalid character sequences.</exception>
-    [<Emit("encodeURIComponent($0)")>]
-    let encodeURIComponent (s: string) : string = jsNative
-    
-    /// Encodes a URI by replacing each instance of certain characters by 
-    /// one, two, three, or four escape sequences representing the UTF-8 
-    /// encoding of the character (will only be four escape sequences for 
-    /// characters composed of two "surrogate" characters).
-    let inline tryEncodeURIComponent (s: string) =
-        try encodeURIComponent s |> Ok
-        with e -> Error e
-
-    /// <summary>
-    /// Decodes a Uniform Resource Identifier (URI) previously created by 
-    /// encodeURI() or by a similar routine.
-    /// </summary>
-    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
-    /// exception when encodedURI contains invalid character sequences.</exception>
-    [<Emit("decodeURI($0)")>]
-    let decodeURI (s: string) : string = jsNative
-    
-    /// Decodes a Uniform Resource Identifier (URI) component previously 
-    /// created by encodeURIComponent or by a similar routine.
-    let inline tryDecodeURI (s: string) =
-        try decodeURI s |> Ok
-        with e -> Error e
-        
-    /// <summary>
-    /// Decodes a Uniform Resource Identifier (URI) component previously 
-    /// created by encodeURIComponent or by a similar routine.
-    /// </summary>
-    /// <exception cref="System.Exception">Throws a "malformed URI sequence" 
-    /// exception when encodedURI contains invalid character sequences.</exception>
-    [<Emit("decodeURIComponent($0)")>]
-    let decodeURIComponent (s: string) : string = jsNative
-    
-    /// Decodes a Uniform Resource Identifier (URI) component previously 
-    /// created by encodeURIComponent or by a similar routine.
-    let inline tryDecodeURIComponent (s: string) =
-        try decodeURIComponent s |> Ok
-        with e -> Error e
-
     /// Decodes a string of data which has been encoded using Base64 encoding.
     [<Emit("atob($0)")>]
     let atob (encodedData: string) : string = jsNative
@@ -270,6 +175,9 @@ module JSe =
         
         /// Returns a sequence of key value pairs in insertion order.
         let inline entries (m: Map<'K,'V>) = m.Entries()
+
+        /// Creates an empty Map.
+        let inline empty<'K,'V> = Map<'K,'V>()
         
         /// Applies the given function once per each key value pair in insertion order.
         let inline forEach (action: 'V -> 'K -> Map<'K, 'V> -> unit) (m: Map<'K,'V>) = m.ForEach(action)
@@ -334,6 +242,9 @@ module JSe =
         /// Removes the specified element by key.
         let inline delete (key: 'K) (wm: WeakMap<'K,'V>) = wm.Delete(key)
         
+        /// Creates an empty WeakMap.
+        let inline empty<'K,'V when 'K : not struct> = WeakMap<'K,'V>()
+
         /// Returns the value for the specified key.
         let inline get (key: 'K) (wm: WeakMap<'K,'V>) = wm.Get(key)
 
@@ -419,6 +330,9 @@ module JSe =
         /// Removes the specified element.
         let inline delete (value: 'T) (s: Set<'T>) = s.Delete(value)
         
+        /// Creates an empty Set.
+        let inline empty<'T> = Set<'T>()
+
         /// Returns a sequence of values in tupled form, use the values 
         /// method to get a sequence of just the value.
         let inline entries (s: Set<'T>) = s.Entries()
@@ -476,6 +390,9 @@ module JSe =
         /// Removes the specified element.
         let inline delete (value: 'T) (ws: WeakSet<'T>) = ws.Delete(value)
         
+        /// Creates an empty WeakSet.
+        let inline empty<'T> = WeakSet<'T>()
+
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (value: 'T) (ws: WeakSet<'T>) = ws.Has(value)
 

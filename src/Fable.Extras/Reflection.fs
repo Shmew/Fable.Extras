@@ -8,16 +8,18 @@ open FSharp.Core
 module JSe =
     type Proxy<'T> = 'T
 
+    /// A proxy that can be disabled.
     [<Erase>]
     type RevocableProxy<'T> =
         [<Emit("$0.proxy")>]
         member _.proxy : Proxy<'T> = jsNative
-        [<Emit("$0.revoke()")>]
-        member _.revoke : unit -> unit = jsNative
 
-        interface System.IDisposable with
-            [<Emit("$0.revoke()")>]
-            member this.Dispose () = this.revoke()
+        /// Invalidates the proxy.
+        ///
+        /// Any future calls to the proxy will throw an exception after this
+        /// has been called.
+        [<Emit("$0.revoke()")>]
+        member _.revoke () : unit = jsNative
 
     /// Defines the custom behavior of the proxy.
     [<Global>]
@@ -280,10 +282,18 @@ module JSe =
 
     [<Erase>]
     type Proxy =
+        /// Creates a proxy from the specified handler.
+        ///
+        /// *NOTE* - Currently multi-parameter functions do not work.
+        /// See: https://github.com/fable-compiler/Fable/issues/2193
         [<Emit("new Proxy($0, $1)")>]
         static member create<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) = unbox<Proxy<'T>>()
-
-        [<Emit("new Proxy($0, $1)")>]
+        
+        /// Creates a proxy from the specified handler that can be disabled.
+        ///
+        /// *NOTE* - Currently multi-parameter functions do not work.
+        /// See: https://github.com/fable-compiler/Fable/issues/2193
+        [<Emit("Proxy.revocable($0, $1)")>]
         static member createRevocable<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
 
     [<Global>]

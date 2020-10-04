@@ -6,6 +6,7 @@ group Fable.Extras
     source https://nuget.org/api/v2
 	source https://api.nuget.org/v3/index.json
 
+    nuget Fable.Browser.Url ~> 1
     nuget Fable.Core ~> 3
     nuget Fable.Fetch ~> 2
     nuget Fable.Promise ~> 2
@@ -21,6 +22,24 @@ group Fable.Extras.Tests
     nuget Fable.FastCheck ~> 0
     nuget Fable.FastCheck.Jest ~> 0
     nuget FSharp.Core ~> 4.7
+
+group Fable.Generator.MIME
+    source https://nuget.org/api/v2
+	source https://api.nuget.org/v3/index.json
+    
+    nuget Fake.IO.FileSystem ~> 5
+    nuget FSharp.Core ~> 4.7
+    nuget FSharp.Data ~> 3
+    
+    http https://www.iana.org/assignments/media-types/application.csv
+    http https://www.iana.org/assignments/media-types/audio.csv
+    http https://www.iana.org/assignments/media-types/font.csv
+    http https://www.iana.org/assignments/media-types/image.csv
+    http https://www.iana.org/assignments/media-types/message.csv
+    http https://www.iana.org/assignments/media-types/model.csv
+    http https://www.iana.org/assignments/media-types/multipart.csv
+    http https://www.iana.org/assignments/media-types/text.csv
+    http https://www.iana.org/assignments/media-types/video.csv
 
 group Tooling
 	source https://nuget.org/api/v2
