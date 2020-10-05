@@ -2,7 +2,6 @@
 
 open Fable.Core
 open FSharp.Core
-open System
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =

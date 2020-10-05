@@ -46,17 +46,28 @@ Jest.describe("Proxy", fun () ->
         Jest.expect(proxy 2).toBe(4)
     )
 
-    // Not currently being compiled correctly see https://github.com/fable-compiler/Fable/issues/2193
-    Jest.test.skip("Can intercept a function", fun () ->
+    Jest.test("Can intercept a function", fun () ->
         let add (x: int) (y: int) = x + y
 
         let proxy =
             JSe.ProxyHandler<int -> int -> int>()
-            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.apply f args |> (+) 1)
+            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.applyCurried f args |> (+) 1)
             |> JSe.Proxy.create add
             
         Jest.expect(add 1 2).toBe(3)
         Jest.expect(proxy 1 2).toBe(4)
+    )
+
+    Jest.test("Can intercept a many arity function", fun () ->
+        let addMany (a: int) (b: int) (c: int) (d: int) (e: int) = a + b + c + d + e
+
+        let proxy =
+            JSe.ProxyHandler<int -> int -> int -> int -> int -> int>()
+            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.applyCurried f args |> (+) 1)
+            |> JSe.Proxy.create addMany
+            
+        Jest.expect(addMany 1 2 3 4 5).toBe(15)
+        Jest.expect(proxy 1 2 3 4 5).toBe(16)
     )
 
     Jest.test("Can intercept an object get", fun () ->
@@ -111,13 +122,12 @@ Jest.describe("RevocableProxy", fun () ->
         Jest.expect(fun () -> revocable.proxy 2).toThrow()
     )
 
-    // Not currently being compiled correctly see https://github.com/fable-compiler/Fable/issues/2193
     Jest.test.skip("Can intercept a function", fun () ->
         let add (x: int) (y: int) = x + y
 
         let revocable =
             JSe.ProxyHandler<int -> int -> int>()
-            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.apply f args |> (+) 1)
+            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.applyCurried f args |> (+) 1)
             |> JSe.Proxy.createRevocable add
             
         Jest.expect(add 1 2).toBe(3)
@@ -126,6 +136,22 @@ Jest.describe("RevocableProxy", fun () ->
         revocable.revoke()
 
         Jest.expect(fun () -> revocable.proxy 1 2).toThrow()
+    )
+
+    Jest.test("Can intercept a many arity function", fun () ->
+        let addMany (a: int) (b: int) (c: int) (d: int) (e: int) = a + b + c + d + e
+
+        let revocable =
+            JSe.ProxyHandler<int -> int -> int -> int -> int -> int>()
+            |> JSe.ProxyHandler.setApply (fun f _ args -> JSe.applyCurried f args |> (+) 1)
+            |> JSe.Proxy.createRevocable addMany
+            
+        Jest.expect(addMany 1 2 3 4 5).toBe(15)
+        Jest.expect(revocable.proxy 1 2 3 4 5).toBe(16)
+
+        revocable.revoke()
+
+        Jest.expect(fun () -> revocable.proxy 1 2 3 4 5).toThrow()
     )
 
     Jest.test("Can intercept an object get", fun () ->

@@ -50,7 +50,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{27F9F1A6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}"
 	ProjectSection(SolutionItems) = preProject
+		docs\contributing.md = docs\contributing.md
 		docs\index.html = docs\index.html
+		docs\installation.md = docs\installation.md
+		docs\mime.md = docs\mime.md
+		docs\operators.md = docs\operators.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{80A18350-F484-458A-BAC0-64EE73830C5F}"
@@ -63,6 +67,57 @@ EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.Extras.Tests", "tests\Fable.Extras.Tests\Fable.Extras.Tests.fsproj", "{0E1BD9FC-74D6-4B1D-B6E8-8E2638610338}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.Generator.MIME", "src\Fable.Generator.MIME\Fable.Generator.MIME.fsproj", "{7CB21B3D-B9C3-49C6-BF83-D1F101AFAD7E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "atomics", "atomics", "{991F5AE1-A402-486F-91A9-067A97B2FDB6}"
+	ProjectSection(SolutionItems) = preProject
+		docs\atomics\atomics.md = docs\atomics\atomics.md
+		docs\atomics\shared-array-buffer.md = docs\atomics\shared-array-buffer.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extras", "extras", "{44FD4722-CF39-4088-8367-5BB5D18ED13D}"
+	ProjectSection(SolutionItems) = preProject
+		docs\extras\array-buffer.md = docs\extras\array-buffer.md
+		docs\extras\array.md = docs\extras\array.md
+		docs\extras\console.md = docs\extras\console.md
+		docs\extras\data-view.md = docs\extras\data-view.md
+		docs\extras\date.md = docs\extras\date.md
+		docs\extras\extensions.md = docs\extras\extensions.md
+		docs\extras\globals.md = docs\extras\globals.md
+		docs\extras\json.md = docs\extras\json.md
+		docs\extras\map.md = docs\extras\map.md
+		docs\extras\math.md = docs\extras\math.md
+		docs\extras\number.md = docs\extras\number.md
+		docs\extras\promise.md = docs\extras\promise.md
+		docs\extras\property-descriptor.md = docs\extras\property-descriptor.md
+		docs\extras\reg-exp.md = docs\extras\reg-exp.md
+		docs\extras\set.md = docs\extras\set.md
+		docs\extras\typed-array.md = docs\extras\typed-array.md
+		docs\extras\weak-map.md = docs\extras\weak-map.md
+		docs\extras\weak-set.md = docs\extras\weak-set.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reflection", "reflection", "{DDB4E323-F103-4A89-B4D4-5E351628B4DA}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reflection\proxy.md = docs\reflection\proxy.md
+		docs\reflection\reflect.md = docs\reflection\reflect.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{FD5A1C5B-D06B-422F-940A-02DFE4970DFA}"
+	ProjectSection(SolutionItems) = preProject
+		docs\web\globals.md = docs\web\globals.md
+		docs\web\url-search-params.md = docs\web\url-search-params.md
+		docs\web\url.md = docs\web\url.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-assembly", "web-assembly", "{14DDF4D7-7136-495B-87C7-2020C760E154}"
+	ProjectSection(SolutionItems) = preProject
+		docs\web-assembly\errors.md = docs\web-assembly\errors.md
+		docs\web-assembly\global.md = docs\web-assembly\global.md
+		docs\web-assembly\instance.md = docs\web-assembly\instance.md
+		docs\web-assembly\memory.md = docs\web-assembly\memory.md
+		docs\web-assembly\module.md = docs\web-assembly\module.md
+		docs\web-assembly\table.md = docs\web-assembly\table.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,6 +149,11 @@ Global
 		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B} = {55637037-300B-4FA5-8D14-B2CECCCD4B0D}
 		{80A18350-F484-458A-BAC0-64EE73830C5F} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
 		{0E1BD9FC-74D6-4B1D-B6E8-8E2638610338} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+		{991F5AE1-A402-486F-91A9-067A97B2FDB6} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{44FD4722-CF39-4088-8367-5BB5D18ED13D} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{DDB4E323-F103-4A89-B4D4-5E351628B4DA} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{FD5A1C5B-D06B-422F-940A-02DFE4970DFA} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{14DDF4D7-7136-495B-87C7-2020C760E154} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {96DAE6A9-B1CC-4FF7-B08C-D5FBFD55B385}

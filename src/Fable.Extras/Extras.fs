@@ -8,6 +8,7 @@ open System.Text.RegularExpressions
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =
+    /// Javascript types.
     [<RequireQualifiedAccess;StringEnum(CaseRules.LowerFirst)>]
     type Types =
         | Bigint
@@ -20,9 +21,17 @@ module JSe =
         | Symbol
         | Undefined
     
-    /// Calls the object's apply prototype and spreads the arguments.
+    /// Returns a Types union case indicating the type of the unevaluated operand.
+    [<Emit("typeof $0")>]
+    let typeof (o: obj) : Types = jsNative
+
+    /// Calls the object's apply prototype.
     [<Emit("$0.apply(this, $1)")>]
     let apply<'T,'U> (f: 'T) (arguments: obj []) : 'U = jsNative
+
+    /// Applies an argument array to a curried function.
+    [<Emit("$1.reduce((p, c) => p(c), $0)")>]
+    let applyCurried<'T,'U> (f: 'T) (arguments: obj [])  : 'U = jsNative
 
     /// An Array-like object accessible inside functions that contains 
     /// the values of the arguments passed to that function.
@@ -33,19 +42,17 @@ module JSe =
     [<Emit("isSecureContext")>]
     let isSecureContext : bool = jsNative
 
+    /// Javascript globalThis keyword.
     [<Emit("globalThis")>]
     let globalThis : obj = jsNative
 
+    /// Javascript this keyword.
     [<Emit("this")>]
     let this' : obj = jsNative
 
     /// The Javascript || operator to collect the first non-None option
     [<Emit("$0 || $1")>]
     let or' (lh: 'T option) (rh: 'T option) : 'T option = jsNative
-    
-    /// Returns a Types union case indicating the type of the unevaluated operand.
-    [<Emit("typeof $0")>]
-    let typeof (o: obj) : Types = jsNative
 
     /// Decodes a string of data which has been encoded using Base64 encoding.
     [<Emit("atob($0)")>]

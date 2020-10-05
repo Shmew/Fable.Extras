@@ -3,22 +3,125 @@
 open Fable.Core
 open Fable.Extras
 open FSharp.Core
+open System.ComponentModel
+
+[<EditorBrowsable(EditorBrowsableState.Never)>]
+module Internal =
+    open Fable.Core.JsInterop
+    
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    let dynamicProxy<'T,'V when 'T : not struct> (target: 'T) (ph: obj) (targetFullName: string) (executor: obj -> obj -> obj) : 'V =
+        match JSe.typeof target with
+        | JSe.Types.Function ->
+            match targetFullName.Split([|','|]).Length - 1 with
+            | 1 -> executor target ph
+            | 2 ->
+                let execFunc : System.Func<obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj> (unbox target)) ph
+                unbox (fun a b -> execFunc.Invoke(a, b))
+            | 3 ->
+                let execFunc : System.Func<obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c -> execFunc.Invoke(a, b, c))
+            | 4 ->
+                let execFunc : System.Func<obj,obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c d -> execFunc.Invoke(a, b, c, d))
+            | 5 ->
+                let execFunc : System.Func<obj,obj,obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c d e -> execFunc.Invoke(a, b, c, d, e))
+            | 6 ->
+                let execFunc : System.Func<obj,obj,obj,obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c d e f -> execFunc.Invoke(a, b, c, d, e, f))
+            | 7 ->
+                let execFunc : System.Func<obj,obj,obj,obj,obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c d e f g -> execFunc.Invoke(a, b, c, d, e, f, g))
+            | 8 ->
+                let execFunc : System.Func<obj,obj,obj,obj,obj,obj,obj,obj,obj> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                unbox (fun a b c d e f g h -> execFunc.Invoke(a, b, c, d, e, f, g, h))
+            | _ -> failwith "Currying to more than 8-arity is not supported for proxies."
+        | _ -> executor target ph
+        |> unbox<'V>
+        
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    [<Global>]
+    type RevocableProxy<'T> =
+        member _.proxy
+            with get () : 'T = jsNative
+            and set (x: 'T) : unit = jsNative
+
+    [<EditorBrowsable(EditorBrowsableState.Never)>]
+    let dynamicRevocableProxy<'T,'V when 'T : not struct> (target: 'T) (ph: obj) (targetFullName: string) (executor: obj -> obj -> obj) : 'V =
+        match JSe.typeof target with
+        | JSe.Types.Function ->
+            match targetFullName.Split([|','|]).Length - 1 with
+            | 1 -> executor target ph
+            | 2 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b -> originalProxy.Invoke(a, b))
+                unbox revocable
+            | 3 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c -> originalProxy.Invoke(a, b, c))
+                unbox revocable
+            | 4 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c d -> originalProxy.Invoke(a, b, c, d))
+                unbox revocable
+            | 5 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c d e -> originalProxy.Invoke(a, b, c, d, e))
+                unbox revocable
+            | 6 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c d e f -> originalProxy.Invoke(a, b, c, d, e, f))
+                unbox revocable
+            | 7 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj,obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c d e f g -> originalProxy.Invoke(a, b, c, d, e, f, g))
+                unbox revocable
+            | 8 ->
+                let revocable : RevocableProxy<System.Func<obj,obj,obj,obj,obj,obj,obj,obj,obj>> = unbox <| executor (System.Func<obj,obj,obj,obj,obj,obj,obj,obj,obj> (unbox target)) ph
+                
+                let originalProxy = revocable.proxy
+
+                revocable.proxy <- unbox (fun a b c d e f g h -> originalProxy.Invoke(a, b, c, d, e, f, g, h))
+                unbox revocable
+            | _ -> failwith "Currying to more than 8-arity is not supported for proxies."
+        | _ -> executor target ph
+        |> unbox<'V>
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =
+    open Internal
+
     type Proxy<'T> = 'T
 
     /// A proxy that can be disabled.
-    [<Erase>]
+    [<Global>]
     type RevocableProxy<'T> =
-        [<Emit("$0.proxy")>]
+        /// The proxied item.
         member _.proxy : Proxy<'T> = jsNative
 
         /// Invalidates the proxy.
         ///
         /// Any future calls to the proxy will throw an exception after this
         /// has been called.
-        [<Emit("$0.revoke()")>]
         member _.revoke () : unit = jsNative
 
     /// Defines the custom behavior of the proxy.
@@ -282,19 +385,21 @@ module JSe =
 
     [<Erase>]
     type Proxy =
-        /// Creates a proxy from the specified handler.
-        ///
-        /// *NOTE* - Currently multi-parameter functions do not work.
-        /// See: https://github.com/fable-compiler/Fable/issues/2193
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         [<Emit("new Proxy($0, $1)")>]
-        static member create<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) = unbox<Proxy<'T>>()
+        static member createInternal<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : Proxy<'T> = target
         
-        /// Creates a proxy from the specified handler that can be disabled.
-        ///
-        /// *NOTE* - Currently multi-parameter functions do not work.
-        /// See: https://github.com/fable-compiler/Fable/issues/2193
+        [<EditorBrowsable(EditorBrowsableState.Never)>]
         [<Emit("Proxy.revocable($0, $1)")>]
-        static member createRevocable<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
+        static member createRevocableInternal<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> = jsNative
+        
+        /// Creates a proxy from the specified handler.
+        static member inline create<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : Proxy<'T> =
+            dynamicProxy<'T,Proxy<'T>> target ph (target.GetType().FullName) (unbox Proxy.createInternal)
+
+        /// Creates a proxy from the specified handler that can be disabled.
+        static member inline createRevocable<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> =
+            dynamicRevocableProxy<'T,RevocableProxy<'T>> target ph (target.GetType().FullName) (unbox Proxy.createRevocableInternal)
 
     [<Global>]
     type Reflect =
