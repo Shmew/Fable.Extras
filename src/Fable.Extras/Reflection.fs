@@ -7,8 +7,6 @@ open System.ComponentModel
 
 [<EditorBrowsable(EditorBrowsableState.Never)>]
 module Internal =
-    open Fable.Core.JsInterop
-    
     [<EditorBrowsable(EditorBrowsableState.Never)>]
     let dynamicProxy<'T,'V when 'T : not struct> (target: 'T) (ph: obj) (targetFullName: string) (executor: obj -> obj -> obj) : 'V =
         match JSe.typeof target with

@@ -7,6 +7,7 @@
 #load "./tools/Web.fs"
 #load "./.fake/build.fsx/intellisense.fsx"
 
+open BlackFox.CommandLine
 open Fake.Core
 open Fake.Core.TargetOperators
 open Fake.DotNet
@@ -54,15 +55,20 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
     | f when f.EndsWith("shproj") -> Shproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
     
-let srcGlob    = __SOURCE_DIRECTORY__ @@ "src/**/*.??proj"
-let fsSrcGlob  = __SOURCE_DIRECTORY__ @@ "src/**/*.fs"
-let fsTestGlob = __SOURCE_DIRECTORY__ @@ "tests/**/*.fs"
-let bin        = __SOURCE_DIRECTORY__ @@ "bin"
-let docs       = __SOURCE_DIRECTORY__ @@ "docs"
-let temp       = __SOURCE_DIRECTORY__ @@ "temp"
-let objFolder  = __SOURCE_DIRECTORY__ @@ "obj"
-let dist       = __SOURCE_DIRECTORY__ @@ "dist"
-let libGlob    = __SOURCE_DIRECTORY__ @@ "src/**/*.fsproj"
+let srcGlob        = __SOURCE_DIRECTORY__ @@ "src/**/*.??proj"
+let fsSrcGlob      = __SOURCE_DIRECTORY__ @@ "src/**/*.fs"
+let fsTestGlob     = __SOURCE_DIRECTORY__ @@ "tests/**/*.fs"
+let bin            = __SOURCE_DIRECTORY__ @@ "bin"
+let docs           = __SOURCE_DIRECTORY__ @@ "docs"
+let temp           = __SOURCE_DIRECTORY__ @@ "temp"
+let objFolder      = __SOURCE_DIRECTORY__ @@ "obj"
+let dist           = __SOURCE_DIRECTORY__ @@ "dist"
+let libGlob        = __SOURCE_DIRECTORY__ @@ "src/**/*.fsproj"
+let wasmDir        = __SOURCE_DIRECTORY__ @@ "tests/Fable.Extras.Tests/wasm"
+let wasmSrcDir     = __SOURCE_DIRECTORY__ @@ "src/fable-wasm/pkg"
+let wasmImportDir  = __SOURCE_DIRECTORY__ @@ "src/fable-wasm-import/pkg"
+let wasmGlob       = wasmSrcDir @@ "*.wasm"
+let wasmImportGlob = wasmImportDir @@ "*.wasm"
 
 let foldExcludeGlobs (g: IGlobbingPattern) (d: string) = g -- d
 let foldIncludeGlobs (g: IGlobbingPattern) (d: string) = g ++ d
@@ -128,17 +134,26 @@ Target.create "CopyBinaries" <| fun _ ->
     |> Seq.map (fun f -> ((Path.getDirectory f) @@ "bin" @@ configuration(), "bin" @@ (Path.GetFileNameWithoutExtension f)))
     |> Seq.iter (fun (fromDir, toDir) -> Shell.copyDir toDir fromDir (fun _ -> true))
 
+Target.create "CopyWasm" <| fun _ ->
+    !! wasmGlob
+    ++ wasmImportGlob
+    |> Shell.copy wasmDir
+
 // --------------------------------------------------------------------------------------
 // Clean tasks
 
 Target.create "Clean" <| fun _ ->
     let clean() =
-        !! (__SOURCE_DIRECTORY__  @@ "tests/**/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "tests/**/obj")
-        ++ (__SOURCE_DIRECTORY__  @@ "tools/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "tools/obj")
-        ++ (__SOURCE_DIRECTORY__  @@ "src/**/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "src/**/obj")
+        !! (__SOURCE_DIRECTORY__ @@ "tests/**/bin")
+        ++ (__SOURCE_DIRECTORY__ @@ "tests/**/obj")
+        ++ (__SOURCE_DIRECTORY__ @@ "tools/bin")
+        ++ (__SOURCE_DIRECTORY__ @@ "tools/obj")
+        ++ (__SOURCE_DIRECTORY__ @@ "src/**/bin")
+        ++ (__SOURCE_DIRECTORY__ @@ "src/**/obj")
+        ++ (__SOURCE_DIRECTORY__ @@ ".fable")
+        ++ wasmDir
+        ++ wasmSrcDir
+        ++ wasmImportDir
         |> Seq.toList
         |> List.append [bin; temp; objFolder; dist]
         |> Shell.cleanDirs
@@ -193,6 +208,15 @@ Target.create "YarnInstall" <| fun _ ->
         }
     Yarn.install setParams
 
+Target.create "RustUpgrade" <| fun _ ->
+    CmdLine.empty
+    |> CmdLine.append "update"
+    |> CmdLine.toString
+    |> CreateProcess.fromRawCommandLine "rustup"
+    |> CreateProcess.ensureExitCodeWithMessage "Rust update failed."
+    |> Proc.run
+    |> ignore
+
 // --------------------------------------------------------------------------------------
 // Build tasks
 
@@ -216,6 +240,10 @@ Target.create "Build" <| fun _ ->
     !! libGlob
     |> List.ofSeq
     |> List.iter (MSBuild.build setParams)
+
+Target.create "BuildWasm" <| fun _ ->
+    Yarn.exec "build-wasm" id
+    Yarn.exec "build-wasm-import" id
 
 // --------------------------------------------------------------------------------------
 // Publish net core applications
@@ -360,12 +388,15 @@ Target.create "Publish" ignore
 "Clean"
   ==> "Restore"
   ==> "PackageJson"
+  ==> "RustUpgrade"
   ==> "YarnInstall"
   ==> "Build"
-  ==> "PostBuildClean" 
+  ==> "BuildWasm"
+  ==> "CopyWasm"
+  ==> "PostBuildClean"
   ==> "CopyBinaries"
 
-"Build" ==> "RunTests"
+"CopyWasm" ==> "RunTests"
 
 "Build"
   ==> "PostBuildClean"

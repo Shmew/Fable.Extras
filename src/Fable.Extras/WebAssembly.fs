@@ -10,7 +10,7 @@ type WA =
     /// The size of a WebAssembly page in bytes.
     static member inline bytesPerPage = 65536
 
-[<Erase;RequireQualifiedAccess>]
+[<RequireQualifiedAccess>]
 module WA =
     /// Indicates an error during WebAssembly decoding or validation.
     [<Global>]
@@ -292,8 +292,7 @@ module WA =
         | Memory
         | Table
 
-    [<AbstractClass;Erase>]
-    type ModuleExportDescriptor [<Emit("null")>] () =
+    type ModuleExportDescriptor =
         [<Emit("$0.kind")>]
         member _.Kind : ImportExportKind = jsNative
 
@@ -305,8 +304,7 @@ module WA =
         let inline kind (descriptor: #ModuleExportDescriptor) = descriptor.Kind
         let inline name (descriptor: #ModuleExportDescriptor) = descriptor.Name
     
-    [<AbstractClass;Erase>]
-    type ModuleImportDescriptor [<Emit("null")>] () =
+    type ModuleImportDescriptor =
         [<Emit("$0.kind")>]
         member _.Kind : ImportExportKind = jsNative
         
@@ -328,7 +326,28 @@ module WA =
     ///
     /// You should avoid using the constructor when possible as it will compile the module synchronously.
     [<Global>]
-    type Module<'Imports,'Exports when 'Imports :> ModuleImportDescriptor and 'Exports :> ModuleExportDescriptor> private () =
+    type Module<'Exports when 'Exports : not struct> private () =
+        [<Emit("new WebAssembly.Module($0)")>]
+        new (buffer: Fable.Core.JS.ArrayBuffer) = new Module<'Exports>()
+
+        [<Emit("new WebAssembly.Module($0)")>]
+        new (buffer: Fable.Core.JS.ArrayBufferView) = new Module<'Exports>()
+        
+        /// Returns a copy of the contents of all custom sections in the given module with the given string name.
+        [<Emit("WebAssembly.Module.customSections($0, $1)")>]
+        static member customSections (module': Module<'Exports>) (sectionName: string) : JS.ArrayBuffer [] = jsNative
+        
+        /// Returns an array containing descriptions of all the declared exports of the given Module.
+        [<Emit("WebAssembly.Module.exports($0)")>]
+        static member exports (module': Module<'Exports>) : ModuleExportDescriptor [] = jsNative
+
+    /// Creates a new Module object containing stateless WebAssembly code that has already 
+    /// been compiled by the browser and can be efficiently shared with Workers, and 
+    /// instantiated multiple times.
+    ///
+    /// You should avoid using the constructor when possible as it will compile the module synchronously.
+    [<Global>]
+    type Module<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> private () =
         [<Emit("new WebAssembly.Module($0)")>]
         new (buffer: Fable.Core.JS.ArrayBuffer) = new Module<'Imports,'Exports>()
 
@@ -347,8 +366,51 @@ module WA =
         [<Emit("WebAssembly.Module.imports($0)")>]
         static member imports (module': Module<'Imports,'Exports>) : ModuleImportDescriptor [] = jsNative
 
-    type Import<'T> =
-        { imports: 'T }
+    /// An object containing the values to be imported into the newly-created Instance, 
+    /// such as functions or WebAssembly.Memory objects.
+    [<Global>]
+    type Import<'Imports when 'Imports : not struct> private () =
+        [<Emit("Object.defineProperty(Object.create(null), 'imports', {value: $0})")>]
+        new (imports: 'Imports) = Import(imports)
+
+        [<Emit("$0.imports")>]
+        member _.Imports: 'Imports = jsNative
+    
+    /// An object containing the values to be imported into the newly-created Instance, 
+    /// such as functions or WebAssembly.Memory objects.
+    ///
+    /// For use with Rust WebAssembly imports.
+    ///
+    /// Rust wasm looks for a {env: ...} object rather than {imports: ...}
+    [<Global>]
+    type ImportEnv<'Imports when 'Imports : not struct> private () =
+        [<Emit("Object.defineProperty(Object.create(null), 'env', {value: $0})")>]
+        new (imports: 'Imports) = ImportEnv(imports)
+
+        [<Emit("$0.env")>]
+        member _.Env: 'Imports = jsNative
+
+    /// <summary>
+    /// A stateful, executable instance of a WebAssembly.Module.
+    ///
+    /// Since instantiation for large modules can be expensive, developers should only use the Instance constructor
+    /// when synchronous instantiation is absolutely required; the asynchronous WA.instantiateStreaming
+    /// method should be used at all other times.
+    /// </summary>
+    /// <exception cref="System.Exception">There must be one matching property for each declared import for the module
+    /// when an importObject is defined or else a WebAssembly.LinkError is thrown.</exception>
+    [<Global>]
+    type Instance<'Exports when 'Exports : not struct> private () =
+        new (module': Module<'Exports>) = new Instance<'Exports>()
+
+        [<Emit("$0.customSections")>]
+        member _.CustomSections : JS.ArrayBuffer = jsNative
+
+        [<Emit("$0.exports")>]
+        member _.Exports : 'Exports = jsNative
+        
+        static member inline customSections (i: Instance<'Exports>) = i.CustomSections
+        static member inline exports (i: Instance<'Exports>) = i.Exports
         
     /// <summary>
     /// A stateful, executable instance of a WebAssembly.Module.
@@ -360,27 +422,37 @@ module WA =
     /// <exception cref="System.Exception">There must be one matching property for each declared import for the module
     /// when an importObject is defined or else a WebAssembly.LinkError is thrown.</exception>
     [<Global>]
-    type Instance<'Imports,'Exports when 'Imports :> ModuleImportDescriptor and 'Exports :> ModuleExportDescriptor> private () =
+    type Instance<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> private () =
         new (module': Module<'Imports,'Exports>, ?importObject: Import<'Imports>) = new Instance<'Imports,'Exports>()
 
         [<Emit("$0.customSections")>]
         member _.CustomSections : JS.ArrayBuffer = jsNative
 
         [<Emit("$0.exports")>]
-        member _.Exports : 'Imports = jsNative
+        member _.Exports : 'Exports = jsNative
         
         [<Emit("$0.imports")>]
-        member _.Imports : 'Exports = jsNative
+        member _.Imports : 'Imports = jsNative
         
-    /// A stateful, executable instance of a WebAssembly.Module.
-    [<Erase;RequireQualifiedAccess>]
-    module Instance =
-        let inline customSections (i: Instance<'Imports,'Exports>) = i.CustomSections
-        let inline exports (i: Instance<'Imports,'Exports>) = i.Exports
-        let inline imports (i: Instance<'Imports,'Exports>) = i.Imports
+        static member inline customSections (i: Instance<'Imports,'Exports>) = i.CustomSections
+        static member inline exports (i: Instance<'Imports,'Exports>) = i.Exports
+        static member inline imports (i: Instance<'Imports,'Exports>) = i.Imports
 
     [<Erase>]
-    type InstantiateResult<'Imports,'Exports when 'Imports :> ModuleImportDescriptor and 'Exports :> ModuleExportDescriptor> =
+    type InstantiateResult<'Exports when 'Exports : not struct> =
+        /// The compiled WebAssembly Module. 
+        ///
+        /// This Module can be instantiated again, shared via postMessage() or 
+        /// cached in IndexedDB.
+        [<Emit("$0.module")>]
+        member _.Module : Module<'Exports> = jsNative
+        
+        /// A WebAssembly Instance that contains all the exported WebAssembly functions.
+        [<Emit("$0.instance")>]
+        member _.Instance : Instance<'Exports> = jsNative
+
+    [<Erase>]
+    type InstantiateResult<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> =
         /// The compiled WebAssembly Module. 
         ///
         /// This Module can be instantiated again, shared via postMessage() or 
@@ -403,7 +475,27 @@ module WAExtensions =
         /// </summary>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.compile($0)")>]
-        static member compile<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member compile<'Exports when 'Exports : not struct>
+            (bufferSource: JS.TypedArray) : JS.Promise<WA.Module<'Exports>> = jsNative
+        /// <summary>
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        /// </summary>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.compile($0)")>]
+        static member compile<'Exports when 'Exports : not struct>
+            (bufferSource: JS.ArrayBuffer) : JS.Promise<WA.Module<'Exports>> = jsNative
+        /// <summary>
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        /// </summary>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.compile($0)")>]
+        static member compile<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (bufferSource: JS.TypedArray) : JS.Promise<WA.Module<'Imports,'Exports>> = jsNative
         /// <summary>
         /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
@@ -413,14 +505,32 @@ module WAExtensions =
         /// </summary>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.compile($0)")>]
-        static member compile<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member compile<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (bufferSource: JS.ArrayBuffer) : JS.Promise<WA.Module<'Imports,'Exports>> = jsNative
 
         /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
         ///
         /// This function is useful if it is necessary to a compile a module before it can be instantiated 
         /// (otherwise, the WA.instantiate function should be used).
-        static member inline tryCompile<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member inline tryCompile<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.TypedArray) =
+            
+            try WA.compile<'Exports>(bufferSource) |> Ok
+            with e -> Error e
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        static member inline tryCompile<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer) =
+            
+            try WA.compile<'Exports>(bufferSource) |> Ok
+            with e -> Error e
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        static member inline tryCompile<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (bufferSource: JS.TypedArray) =
             
             try WA.compile<'Imports,'Exports>(bufferSource) |> Ok
@@ -429,7 +539,7 @@ module WAExtensions =
         ///
         /// This function is useful if it is necessary to a compile a module before it can be instantiated 
         /// (otherwise, the WA.instantiate function should be used).
-        static member inline tryCompile<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member inline tryCompile<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (bufferSource: JS.ArrayBuffer) =
             
             try WA.compile<'Imports,'Exports>(bufferSource) |> Ok
@@ -443,7 +553,27 @@ module WAExtensions =
         /// </summary>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.compileStreaming($0)")>]
-        static member compileStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member compileStreaming<'Exports when 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse) : JS.Promise<WA.Module<'Exports>> = jsNative
+        /// <summary>
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        /// </summary>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.compileStreaming($0)")>]
+        static member compileStreaming<'Exports when 'Exports : not struct> 
+            (source: Fetch.Types.Response) : JS.Promise<WA.Module<'Exports>> = jsNative
+        /// <summary>
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        /// </summary>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.compileStreaming($0)")>]
+        static member compileStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (source: Fable.SimpleHttp.HttpResponse) : JS.Promise<WA.Module<'Imports,'Exports>> = jsNative
         /// <summary>
         /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
@@ -453,14 +583,14 @@ module WAExtensions =
         /// </summary>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.compileStreaming($0)")>]
-        static member compileStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
+        static member compileStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
             (source: Fetch.Types.Response) : JS.Promise<WA.Module<'Imports,'Exports>> = jsNative
 
         /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
         ///
         /// This function is useful if it is necessary to a compile a module before it can be instantiated 
         /// (otherwise, the WA.instantiate function should be used).
-        static member tryCompileStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> (source: Fable.SimpleHttp.HttpResponse) =
+        static member inline tryCompileStreaming<'Exports when 'Exports : not struct> (source: Fable.SimpleHttp.HttpResponse) =
             promise {
                 try
                     return! WA.compileStreaming(source) |> Promise.map Ok
@@ -471,7 +601,29 @@ module WAExtensions =
         ///
         /// This function is useful if it is necessary to a compile a module before it can be instantiated 
         /// (otherwise, the WA.instantiate function should be used).
-        static member tryCompileStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> (source: Fetch.Types.Response) =
+        static member inline tryCompileStreaming<'Exports> (source: Fetch.Types.Response) =
+            promise {
+                try
+                    return! WA.compileStreaming(source) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        static member inline tryCompileStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> (source: Fable.SimpleHttp.HttpResponse) =
+            promise {
+                try
+                    return! WA.compileStreaming(source) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Compiles WebAssembly binary code into a WebAssembly.Module object. 
+        ///
+        /// This function is useful if it is necessary to a compile a module before it can be instantiated 
+        /// (otherwise, the WA.instantiate function should be used).
+        static member inline tryCompileStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> (source: Fetch.Types.Response) =
             promise {
                 try
                     return! WA.compileStreaming(source) |> Promise.map Ok
@@ -491,8 +643,8 @@ module WAExtensions =
         /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.instantiate($0...)")>]
-        static member instantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (bufferSource: JS.TypedArray, ?importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        static member instantiate<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.TypedArray) : JS.Promise<WA.InstantiateResult<'Exports>> = jsNative
         /// <summary>
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -505,8 +657,8 @@ module WAExtensions =
         /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.instantiate($0...)")>]
-        static member instantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (bufferSource: JS.ArrayBuffer, ?importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        static member instantiate<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer) : JS.Promise<WA.InstantiateResult<'Exports>> = jsNative
         /// <summary>
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -519,8 +671,92 @@ module WAExtensions =
         /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.instantiate($0...)")>]
-        static member instantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (module': WA.Module<'Imports,'Exports>, ?importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        static member instantiate<'Exports when 'Exports : not struct> 
+            (module': WA.Module<'Exports>) : JS.Promise<WA.InstantiateResult<'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.TypedArray, importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.TypedArray, importObject: WA.ImportEnv<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer, importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer, importObject: WA.ImportEnv<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (module': WA.Module<'Imports,'Exports>, importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiate($0...)")>]
+        static member instantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (module': WA.Module<'Imports,'Exports>, importObject: WA.ImportEnv<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
 
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -529,10 +765,10 @@ module WAExtensions =
         /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
         /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
         /// bytecode, so doesn't require conversion to an ArrayBuffer.
-        static member tryInstantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (bufferSource: JS.TypedArray, ?importObject: WA.Import<'Imports>) =
+        static member inline tryInstantiate<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.TypedArray) =
             
-            try WA.instantiate<'Imports,'Exports>(bufferSource, ?importObject = importObject) |> Ok
+            try WA.instantiate<'Exports>(bufferSource) |> Ok
             with e -> Error e
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -541,10 +777,10 @@ module WAExtensions =
         /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
         /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
         /// bytecode, so doesn't require conversion to an ArrayBuffer.
-        static member tryInstantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (bufferSource: JS.ArrayBuffer, ?importObject: WA.Import<'Imports>) = 
+        static member inline tryInstantiate<'Exports when 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer) = 
 
-            try WA.instantiate<'Imports,'Exports>(bufferSource, ?importObject = importObject) |> Ok
+            try WA.instantiate<'Exports>(bufferSource) |> Ok
             with e -> Error e
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -553,10 +789,82 @@ module WAExtensions =
         /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
         /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
         /// bytecode, so doesn't require conversion to an ArrayBuffer.
-        static member tryInstantiate<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (module': WA.Module<'Imports,'Exports>, ?importObject: WA.Import<'Imports>) =
+        static member inline tryInstantiate<'Exports when 'Exports : not struct> 
+            (module': WA.Module<'Exports>) =
             
-            try WA.instantiate<'Imports,'Exports>(module', ?importObject = importObject) |> Ok
+            try WA.instantiate<'Exports>(module') |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.TypedArray, importObject: WA.Import<'Imports>) =
+            
+            try WA.instantiate<'Imports,'Exports>(bufferSource, importObject = importObject) |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.TypedArray, importObject: WA.ImportEnv<'Imports>) =
+            
+            try WA.instantiate<'Imports,'Exports>(bufferSource, importObject = importObject) |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer, importObject: WA.Import<'Imports>) = 
+
+            try WA.instantiate<'Imports,'Exports>(bufferSource, importObject = importObject) |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (bufferSource: JS.ArrayBuffer, importObject: WA.ImportEnv<'Imports>) = 
+
+            try WA.instantiate<'Imports,'Exports>(bufferSource, importObject = importObject) |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (module': WA.Module<'Imports,'Exports>, importObject: WA.Import<'Imports>) =
+            
+            try WA.instantiate<'Imports,'Exports>(module', importObject = importObject) |> Ok
+            with e -> Error e
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiate<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (module': WA.Module<'Imports,'Exports>, importObject: WA.ImportEnv<'Imports>) =
+            
+            try WA.instantiate<'Imports,'Exports>(module', importObject = importObject) |> Ok
             with e -> Error e
 
         /// <summary>
@@ -571,8 +879,8 @@ module WAExtensions =
         /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.instantiateStreaming($0...)")>]
-        static member instantiateStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (source: Fable.SimpleHttp.HttpResponse, ?importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        static member instantiateStreaming<'Exports when 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse) : JS.Promise<WA.InstantiateResult<'Exports>> = jsNative
         /// <summary>
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -585,8 +893,64 @@ module WAExtensions =
         /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
         /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
         [<Emit("WebAssembly.instantiateStreaming($0...)")>]
-        static member instantiateStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (source: Fetch.Types.Response, ?importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        static member instantiateStreaming<'Exports when 'Exports : not struct> 
+            (source: Fetch.Types.Response) : JS.Promise<WA.InstantiateResult<'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiateStreaming($0...)")>]
+        static member instantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse, importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiateStreaming($0...)")>]
+        static member instantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse, importObject: WA.ImportEnv<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiateStreaming($0...)")>]
+        static member instantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fetch.Types.Response, importObject: WA.Import<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
+        /// <summary>
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        /// </summary>
+        /// <exception cref="System.Exception">The module loaded does not match the provided type structure.</exception>
+        /// <exception cref="System.Exception">The operation failed and the promise rejects.</exception>
+        [<Emit("WebAssembly.instantiateStreaming($0...)")>]
+        static member instantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fetch.Types.Response, importObject: WA.ImportEnv<'Imports>) : JS.Promise<WA.InstantiateResult<'Imports,'Exports>> = jsNative
 
         /// Allows you to compile and instantiate WebAssembly code.
         ///
@@ -595,12 +959,12 @@ module WAExtensions =
         /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
         /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
         /// bytecode, so doesn't require conversion to an ArrayBuffer.
-        static member tryInstantiateStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (source: Fable.SimpleHttp.HttpResponse, ?importObject: WA.Import<'Imports>) =
+        static member inline tryInstantiateStreaming<'Exports when 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse) =
                 
             promise {
                 try
-                    return! WA.instantiateStreaming<'Imports,'Exports>(source, ?importObject = importObject) |> Promise.map Ok
+                    return! WA.instantiateStreaming<'Exports>(source) |> Promise.map Ok
                 with e ->
                     return Error e
             }
@@ -611,12 +975,76 @@ module WAExtensions =
         /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
         /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
         /// bytecode, so doesn't require conversion to an ArrayBuffer.
-        static member tryInstantiateStreaming<'Imports,'Exports when 'Imports :> WA.ModuleImportDescriptor and 'Exports :> WA.ModuleExportDescriptor> 
-            (source: Fetch.Types.Response, ?importObject: WA.Import<'Imports>) =
+        static member inline tryInstantiateStreaming<'Exports when 'Exports : not struct> 
+            (source: Fetch.Types.Response) =
 
             promise {
                 try
-                    return! WA.instantiateStreaming<'Imports,'Exports>(source, ?importObject = importObject) |> Promise.map Ok
+                    return! WA.instantiateStreaming<'Exports>(source) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse, importObject: WA.Import<'Imports>) =
+                
+            promise {
+                try
+                    return! WA.instantiateStreaming<'Imports,'Exports>(source, importObject = importObject) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fable.SimpleHttp.HttpResponse, importObject: WA.ImportEnv<'Imports>) =
+                
+            promise {
+                try
+                    return! WA.instantiateStreaming<'Imports,'Exports>(source, importObject = importObject) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fetch.Types.Response, importObject: WA.Import<'Imports>) =
+
+            promise {
+                try
+                    return! WA.instantiateStreaming<'Imports,'Exports>(source, importObject = importObject) |> Promise.map Ok
+                with e ->
+                    return Error e
+            }
+        /// Allows you to compile and instantiate WebAssembly code.
+        ///
+        /// This method is not the most efficient way of fetching and instantiating wasm modules. 
+        ///
+        /// If at all possible, you should use the newer WebAssembly.instantiateStreaming() method instead, 
+        /// which fetches, compiles, and instantiates a module all in one step, directly from the raw 
+        /// bytecode, so doesn't require conversion to an ArrayBuffer.
+        static member inline tryInstantiateStreaming<'Imports,'Exports when 'Imports : not struct and 'Exports : not struct> 
+            (source: Fetch.Types.Response, importObject: WA.ImportEnv<'Imports>) =
+
+            promise {
+                try
+                    return! WA.instantiateStreaming<'Imports,'Exports>(source, importObject = importObject) |> Promise.map Ok
                 with e ->
                     return Error e
             }

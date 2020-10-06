@@ -339,12 +339,14 @@ Jest.describe("Object", fun () ->
 )
 
 Jest.describe("Date", fun () ->
-    Jest.beforeAll <| fun () ->
+    Jest.beforeAll(fun () ->
         Jest.useFakeTimers()
         Jest.setSystemTime(0)
+    )
 
-    Jest.afterAll <| fun () ->
+    Jest.afterAll(fun () ->
         Jest.clearAllTimers()
+    )
 
     Jest.test("Can create an empty Date", fun () ->
         let d = JSe.Date()
@@ -379,11 +381,13 @@ Jest.describe("JSON", fun () ->
 )
 
 Jest.describe("Promise", fun () ->
-    Jest.beforeAll <| fun () ->
+    Jest.beforeAll(fun () ->
         Jest.useFakeTimers()
-        
-    Jest.afterAll <| fun () ->
+    )
+
+    Jest.afterAll(fun () ->
         Jest.clearAllTimers()
+    )
 
     Jest.test("Can create", promise {
         let p = JSe.Promise(fun resolve _ -> resolve 1)

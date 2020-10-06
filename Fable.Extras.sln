@@ -119,6 +119,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-assembly", "web-assembl
 		docs\web-assembly\table.md = docs\web-assembly\table.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fable-wasm", "fable-wasm", "{C45AE787-9BBD-4210-859D-25318D965691}"
+	ProjectSection(SolutionItems) = preProject
+		src\fable-wasm\.cargo-ok = src\fable-wasm\.cargo-ok
+		src\fable-wasm\Cargo.toml = src\fable-wasm\Cargo.toml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{57F94FB3-C267-4A9E-BCA4-0D30942C96AE}"
+	ProjectSection(SolutionItems) = preProject
+		src\fable-wasm\src\lib.rs = src\fable-wasm\src\lib.rs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wasm", "wasm", "{401D9744-543E-469B-88F8-DA4DB25B2AD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fable-wasm-import", "fable-wasm-import", "{DCC29D18-A112-4DE2-83B1-4DFFB09AF375}"
+	ProjectSection(SolutionItems) = preProject
+		src\fable-wasm-import\.cargo-ok = src\fable-wasm-import\.cargo-ok
+		src\fable-wasm-import\Cargo.lock = src\fable-wasm-import\Cargo.lock
+		src\fable-wasm-import\Cargo.toml = src\fable-wasm-import\Cargo.toml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{24B30831-74FB-4938-A811-FE74EE4E7F81}"
+	ProjectSection(SolutionItems) = preProject
+		src\fable-wasm-import\src\lib.rs = src\fable-wasm-import\src\lib.rs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -154,6 +179,10 @@ Global
 		{DDB4E323-F103-4A89-B4D4-5E351628B4DA} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
 		{FD5A1C5B-D06B-422F-940A-02DFE4970DFA} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
 		{14DDF4D7-7136-495B-87C7-2020C760E154} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{C45AE787-9BBD-4210-859D-25318D965691} = {401D9744-543E-469B-88F8-DA4DB25B2AD1}
+		{57F94FB3-C267-4A9E-BCA4-0D30942C96AE} = {C45AE787-9BBD-4210-859D-25318D965691}
+		{DCC29D18-A112-4DE2-83B1-4DFFB09AF375} = {401D9744-543E-469B-88F8-DA4DB25B2AD1}
+		{24B30831-74FB-4938-A811-FE74EE4E7F81} = {DCC29D18-A112-4DE2-83B1-4DFFB09AF375}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {96DAE6A9-B1CC-4FF7-B08C-D5FBFD55B385}

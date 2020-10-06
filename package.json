@@ -14,6 +14,8 @@
   },
   "scripts": {
     "build": "webpack -p",
+    "build-wasm": "wasm-pack build src/fable-wasm",
+    "build-wasm-import": "wasm-pack build src/fable-wasm-import",
     "pretest": "fable-splitter -c tests/Fable.Extras.Tests/splitter.config.js",
     "publish-docs": "node publish.js",
     "start": "live-server --port=8080 docs/",
@@ -45,7 +47,8 @@
     "live-server": "^1",
     "nodemon": "^2",
     "npx": "^10",
-    "prettier": "^2"
+    "prettier": "^2",
+    "wasm-pack": "^0"
   },
   "private": true,
   "jest": {

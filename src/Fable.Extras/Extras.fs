@@ -1263,6 +1263,9 @@ module JSe =
         [<Emit("$0")>]
         new (ab: JS.ArrayBuffer) = ArrayBuffer(0)
 
+        [<Emit("$0")>]
+        new (b: System.Buffer) = ArrayBuffer(0)
+
         /// The read-only size, in bytes, of the ArrayBuffer.
         [<Emit("$0.byteLength")>]
         member _.ByteLength: int = jsNative
