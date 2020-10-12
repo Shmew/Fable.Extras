@@ -221,7 +221,7 @@ Target.create "RustUpgrade" <| fun _ ->
 // Build tasks
 
 Target.create "Build" <| fun _ ->
-    let setParams (defaults:MSBuildParams) =
+    let setParams (defaults: MSBuildParams) =
         { defaults with
             Verbosity = Some(Quiet)
             Targets = ["Build"]
@@ -443,7 +443,7 @@ Target.create "Publish" ignore
 
 "Dev" <== ["All"; "ConfigDebug"; "Start"]
 
-"Release" <== ["All"; "NuGet"; "ConfigRelease"]
+"Release" <== ["All"; "NuGet"; "ConfigRelease"; "PrepDocs"]
 
 "Publish" <== ["Release"; "ConfigRelease"; "NuGetPublish"; "PublishDocs"; "GitTag"; "GitPush" ]
 
