@@ -106,7 +106,7 @@ bool
 
 The Javascript || operator to collect the first non-None option
 
-<Note>This is available as an operator, see [operators](/operators#todo).</Note>
+<Note>This is available as an operator, see [operators](/operators#or).</Note>
 
 Signature:
 ```fsharp
