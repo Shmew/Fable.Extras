@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Fable.Extras</title>
+    <link rel="stylesheet" href="https://unpkg.com/docute@4/dist/docute.css">
+    <link rel="stylesheet" type="text/css" href="styles/website.css">
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
+    <script>
+        // make images work using absolute urls both in developement and when published to github
+        Vue.component("ResolvedImage", {
+            props: ["source"],
+            template: "<img :src='resolvedUrl' />",
+            computed: {
+                resolvedUrl: function () {
+                    let path = window.location.pathname;
+                    if (path.endsWith("/")) {
+                        return path.substr(0, path.length - 1) + this.source;
+                    } else {
+                        return path + this.source;
+                    }
+                }
+            }
+        });
+
+        var docs = new Docute({
+            detectSystemDarkTheme: true,
+            darkThemeToggler: true,
+            imageZoom: true,
+            layout: "wide",
+            target: "#root",
+            highlight: ["fsharp", "bash", "powershell", "json"],
+            cssVariables: {
+                accentColor: "hsl(171, 100%, 41%)",
+                sidebarWidth: "300px",
+                sidebarLinkActiveColor: "hsl(171, 100%, 41%)",
+                sidebarLinkArrowColor: "hsl(171, 100%, 41%)"
+            },
+            nav: [
+                { title: "GitHub Repository", link: "https://github.com/Shmew/Fable.Extras" }
+            ],
+            sidebar: [
+                { title: "Introduction", link: "/" },
+                { title: "Installation", link: "/installation" },
+                { title: "Release Notes", link: "/RELEASE_NOTES" },
+                {
+                    title: "Extras",
+                    links: [
+                        { title: "Array Buffer", link: "/extras/array-buffer" },
+                        { title: "Array", link: "/extras/array" },
+                        { title: "Console", link: "/extras/console" },
+                        { title: "Data View", link: "/extras/data-view" },
+                        { title: "Date", link: "/extras/date" },
+                        { title: "Extensions", link: "/extras/extensions" },
+                        { title: "Globals", link: "/extras/globals" },
+                        { title: "JSON", link: "/extras/json" },
+                        { title: "Map", link: "/extras/map" },
+                        { title: "Math", link: "/extras/math" },
+                        { title: "Number", link: "/extras/number" },
+                        { title: "Promise", link: "/extras/promise" },
+                        { title: "Property Descriptor", link: "/extras/property-descriptor" },
+                        { title: "Regular Expressions", link: "/extras/reg-exp" },
+                        { title: "Set", link: "/extras/set" },
+                        { title: "Typed Array", link: "/extras/typed-array" },
+                        { title: "Weak Map", link: "/extras/weak-map" },
+                        { title: "Weak Set", link: "/extras/weak-set" }
+                    ]
+                },
+                {
+                    title: "Atomics",
+                    links: [
+                        { title: "Atomics", link: "/atomics/atomics" },
+                        { title: "Shared Array Buffer", link: "/atomics/shared-array-buffer" }
+                    ]
+                },
+                {
+                    title: "Reflection",
+                    links: [
+                        { title: "Proxy Handler", link: "/reflection/proxy-handler" },
+                        { title: "Proxy", link: "/reflection/proxy" },
+                        { title: "Reflect", link: "/reflection/reflect" }
+                    ]
+                },
+                { title: "MIME Types", link: "/mime" },
+                { title: "Media", link: "/media" },
+                {
+                    title: "Web",
+                    links: [
+                        { title: "Globals", link: "/web/globals" },
+                        { title: "URL Search Parameters", link: "/web/url-search-params" },
+                        { title: "URL", link: "/web/url" }
+                    ]
+                },
+                {
+                    title: "Web Assembly",
+                    links: [
+                        { title: "Errors", link: "/web-assembly/errors" },
+                        { title: "Global", link: "/web-assembly/global" },
+                        { title: "Import", link: "/web-assembly/import" },
+                        { title: "Instance", link: "/web-assembly/instance" },
+                        { title: "Memory", link: "/web-assembly/memory" },
+                        { title: "Module", link: "/web-assembly/module" },
+                        { title: "Table", link: "/web-assembly/table" },
+                        { title: "Web Assembly", link: "/web-assembly/web-assembly" }
+                    ]
+                },
+                { title: "Contributing", link: "/contributing" }
+            ]
+        });
+    </script>
+</body>
+</html>

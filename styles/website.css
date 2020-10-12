@@ -1,0 +1,23 @@
+.Content {
+    max-width: 1000px !important;
+}
+
+/* width */
+*::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+    display: none;
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+    background: rgba(0, 209, 178, 0.54);
+}
+
+/* Handle on hover */
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 209, 178);
+}
