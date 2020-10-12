@@ -6,7 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extras.fs" />
-    <Compile Include="Operators.fs" />
     <Compile Include="Atomics.fs" />
     <Compile Include="Reflection.fs" />
     <Compile Include="Events.fs" />

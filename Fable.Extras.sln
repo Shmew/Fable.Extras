@@ -53,6 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D05F59F8-1
 		docs\contributing.md = docs\contributing.md
 		docs\index.html = docs\index.html
 		docs\installation.md = docs\installation.md
+		docs\media.md = docs\media.md
 		docs\mime.md = docs\mime.md
 		docs\operators.md = docs\operators.md
 	EndProjectSection
@@ -98,6 +99,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extras", "extras", "{44FD47
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reflection", "reflection", "{DDB4E323-F103-4A89-B4D4-5E351628B4DA}"
 	ProjectSection(SolutionItems) = preProject
+		docs\reflection\proxy-handler.md = docs\reflection\proxy-handler.md
 		docs\reflection\proxy.md = docs\reflection\proxy.md
 		docs\reflection\reflect.md = docs\reflection\reflect.md
 	EndProjectSection
@@ -113,10 +115,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web-assembly", "web-assembl
 	ProjectSection(SolutionItems) = preProject
 		docs\web-assembly\errors.md = docs\web-assembly\errors.md
 		docs\web-assembly\global.md = docs\web-assembly\global.md
+		docs\web-assembly\import.md = docs\web-assembly\import.md
 		docs\web-assembly\instance.md = docs\web-assembly\instance.md
 		docs\web-assembly\memory.md = docs\web-assembly\memory.md
 		docs\web-assembly\module.md = docs\web-assembly\module.md
 		docs\web-assembly\table.md = docs\web-assembly\table.md
+		docs\web-assembly\web-assembly.md = docs\web-assembly\web-assembly.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fable-wasm", "fable-wasm", "{C45AE787-9BBD-4210-859D-25318D965691}"

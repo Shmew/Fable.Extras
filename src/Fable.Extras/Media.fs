@@ -6,7 +6,7 @@ open FSharp.Core
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =
-    /// The state of a MediaSource
+    /// The state of a MediaSource.
     [<RequireQualifiedAccess;StringEnum(CaseRules.LowerFirst)>]
     type MediaSourceState =
         /// The source is not currently attached to a media element.
@@ -34,7 +34,6 @@ module JSe =
         /// For example, you might have a function that handles media chunk requests, 
         /// separate from other network requests.
         | Network
-
 
     /// Represents a source of media data for an HTMLMediaElement object. 
     ///

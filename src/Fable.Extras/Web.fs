@@ -26,6 +26,10 @@ module JSe =
     /// one, two, three, or four escape sequences representing the UTF-8 
     /// encoding of the character (will only be four escape sequences for 
     /// characters composed of two "surrogate" characters).
+    ///
+    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
+    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
+    /// however, does encode these characters.
     let inline tryEncodeURI (s: string) =
         try encodeURI s |> Ok
         with e -> Error e
@@ -35,6 +39,8 @@ module JSe =
     /// one, two, three, or four escape sequences representing the UTF-8 
     /// encoding of the character (will only be four escape sequences for 
     /// characters composed of two "surrogate" characters).
+    ///
+    /// This implementation follows RFC3986 by encoding brackets reserved for IPv6.
     ///
     /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
     /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
@@ -49,6 +55,12 @@ module JSe =
     /// one, two, three, or four escape sequences representing the UTF-8 
     /// encoding of the character (will only be four escape sequences for 
     /// characters composed of two "surrogate" characters).
+    ///
+    /// This implementation follows RFC3986 by encoding brackets reserved for IPv6.
+    ///
+    /// Note that encodeURI by itself cannot form proper HTTP, GET, and POST 
+    /// requests, such as for XMLHttpRequest requests. encodeURIComponent, 
+    /// however, does encode these characters.
     let inline tryEncodeURIIPv6 (s: string) =
         try encodeURIIPv6 s |> Ok
         with e -> Error e
@@ -108,6 +120,9 @@ module JSe =
     /// leading ? off of a string, if present.
     [<Global>]
     type URLSearchParams private (o: obj) =
+        [<Emit("new URLSearchParams()")>]
+        new () = URLSearchParams("")
+
         [<Emit("new URLSearchParams($0)")>]
         new (urlEncoded: string) = URLSearchParams(urlEncoded)
 
@@ -131,19 +146,19 @@ module JSe =
         member _.Entries () : seq<string * string> = jsNative
 
         /// Iterates through all keys and values in the object, respectively.
-        [<Emit("$0.forEach($0)")>]
+        [<Emit("$0.forEach($1)")>]
         member _.ForEach (f: string -> string -> unit) : unit = jsNative
         
         /// Returns the first value associated to the given search parameter.
-        [<Emit("$0.get($0)")>]
+        [<Emit("$0.get($1)")>]
         member _.Get (key: string) : string option = jsNative
         
         /// Returns all values associated to the given search parameter.
-        [<Emit("$0.getAll($0)")>]
+        [<Emit("$0.getAll($1)")>]
         member _.GetAll (key: string) : seq<string option> = jsNative
         
         /// Returns a Boolean that indicates whether a parameter with the specified name exists.
-        [<Emit("$0.has($0)")>]
+        [<Emit("$0.has($1)")>]
         member _.Has (key: string) : bool = jsNative
         
         /// Returns a sequence of all keys contained in this object.
@@ -221,9 +236,9 @@ module JSe =
         
         /// Sets the value associated with a given search parameter to the given value. 
         ///
-        /// If there were several matching values, this method deletes the others. 
+        /// If there were several matching values, this function deletes the others. 
         ///
-        /// If the search parameter doesn't exist, this method creates it.
+        /// If the search parameter doesn't exist, this function creates it.
         let inline set (key: string) (value: string) (sp: URLSearchParams) = 
             sp.Set(key, value)
             sp
@@ -231,12 +246,13 @@ module JSe =
         /// Sorts all key/value pairs contained in this object in place. 
         /// The sort order is according to unicode code points of the keys. 
         ///
-        /// This method uses a stable sorting algorithm (i.e. the relative order between 
+        /// This function uses a stable sorting algorithm (i.e. the relative order between 
         /// key/value pairs with equal keys will be preserved).
         let inline sort (sp: URLSearchParams) = 
             sp.Sort()
             sp
 
+        /// Returns the string value of the url search parameters.
         let inline toString (sp: URLSearchParams) = sp.ToString()
         
         /// Returns a sequence of all values of the key/value pairs contained in this object.
@@ -274,8 +290,8 @@ module JSe =
 
         /// A string containing the domain of the URL.
         member _.HostName
-            with [<Emit("$0.hostName")>] get () : string = jsNative
-            and [<Emit("$0.hostName = $1")>] set (x: string) = jsNative
+            with [<Emit("$0.hostname")>] get () : string = jsNative
+            and [<Emit("$0.hostname = $1")>] set (x: string) = jsNative
 
         /// A stringifier that returns a string containing the whole URL.
         member _.Href
@@ -338,7 +354,7 @@ module JSe =
         /// Each time you call createObjectURL, a new object URL is created, even if you've 
         /// already created one for the same object. Each of these must be released by 
         /// calling URL.revokeObjectURL when you no longer need them.
-        static member createObjectURL (o: Browser.Types.File) : string = jsNative
+        static member createObjectURL (o: Browser.Types.Blob) : string = jsNative
         /// Creates a string containing a URL representing the object given in the parameter. 
         ///
         /// The URL lifetime is tied to the document in the window on which it was created. 
@@ -346,7 +362,7 @@ module JSe =
         /// Each time you call createObjectURL, a new object URL is created, even if you've 
         /// already created one for the same object. Each of these must be released by 
         /// calling URL.revokeObjectURL when you no longer need them.
-        static member createObjectURL (o: Browser.Types.Blob) : string = jsNative
+        static member createObjectURL (o: Browser.Types.File) : string = jsNative
         /// Creates a string containing a URL representing the object given in the parameter. 
         ///
         /// The URL lifetime is tied to the document in the window on which it was created. 
@@ -496,6 +512,7 @@ module JSe =
             url.Username <- username
             url
 
+        /// Returns the entire URL.
         let inline toString (url: URL) = url.ToString()
 
         /// Returns a string containing the whole URL. 

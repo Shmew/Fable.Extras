@@ -127,7 +127,8 @@ module JSe =
     type ProxyHandler<'T> [<Emit("Object.create(null)")>] () =
         /// A trap for a function call.
         ///
-        /// The arguments are the target, the `this` keyword scoped to the fuction call, and the function arguments.        
+        /// The arguments are the target, the `this` keyword scoped to the fuction call, 
+        /// and the function arguments.        
         member _.Apply
             with [<Emit("$0.apply")>] get () : ('T -> obj -> obj [] -> obj) option = jsNative
             and [<Emit("$0.apply = $1")>] set (f: ('T -> obj -> obj [] -> obj) option) = jsNative
@@ -143,8 +144,8 @@ module JSe =
         ///
         /// The arguments are the target, property name, and property descriptor.
         member _.DefineProperty
-            with [<Emit("$0.defineProperty")>] get () : ('T -> string -> JS.PropertyDescriptor -> bool) option = jsNative
-            and [<Emit("$0.defineProperty = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor -> bool) option) = jsNative
+            with [<Emit("$0.defineProperty")>] get () : ('T -> string -> JSe.PropertyDescriptor<obj> -> bool) option = jsNative
+            and [<Emit("$0.defineProperty = $1")>] set (f: ('T -> string -> JSe.PropertyDescriptor<obj> -> bool) option) = jsNative
 
         /// A trap for the delete operator.
         ///
@@ -164,8 +165,8 @@ module JSe =
         ///
         /// The arguments are the target and property name.
         member _.GetOwnPropertyDescriptor
-            with [<Emit("$0.getOwnPropertyDescriptor")>] get () : ('T -> string -> JS.PropertyDescriptor option) option = jsNative
-            and [<Emit("$0.getOwnPropertyDescriptor = $1")>] set (f: ('T -> string -> JS.PropertyDescriptor option) option) = jsNative
+            with [<Emit("$0.getOwnPropertyDescriptor")>] get () : ('T -> string -> JSe.PropertyDescriptor<obj> option) option = jsNative
+            and [<Emit("$0.getOwnPropertyDescriptor = $1")>] set (f: ('T -> string -> JSe.PropertyDescriptor<obj> option) option) = jsNative
 
         /// A trap for Object.getPrototypeOf.
         ///
@@ -399,32 +400,33 @@ module JSe =
         static member inline createRevocable<'T when 'T : not struct> (target: 'T) (ph: ProxyHandler<'T>) : RevocableProxy<'T> =
             dynamicRevocableProxy<'T,RevocableProxy<'T>> target ph (target.GetType().FullName) (unbox Proxy.createRevocableInternal)
 
+    /// Provides methods for interceptable operations.
     [<Global>]
     type Reflect =
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         static member apply (target: 'a -> 'b) (thisArg: obj) (arguments: obj []) : 'b = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply2 (target: 'a -> 'b -> 'c) (thisArg: obj) (arguments: obj []) : 'c  = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply3 (target: 'a -> 'b -> 'c -> 'd) (thisArg: obj) (arguments: obj []) : 'd = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply4 (target: 'a -> 'b -> 'c -> 'd -> 'e) (thisArg: obj) (arguments: obj []) : 'e = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply5 (target: 'a -> 'b -> 'c -> 'd -> 'e -> 'f) (thisArg: obj) (arguments: obj []) : 'f = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply6 (target: 'a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g) (thisArg: obj) (arguments: obj []) : 'g = jsNative
 
-        /// Calls a target function with arguments as specified by the argumentsList parameter.
+        /// Calls a target function with arguments as specified by the arguments parameter.
         [<Emit("Reflect.apply($0, $1, $2)")>]
         static member apply7 (target: 'a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h) (thisArg: obj) (arguments: obj []) : 'h = jsNative
 

@@ -8,6 +8,57 @@ open System.Text.RegularExpressions
 
 [<Erase;RequireQualifiedAccess>]
 module JSe =
+    /// Decodes a string of data which has been encoded using Base64 encoding.
+    [<Emit("atob($0)")>]
+    let atob (encodedData: string) : string = jsNative
+
+    /// Creates a Base64-encoded ASCII string from a binary string (i.e., a 
+    /// String object in which each character in the string is treated as a 
+    /// byte of binary data).
+    [<Emit("btoa($0)")>]
+    let btoa (stringToEncode: string) : string = jsNative
+
+    /// Calls the object's apply prototype.
+    [<Emit("$0.apply(this, $1)")>]
+    let apply<'T,'U> (f: 'T) (arguments: obj []) : 'U = jsNative
+
+    /// Applies an argument array to a curried function.
+    [<Emit("$1.reduce((p, c) => p(c), $0)")>]
+    let applyCurried<'T,'U> (f: 'T) (arguments: obj [])  : 'U = jsNative
+
+    /// An Array-like object accessible inside functions that contains 
+    /// the values of the arguments passed to that function.
+    [<Emit("arguments")>]
+    let arguments : obj [] = jsNative
+
+    /// Javascript globalThis keyword.
+    [<Emit("globalThis")>]
+    let globalThis : obj = jsNative
+    
+    /// Returns if the session is considered secure.
+    [<Emit("isSecureContext")>]
+    let isSecureContext : bool = jsNative
+
+    /// The Javascript || operator to collect the first non-None option
+    [<Emit("$0 || $1")>]
+    let or' (lh: 'T option) (rh: 'T option) : 'T option = jsNative
+
+    /// Queues a microtask to be executed at a safe time prior to control returning 
+    /// to the browser's event loop. The microtask is a short function which will 
+    /// run after the current task has completed its work and when there is no other 
+    /// code waiting to be run before control of the execution context is returned 
+    /// to the browser's event loop.
+    ///
+    /// This lets your code run without interfering with any other, potentially higher 
+    /// priority, code that is pending, but before the browser regains control over 
+    /// the execution context, potentially depending on work you need to complete.
+    [<Emit("queueMicrotask($0)")>]
+    let queueMicrotask (f: unit -> unit) : unit = jsNative
+
+    /// Javascript this keyword.
+    [<Emit("this")>]
+    let this' : obj = jsNative
+
     /// Javascript types.
     [<RequireQualifiedAccess;StringEnum(CaseRules.LowerFirst)>]
     type Types =
@@ -25,79 +76,28 @@ module JSe =
     [<Emit("typeof $0")>]
     let typeof (o: obj) : Types = jsNative
 
-    /// Calls the object's apply prototype.
-    [<Emit("$0.apply(this, $1)")>]
-    let apply<'T,'U> (f: 'T) (arguments: obj []) : 'U = jsNative
-
-    /// Applies an argument array to a curried function.
-    [<Emit("$1.reduce((p, c) => p(c), $0)")>]
-    let applyCurried<'T,'U> (f: 'T) (arguments: obj [])  : 'U = jsNative
-
-    /// An Array-like object accessible inside functions that contains 
-    /// the values of the arguments passed to that function.
-    [<Emit("arguments")>]
-    let arguments : obj [] = jsNative
-
-    /// Checks if the session is considered secure.
-    [<Emit("isSecureContext")>]
-    let isSecureContext : bool = jsNative
-
-    /// Javascript globalThis keyword.
-    [<Emit("globalThis")>]
-    let globalThis : obj = jsNative
-
-    /// Javascript this keyword.
-    [<Emit("this")>]
-    let this' : obj = jsNative
-
-    /// The Javascript || operator to collect the first non-None option
-    [<Emit("$0 || $1")>]
-    let or' (lh: 'T option) (rh: 'T option) : 'T option = jsNative
-
-    /// Decodes a string of data which has been encoded using Base64 encoding.
-    [<Emit("atob($0)")>]
-    let atob (encodedData: string) : string = jsNative
-
-    /// Creates a Base64-encoded ASCII string from a binary string (i.e., a 
-    /// String object in which each character in the string is treated as a 
-    /// byte of binary data).
-    [<Emit("btoa($0)")>]
-    let btoa (stringToEncode: string) : string = jsNative
-
-    /// Queues a microtask to be executed at a safe time prior to control returning 
-    /// to the browser's event loop. The microtask is a short function which will 
-    /// run after the current task has completed its work and when there is no other 
-    /// code waiting to be run before control of the execution context is returned 
-    /// to the browser's event loop.
-    ///
-    /// This lets your code run without interfering with any other, potentially higher 
-    /// priority, code that is pending, but before the browser regains control over 
-    /// the execution context, potentially depending on work you need to complete.
-    [<Emit("queueMicrotask($0)")>]
-    let queueMicrotask (f: unit -> unit) : unit = jsNative
-
-    [<Measure>]
-    type TimeoutId
-
     [<Measure>]
     type IntervalId
 
-    /// Schedules a function to execute in a given amount of time (in miliseconds).
-    [<Emit("setTimeout($0, $1)")>]
-    let setTimeout (f: unit -> unit) (timeout: int) : int<TimeoutId> = jsNative
-
-    /// Cancels the delayed execution set using setTimeout.
+    /// Cancels the repeated execution set using setInterval.
     [<Emit("clearTimeout($0)")>]
-    let clearTimeout (id: int<TimeoutId>) : unit = jsNative
+    let clearInterval (id: int<IntervalId>) : unit = jsNative
     
     /// Schedules a function to execute every time a given number 
     /// of milliseconds elapses.
     [<Emit("setInterval($0, $1)")>]
     let setInterval (f: unit -> unit) (delay: int) : int<IntervalId> = jsNative
+    
+    [<Measure>]
+    type TimeoutId
 
-    /// Cancels the repeated execution set using setInterval.
+    /// Cancels the delayed execution set using setTimeout.
     [<Emit("clearTimeout($0)")>]
-    let clearInterval (id: int<IntervalId>) : unit = jsNative
+    let clearTimeout (id: int<TimeoutId>) : unit = jsNative
+
+    /// Schedules a function to execute in a given amount of time (in miliseconds).
+    [<Emit("setTimeout($0, $1)")>]
+    let setTimeout (f: unit -> unit) (timeout: int) : int<TimeoutId> = jsNative
 
     /// Holds key-value pairs and remembers the original insertion order of the keys.
     ///
@@ -122,7 +122,7 @@ module JSe =
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.entries()")>]
         member _.Entries' () : seq<'K * 'V> = jsNative
         
-        /// Returns a sequence of key value pairs in insertion order.
+        /// Returns a list of key value pairs in insertion order.
         member inline this.Entries () = this.Entries'() |> List.ofSeq
 
         /// Applies the given function once per each key value pair in insertion order.
@@ -137,11 +137,10 @@ module JSe =
         [<Emit("$0.has($1)")>]
         member _.Has (key: 'K) : bool = jsNative
 
-        /// Returns a sequence of keys in insertion order.
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.keys()")>]
         member _.Keys' () : seq<'K> = jsNative
         
-        /// Returns a sequence of keys in insertion order.
+        /// Returns a list of keys in insertion order.
         member inline this.Keys () = this.Keys'() |> List.ofSeq
 
         /// Adds or updates an element with the specified key.
@@ -150,11 +149,10 @@ module JSe =
         [<Emit("$0.set($1...)")>]
         member _.Set (key: 'K, ?value: 'V) : Map<'K, 'V> = jsNative
 
-        /// Returns a sequence of values in insertion order.
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.values()")>]
         member _.Values' () : seq<'V> = jsNative
         
-        /// Returns a sequence of values in insertion order.
+        /// Returns a list of values in insertion order.
         member inline this.Values () = this.Values'() |> List.ofSeq
 
         interface JS.Map<'K,'V> with
@@ -175,12 +173,16 @@ module JSe =
     [<Erase;RequireQualifiedAccess>]
     module Map =
         /// Removes all elements.
-        let inline clear (m: Map<'K,'V>) = m.Clear()
+        let inline clear (m: Map<'K,'V>) = 
+            m.Clear()
+            m
         
         /// Removes the specified element by key.
-        let inline delete (key: 'K) (m: Map<'K,'V>) = m.Delete(key)
+        let inline delete (key: 'K) (m: Map<'K,'V>) = 
+            m.Delete(key) |> ignore
+            m
         
-        /// Returns a sequence of key value pairs in insertion order.
+        /// Returns a list of key value pairs in insertion order.
         let inline entries (m: Map<'K,'V>) = m.Entries()
 
         /// Creates an empty Map.
@@ -198,7 +200,7 @@ module JSe =
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (key: 'K) (m: Map<'K,'V>) = m.Has(key)
         
-        /// Returns a sequence of keys in insertion order.
+        /// Returns a list of keys in insertion order.
         let inline keys (m: Map<'K,'V>) = m.Keys()
         
         /// Adds or updates an element with the specified key.
@@ -209,7 +211,7 @@ module JSe =
         /// The number of elements.
         let inline size (m: Map<'K,'V>) = m.Size
         
-        /// Returns a sequence of values in insertion order.
+        /// Returns a list of values in insertion order.
         let inline values (m: Map<'K,'V>) = m.Values()
 
     /// Lets you store weakly held objects in a collection.
@@ -288,8 +290,8 @@ module JSe =
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.entries()")>]
         member _.Entries' () : seq<'T * 'T> = jsNative
         
-        /// Returns a sequence of values in tupled form, use the values 
-        /// method to get a sequence of just the value.
+        /// Returns a list of values in tupled form, use the values 
+        /// method to get a list of just the value.
         member inline this.Entries () = this.Entries'() |> List.ofSeq
 
         /// Applies the given function once per each value.
@@ -303,7 +305,7 @@ module JSe =
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.keys()")>]
         member _.Keys' () : seq<'T> = jsNative
         
-        /// Returns a sequence of values.
+        /// Returns a list of values.
         ///
         /// This is an alias for the values method.
         member inline this.Keys () = this.Keys'() |> List.ofSeq
@@ -311,7 +313,7 @@ module JSe =
         [<EditorBrowsable(EditorBrowsableState.Never);Emit("$0.values()")>]
         member _.Values' () : seq<'T> = jsNative
 
-        /// Returns a sequence of values.
+        /// Returns a list of values.
         member inline this.Values () = this.Values'() |> List.ofSeq
     
         interface JS.Set<'T> with
@@ -332,16 +334,20 @@ module JSe =
         let inline add (value: 'T) (s: Set<'T>) = s.Add(value)
         
         /// Removes all elements.
-        let inline clear (s: Set<'T>) = s.Clear()
-        
+        let inline clear (s: Set<'T>) = 
+            s.Clear()
+            s
+
         /// Removes the specified element.
-        let inline delete (value: 'T) (s: Set<'T>) = s.Delete(value)
+        let inline delete (value: 'T) (s: Set<'T>) = 
+            s.Delete(value) |> ignore
+            s
         
         /// Creates an empty Set.
         let inline empty<'T> = Set<'T>()
 
-        /// Returns a sequence of values in tupled form, use the values 
-        /// method to get a sequence of just the value.
+        /// Returns a list of values in tupled form, use the values 
+        /// method to get a list of just the value.
         let inline entries (s: Set<'T>) = s.Entries()
         
         /// Applies the given function once per each value.
@@ -353,7 +359,7 @@ module JSe =
         /// Returns a boolean indicating whether an element with the specified value exists.
         let inline has (value: 'T) (s: Set<'T>) = s.Has(value)
         
-        /// Returns a sequence of values.
+        /// Returns a list of values.
         ///
         /// This is an alias for the values method.
         let inline keys (s: Set<'T>) = s.Keys()
@@ -361,7 +367,7 @@ module JSe =
         /// The number of elements.
         let inline size (s: Set<'T>) = s.Size
         
-        /// Returns a sequence of values.
+        /// Returns a list of values.
         let inline values (s: Set<'T>) = s.Values()
         
     /// Stores weakly held objects in a collection.
@@ -411,16 +417,12 @@ module JSe =
 
         /// True if the type of this property descriptor may be changed and 
         /// if the property may be deleted from the corresponding object.
-        ///
-        /// Defaults to false.
         member _.Configurable
             with [<Emit("$0.configurable")>] get () : bool option = jsNative
             and [<Emit("$0.configurable = $1")>] set (x: bool option) = jsNative
 
         /// True if and only if this property shows up during enumeration 
         /// of the properties on the corresponding object.
-        ///
-        /// Defaults to false.
         member _.Enumerable
             with [<Emit("$0.enumerable")>] get () : bool option = jsNative
             and [<Emit("$0.enumerable = $1")>] set (x: bool option) = jsNative
@@ -433,8 +435,6 @@ module JSe =
         /// be the object on which the property is defined due to inheritance). 
         ///
         /// The return value will be used as the value of the property.
-        ///
-        /// Defaults to undefined.
         member _.Get
             with [<Emit("$0.get")>] get () : (unit -> 'T) option = jsNative
             and [<Emit("$0.get = $1")>] set (x: (unit -> 'T) option) = jsNative
@@ -445,24 +445,18 @@ module JSe =
         /// When the property is assigned, this function is called with one argument (the value 
         /// being assigned to the property) and with this set to the object through which the 
         /// property is assigned.
-        ///
-        /// Defaults to undefined.
         member _.Set
             with [<Emit("$0.set")>] get () : ('T -> unit) option = jsNative
             and [<Emit("$0.set = $1")>] set (x: ('T -> unit) option) = jsNative
 
         /// The value associated with the property. Can be any valid JavaScript 
         /// value (number, object, function, etc).
-        ///
-        /// Defaults to None.
         member _.Value
             with [<Emit("$0.value")>] get () : 'T option  = jsNative
             and [<Emit("$0.value = $1")>] set (x: 'T option) = jsNative
 
         /// True if the value associated with the property may be changed with 
         /// an assignment operator.
-        ///
-        /// Defaults to false.
         member _.Writable
             with [<Emit("$0.writable")>] get () : bool option = jsNative
             and [<Emit("$0.writable = $1")>] set (x: bool option) = jsNative
@@ -488,84 +482,96 @@ module JSe =
     module PropertyDescriptor =
         /// True if the type of this property descriptor may be changed and 
         /// if the property may be deleted from the corresponding object.
-        ///
-        /// Defaults to false.
         let inline configurable (pd: PropertyDescriptor<'T>) = pd.Configurable
 
-        /// Indicates whether the specified property is enumerable 
-        /// and is the object's own property.
+        /// True if and only if this property shows up during enumeration 
+        /// of the properties on the corresponding object.
         let inline enumerable (pd: PropertyDescriptor<'T>) = pd.Enumerable
 
-        /// Indicates whether the object has the specified property 
-        /// as its own property (as opposed to inheriting it).
+        /// A function which serves as a getter for the property, or undefined if 
+        /// there is no getter. 
+        ///
+        /// When the property is accessed, this function is called without arguments and 
+        /// with this set to the object through which the property is accessed (this may not 
+        /// be the object on which the property is defined due to inheritance). 
+        ///
+        /// The return value will be used as the value of the property.
         let inline get (pd: PropertyDescriptor<'T>) = pd.Get
         
-        /// Checks if an object exists in another object's prototype chain.
+        /// A function which serves as a setter for the property, or undefined if there is no 
+        /// setter. 
+        ///
+        /// When the property is assigned, this function is called with one argument (the value 
+        /// being assigned to the property) and with this set to the object through which the 
+        /// property is assigned.
         let inline set (pd: PropertyDescriptor<'T>) = pd.Set
 
-        /// Indicates whether the specified property is enumerable 
-        /// and is the object's own property.
-        ///
-        /// An integer would be used when testing against an array.
+        /// The value associated with the property. Can be any valid JavaScript 
+        /// value (number, object, function, etc).
         let inline value (pd: PropertyDescriptor<'T>) = pd.Value
         
         /// True if the value associated with the property may be changed with 
         /// an assignment operator.
-        ///
-        /// Defaults to false.
         let inline writable (pd: PropertyDescriptor<'T>) = pd.Writable
 
         /// True if the type of this property descriptor may be changed and 
         /// if the property may be deleted from the corresponding object.
-        ///
-        /// Defaults to false.
         let inline setConfigurable (b: bool) (pd: PropertyDescriptor<'T>) = 
             pd.Configurable <- Some b
             pd
 
-        /// Indicates whether the specified property is enumerable 
-        /// and is the object's own property.
+        /// True if and only if this property shows up during enumeration 
+        /// of the properties on the corresponding object.
         let inline setEnumerable (b: bool) (pd: PropertyDescriptor<'T>) = 
             pd.Enumerable <- Some b
             pd
 
-        /// Indicates whether the object has the specified property 
-        /// as its own property (as opposed to inheriting it).
+        /// A function which serves as a getter for the property, or undefined if 
+        /// there is no getter. 
+        ///
+        /// When the property is accessed, this function is called without arguments and 
+        /// with this set to the object through which the property is accessed (this may not 
+        /// be the object on which the property is defined due to inheritance). 
+        ///
+        /// The return value will be used as the value of the property.
         let inline setGet (f: unit -> 'T) (pd: PropertyDescriptor<'T>) = 
             pd.Get <- Some f
             pd
 
-        /// Checks if an object exists in another object's prototype chain.
+        /// A function which serves as a setter for the property, or undefined if there is no 
+        /// setter. 
+        ///
+        /// When the property is assigned, this function is called with one argument (the value 
+        /// being assigned to the property) and with this set to the object through which the 
+        /// property is assigned.
         let inline setSet (f: 'T -> unit) (pd: PropertyDescriptor<'T>) = 
             pd.Set <- Some f
             pd
 
-        /// Indicates whether the specified property is enumerable 
-        /// and is the object's own property.
-        ///
-        /// An integer would be used when testing against an array.
+        /// The value associated with the property. Can be any valid JavaScript 
+        /// value (number, object, function, etc).
         let inline setValue (v: 'T) (pd: PropertyDescriptor<'T>) = 
             pd.Value <- Some v
             pd
 
         /// True if the value associated with the property may be changed with 
         /// an assignment operator.
-        ///
-        /// Defaults to false.
         let inline setWritable (b: bool) (pd: PropertyDescriptor<'T>) = 
             pd.Writable <- Some b
             pd
 
     [<Global>]
     type Array =
-        static member isArray (arg: obj) : bool = jsNative
+        /// Determines whether the passed value is an Array.
+        static member isArray (maybeArray: obj) : bool = jsNative
 
         interface JS.ArrayConstructor with
             member _.isArray x = Array.isArray x
     
     [<Global>]
     type Number =
-        static member isNaN (value: float) : bool = jsNative
+        /// Determines whether the passed value is NaN and its type is Number.
+        static member isNaN (maybeNumber: obj) : bool = jsNative
     
         interface JS.NumberConstructor with
             member _.isNaN x = Number.isNaN x
@@ -788,7 +794,9 @@ module JSe =
         static member floor (x: float) : int = jsNative
         
         /// Returns the nearest 32-bit single precision float representation of a Number.
-        static member fround (x: float) : float = jsNative
+        static member fround (x: float) : float32 = jsNative
+        /// Returns the nearest 32-bit single precision float representation of a Number.
+        static member fround (x: float32) : float32 = jsNative
         
         /// Returns the square root of the sum of squares of its arguments.
         static member hypot ([<ParamArray>] values: float []) : float = jsNative
@@ -866,43 +874,36 @@ module JSe =
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
-        ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
         static member sign (x: decimal) : int = jsNative
         /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
+        static member sign (x: float32) : int = jsNative
+        /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
+        /// the argument. 
         ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
+        /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
         static member sign (x: float) : int = jsNative
         /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
-        ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
         static member sign (x: int16) : int = jsNative
         /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
-        ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
         static member sign (x: int) : int = jsNative
         /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
-        ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
         static member sign (x: int64) : int = jsNative
         /// Returns either a positive or negative +/- 1, indicating the sign of a number passed into 
         /// the argument. 
         ///
         /// If the number passed into Math.sign() is 0, it will return a +/- 0. 
-        ///
-        /// Note that if the number is positive, an explicit (+) will not be returned.
         static member sign (x: sbyte) : int = jsNative
 
         /// Returns the sine of a number.
@@ -939,135 +940,194 @@ module JSe =
         [<Emit("$0")>]
         new (d: JS.Date) = Date()
             
+        /// Converts the Date to System.DateTime.
+        ///
+        /// No runetime cost.
         [<Emit("$0")>]
         member _.AsDateTime () : DateTime = jsNative
 
+        /// Returns the day of the month (1-31) for the specified date according to local time.
         [<Emit("$0.getDate()")>]
         member _.GetDate () : int = jsNative
         
+        /// Returns the day of the week (0-6) for the specified date according to local time.
         [<Emit("$0.getDay()")>]
         member _.GetDay () : DayOfWeek = jsNative
-
+        
+        /// Returns the year (4 digits for 4-digit years) of the specified date according to local time.
         [<Emit("$0.getFullYear()")>]
         member _.GetFullYear () : int = jsNative
         
+        /// Returns the hour (0-23) in the specified date according to local time.
         [<Emit("$0.getHours()")>]
         member _.GetHours () : int = jsNative
         
+        /// Returns the milliseconds (0-999) in the specified date according to local time.
         [<Emit("$0.getMilliseconds()")>]
         member _.GetMilliseconds () : int = jsNative
-
+        
+        /// Returns the minutes (0-59) in the specified date according to local time.
         [<Emit("$0.getMinutes()")>]
         member _.GetMinutes () : int = jsNative
-
+        
+        /// Returns the month (0-11) in the specified date according to local time.
         [<Emit("$0.getMonth()")>]
         member _.GetMonth () : int = jsNative
         
+        /// Returns the seconds (0-59) in the specified date according to local time.
         [<Emit("$0.getSeconds()")>]
         member _.GetSeconds () : int = jsNative
-
+        
+        /// Returns the numeric value of the specified date as the number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
         [<Emit("$0.getTime()")>]
         member _.GetTime () : int64 = jsNative
         
+        /// Returns the numeric value of the specified date as the number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
         [<Emit("$0.getTimezoneOffset()")>]
-        member _.GetTimezoneOffset () : int = jsNative
-
+        member _.GetTimezoneOffset () : int64 = jsNative
+        
+        /// Returns the day (date) of the month (1-31) in the specified date according to 
+        /// universal time.
         [<Emit("$0.getUTCDate()")>]
         member _.GetUTCDate () : int = jsNative
-
+        
+        /// Returns the day of the week (0-6) in the specified date according to universal time.
         [<Emit("$0.getUTCDay()")>]
         member _.GetUTCDay () : DayOfWeek = jsNative
-
+        
+        /// Returns the year (4 digits for 4-digit years) in the specified date according to 
+        /// universal time.
         [<Emit("$0.getUTCFullYear()")>]
         member _.GetUTCFullYear () : int = jsNative
-
+        
+        /// Returns the hours (0-23) in the specified date according to universal time.
         [<Emit("$0.getUTCHours()")>]
         member _.GetUTCHours () : int = jsNative
         
+        /// Returns the milliseconds (0-999) in the specified date according to universal time.
         [<Emit("$0.getUTCMilliseconds()")>]
         member _.GetUTCMilliseconds () : int = jsNative
-
+        
+        /// Returns the minutes (0-59) in the specified date according to universal time.
         [<Emit("$0.getUTCMinutes()")>]
         member _.GetUTCMinutes () : int = jsNative
-
+        
+        /// Returns the month (0-11) in the specified date according to universal time.
         [<Emit("$0.getUTCMonth()")>]
         member _.GetUTCMonth () : int = jsNative
         
+        /// Returns the seconds (0-59) in the specified date according to universal time.
         [<Emit("$0.getUTCSeconds()")>]
         member _.GetUTCSeconds () : int = jsNative
         
+        /// Sets the day of the month for a specified date according to local time.
         [<Emit("new Date($0.setDate($1))")>]
         member _.SetDate (date: int) : Date = jsNative
         
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// local time.
         [<Emit("new Date($0.setFullYear($1...))")>]
         member _.SetFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
         
+        /// Sets the hours for a specified date according to local time.
         [<Emit("new Date($0.setHours($1...))")>]
         member _.SetHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
         
+        /// Sets the milliseconds for a specified date according to local time.
         [<Emit("new Date($0.setMilliseconds($1))")>]
         member _.SetMilliseconds (ms: int) : Date = jsNative
         
+        /// Sets the minutes for a specified date according to local time.
         [<Emit("new Date($0.setMinutes($1...))")>]
         member _.SetMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
         
+        /// Sets the month for a specified date according to local time.
         [<Emit("new Date($0.setMonth($1...))")>]
         member _.SetMonth (month: int, ?date: int) : Date = jsNative
         
+        /// Sets the seconds for a specified date according to local time.
         [<Emit("new Date($0.setSeconds($1...))")>]
         member _.SetSeconds (sec: int, ?ms: int) : Date = jsNative
         
+        /// Sets the Date object to the time represented by a number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC. 
+        ///
+        /// Use negative numbers for times prior.
         [<Emit("new Date($0.setTime($1))")>]
-        member _.SetTime (time: int) : Date = jsNative
+        member _.SetTime (time: int64) : Date = jsNative
         
+        /// Sets the day of the month for a specified date according to universal time.
         [<Emit("new Date($0.setUTCDate($1))")>]
         member _.SetUTCDate (date: int) : Date = jsNative
         
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// universal time.
         [<Emit("new Date($0.setUTCFullYear($1...))")>]
         member _.SetUTCFullYear (year: int, ?month: int, ?date: int) : Date = jsNative
         
+        /// Sets the hour for a specified date according to universal time.
         [<Emit("new Date($0.setUTCHours($1...))")>]
         member _.SetUTCHours (hours: int, ?min: int, ?sec: int, ?ms: int) : Date = jsNative
         
+        /// Sets the milliseconds for a specified date according to universal time.
         [<Emit("new Date($0.setUTCMilliseconds($1))")>]
         member _.SetUTCMilliseconds (ms: int) : Date = jsNative
         
+        /// Sets the minutes for a specified date according to universal time.
         [<Emit("new Date($0.setUTCMinutes($1...))")>]
         member _.SetUTCMinutes (min: int, ?sec: int, ?ms: int) : Date = jsNative
         
+        /// Sets the month for a specified date according to universal time.
         [<Emit("new Date($0.setUTCMonth($1...))")>]
         member _.SetUTCMonth (month: int, ?date: int) : Date = jsNative
         
+        /// Sets the seconds for a specified date according to universal time.
         [<Emit("new Date($0.setUTCSeconds($1...))")>]
         member _.SetUTCSeconds (sec: int, ?ms: int) : Date = jsNative
         
+        /// Returns the "date" portion of the Date as a human-readable string like 'Thu Apr 12 2018'.
         [<Emit("$0.toDateString()")>]
         member _.ToDateString () : string = jsNative
-
+        
+        /// Returns a string representing the Date using toISOString(). 
+        /// 
+        /// Intended for use by JSON.stringify().
         [<Emit("$0.toJSON()")>]
         member _.ToJSON () : string = jsNative
-
+        
+        /// Returns a string with a locality sensitive representation of the date portion of this 
+        /// date based on system settings.
         [<Emit("$0.toLocaleDateString()")>]
         member _.ToLocaleDateString () : string = jsNative
-
+        
+        /// Returns a string with a locality-sensitive representation of this date.
         [<Emit("$0.toLocaleString()")>]
         member _.ToLocaleString () : string = jsNative
-
+        
+        /// Returns a string with a locality-sensitive representation of the time portion of this
+        /// date, based on system settings.
         [<Emit("$0.toLocaleTimeString()")>]
         member _.ToLocaleTimeString () : string = jsNative
-
+        
+        /// Converts a date to a string following the ISO 8601 Extended Format.
         [<Emit("$0.toISOString()")>]
         member _.ToISOString () : string = jsNative
-
+        
+        /// Returns a string representing the specified Date object.
         [<Emit("$0.toString()")>]
         override _.ToString () : string = jsNative
-
+        
+        /// Returns the "time" portion of the Date as a human-readable string.
         [<Emit("$0.toTimeString()")>]
         member _.ToTimeString () : string = jsNative
-
+        
+        /// Converts a date to a string using the UTC timezone.
         [<Emit("$0.toUTCString()")>]
         member _.ToUTCString () : string = jsNative
-
+        
+        /// Returns the primitive value of a Date object.
         [<Emit("$0.valueOf()")>]
         member _.ValueOf () : int64 = jsNative
     
@@ -1075,133 +1135,417 @@ module JSe =
         [<Emit("Date()")>]
         static member invoke () : string = jsNative
     
+        /// Returns the current time in ticks.
+        static member now () : int64 = jsNative
+
         /// Parses a string representation of a date and returns the ticks.
         static member parse (s: string) : int64 = jsNative
     
-        /// Accepts parameters similar to the Date constructor, but treats them as UTC in ticks.
+        /// Accepts parameters similar to the Date constructor, but treats them as UTC 
+        /// in ticks.
         static member UTC (year: int, month: int, ?date: int, ?hours: int, ?minutes: int, ?seconds: int, ?ms: int) : int64 = jsNative
-    
-        /// Returns the current time in ticks.
-        static member now () : int64 = jsNative
         
     /// Represents a single moment in time in a platform-independent format.
     [<Erase;RequireQualifiedAccess>]
     module Date =
+        /// Converts the Date to System.DateTime.
+        ///
+        /// No runetime cost.
         let inline asDateTime (d: Date) = d.AsDateTime()
-
+        
+        /// Returns the day of the month (1-31) for the specified date according to local time.
         let inline getDate (d: Date) = d.GetDate()
         
+        /// Returns the day of the week (0-6) for the specified date according to local time.
         let inline getDay (d: Date) = d.GetDay()
         
+        /// Returns the year (4 digits for 4-digit years) of the specified date according to local time.
         let inline getFullYear (d: Date) = d.GetFullYear()
         
+        /// Returns the hour (0-23) in the specified date according to local time.
         let inline getHours (d: Date) = d.GetHours()
         
+        /// Returns the milliseconds (0-999) in the specified date according to local time.
         let inline getMilliseconds (d: Date) = d.GetMilliseconds()
         
+        /// Returns the minutes (0-59) in the specified date according to local time.
         let inline getMinutes (d: Date) = d.GetMinutes()
         
+        /// Returns the month (0-11) in the specified date according to local time.
         let inline getMonth (d: Date) = d.GetMonth()
         
+        /// Returns the seconds (0-59) in the specified date according to local time.
         let inline getSeconds (d: Date) = d.GetSeconds()
         
+        /// Returns the numeric value of the specified date as the number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
         let inline getTime (d: Date) = d.GetTime()
         
+        /// Returns the numeric value of the specified date as the number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC. (Negative values are returned for prior times.)
         let inline getTimezoneOffset (d: Date) = d.GetTimezoneOffset()
         
+        /// Returns the day (date) of the month (1-31) in the specified date according to 
+        /// universal time.
         let inline getUTCDate (d: Date) = d.GetUTCDate()
         
+        /// Returns the day of the week (0-6) in the specified date according to universal time.
         let inline getUTCDay (d: Date) = d.GetUTCDay()
         
+        /// Returns the year (4 digits for 4-digit years) in the specified date according to 
+        /// universal time.
         let inline getUTCFullYear (d: Date) = d.GetUTCFullYear()
         
+        /// Returns the hours (0-23) in the specified date according to universal time.
         let inline getUTCHours (d: Date) = d.GetUTCHours()
         
+        /// Returns the milliseconds (0-999) in the specified date according to universal time.
         let inline getUTCMilliseconds (d: Date) = d.GetUTCMilliseconds()
         
+        /// Returns the minutes (0-59) in the specified date according to universal time.
         let inline getUTCMinutes (d: Date) = d.GetUTCMinutes()
         
+        /// Returns the month (0-11) in the specified date according to universal time.
         let inline getUTCMonth (d: Date) = d.GetUTCMonth()
         
+        /// Returns the seconds (0-59) in the specified date according to universal time.
         let inline getUTCSeconds (d: Date) = d.GetUTCSeconds()
         
+        /// Sets the day of the month for a specified date according to local time.
         let inline setDate (date: int) (d: Date) = d.SetDate(date)
         
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// local time.
         let inline setFullYear (year: int) (d: Date) = d.SetFullYear(year)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// local time.
         let inline setFullYearM (year: int) (month: int) (d: Date) = d.SetFullYear(year, month = month)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// local time.
         let inline setFullYearD (year: int) (date: int) (d: Date) = d.SetFullYear(year, date = date)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// local time.
         let inline setFullYearMD (year: int) (month: int) (date: int) (d: Date) = d.SetFullYear(year, month, date)
         
+        /// Sets the hours for a specified date according to local time.
         let inline setHours (hours: int) (d: Date) = d.SetHours(hours)
+        /// Sets the hours for a specified date according to local time.
         let inline setHoursM (hours: int) (min: int) (d: Date) = d.SetHours(hours, min = min)
+        /// Sets the hours for a specified date according to local time.
         let inline setHoursMS (hours: int) (min: int) (sec: int) (d: Date) = d.SetHours(hours, min = min, sec = sec)
+        /// Sets the hours for a specified date according to local time.
         let inline setHoursMSM (hours: int) (min: int) (sec: int) (ms: int) (d: Date) = d.SetHours(hours, min, sec, ms)
         
+        /// Sets the milliseconds for a specified date according to local time.
         let inline setMilliseconds (ms: int) (d: Date) = d.SetMilliseconds(ms)
         
+        /// Sets the minutes for a specified date according to local time.
         let inline setMinutes (min: int) (d: Date) = d.SetMinutes(min)
+        /// Sets the minutes for a specified date according to local time.
         let inline setMinutesS (min: int) (sec: int) (d: Date) = d.SetMinutes(min, sec = sec)
+        /// Sets the minutes for a specified date according to local time.
         let inline setMinutesSM (min: int) (sec: int) (ms: int) (d: Date) = d.SetMinutes(min, sec, ms)
         
+        /// Sets the month for a specified date according to local time.
         let inline setMonth (month: int) (d: Date) = d.SetMonth(month)
+        /// Sets the month for a specified date according to local time.
         let inline setMonthD (month: int) (date: int) (d: Date) = d.SetMonth(month, date)
         
+        /// Sets the seconds for a specified date according to local time.
         let inline setSeconds (sec: int) (d: Date) = d.SetSeconds(sec)
+        /// Sets the seconds for a specified date according to local time.
         let inline setSecondsM (sec: int) (ms: int) (d: Date) = d.SetSeconds(sec, ms)
         
-        let inline setTime (time: int) (d: Date) = d.SetTime(time)
+        /// Sets the Date object to the time represented by a number of milliseconds since 
+        /// January 1, 1970, 00:00:00 UTC.
+        ///
+        /// Use negative numbers for times prior.
+        let inline setTime (time: int64) (d: Date) = d.SetTime(time)
         
+        /// Sets the day of the month for a specified date according to universal time.
         let inline setUTCDate (date: int) (d: Date) = d.SetUTCDate(date)
         
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// universal time.
         let inline setUTCFullYear (year: int) (d: Date) = d.SetUTCFullYear(year)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// universal time.
         let inline setUTCFullYearM (year: int) (month: int) (d: Date) = d.SetUTCFullYear(year, month = month)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// universal time.
         let inline setUTCFullYearD (year: int) (date: int) (d: Date) = d.SetUTCFullYear(year, date = date)
+        /// Sets the full year (e.g. 4 digits for 4-digit years) for a specified date according to 
+        /// universal time.
         let inline setUTCFullYearMD (year: int) (month: int) (date: int) (d: Date) = d.SetUTCFullYear(year, month, date)
         
+        /// Sets the hour for a specified date according to universal time.
         let inline setUTCHours (hours: int) (d: Date) = d.SetUTCHours(hours)
+        /// Sets the hour for a specified date according to universal time.
         let inline setUTCHoursM (hours: int) (min: int) (d: Date) = d.SetUTCHours(hours, min = min)
+        /// Sets the hour for a specified date according to universal time.
         let inline setUTCHoursMS (hours: int) (min: int) (sec: int) (d: Date) = d.SetUTCHours(hours, min = min, sec = sec)
+        /// Sets the hour for a specified date according to universal time.
         let inline setUTCHoursMSM (hours: int) (min: int) (sec: int) (ms: int) (d: Date) = d.SetUTCHours(hours, min, sec, ms)
         
+        /// Sets the milliseconds for a specified date according to universal time.
         let inline setUTCMilliseconds (ms: int) (d: Date) = d.SetUTCMilliseconds(ms)
         
+        /// Sets the minutes for a specified date according to universal time.
         let inline setUTCMinutes (min: int) (d: Date) = d.SetUTCMinutes(min)
+        /// Sets the minutes for a specified date according to universal time.
         let inline setUTCMinutesS (min: int) (sec: int) (d: Date) = d.SetUTCMinutes(min, sec = sec)
+        /// Sets the minutes for a specified date according to universal time.
         let inline setUTCMinutesMS (min: int) (sec: int) (ms: int) (d: Date) = d.SetUTCMinutes(min, sec, ms)
         
+        /// Sets the month for a specified date according to universal time.
         let inline setUTCMonth (month: int) (d: Date) = d.SetUTCMonth(month)
+        /// Sets the month for a specified date according to universal time.
         let inline setUTCMonthD (month: int) (date: int) (d: Date) = d.SetUTCMonth(month, date)
         
+        /// Sets the seconds for a specified date according to universal time.
         let inline setUTCSeconds (sec: int) (d: Date) = d.SetUTCSeconds(sec)
+        /// Sets the seconds for a specified date according to universal time.
         let inline setUTCSecondsM (sec: int) (ms: int) (d: Date) = d.SetUTCSeconds(sec, ms)
         
+        /// Returns the "date" portion of the Date as a human-readable string like 'Thu Apr 12 2018'.
         let inline toDateString (d: Date) = d.ToDateString()
         
+        /// Returns a string representing the Date using toISOString(). 
+        /// 
+        /// Intended for use by JSON.stringify().
         let inline toJSON (d: Date) = d.ToJSON()
         
+        /// Returns a string with a locality sensitive representation of the date portion of this 
+        /// date based on system settings.
         let inline toLocaleDateString (d: Date) = d.ToLocaleDateString()
         
+        /// Returns a string with a locality-sensitive representation of this date.
         let inline toLocaleString (d: Date) = d.ToLocaleString()
         
+        /// Returns a string with a locality-sensitive representation of the time portion of this
+        /// date, based on system settings.
         let inline toLocaleTimeString (d: Date) = d.ToLocaleTimeString()
         
+        /// Converts a date to a string following the ISO 8601 Extended Format.
         let inline toISOString (d: Date) = d.ToISOString()
         
+        /// Returns a string representing the specified Date object.
         let inline toString (d: Date) = d.ToString()
         
+        /// Returns the "time" portion of the Date as a human-readable string.
         let inline toTimeString (d: Date) = d.ToTimeString()
         
+        /// Converts a date to a string using the UTC timezone.
         let inline toUTCString (d: Date) = d.ToUTCString()
         
+        /// Returns the primitive value of a Date object.
         let inline valueOf (d: Date) = d.ValueOf()
 
-    [<Global>]
+    /// Functions for parsing JavaScript Object Notation (JSON) and converting values to JSON.
+    [<Erase>]
     type JSON =
+        /// <summary>
+        /// Parse the string text as JSON, optionally transform the produced value and its properties, 
+        /// and return the value. 
+        ///
+        /// The reviver option allows for interpreting what the replacer has used to stand in for other datatypes.
+        /// A function to map each key (first parameter) and value (second parameter) pair before the end result.
+        /// </summary>
+        /// <exception cref="System.Exception">Any violations of the JSON syntax, including those pertaining to the differences between 
+        /// JavaScript and JSON, cause a SyntaxError to be thrown. 
+        /// </exception>
+        [<Emit("JSON.parse($0...)")>]
         static member parse (text: string, ?reviver: obj -> obj -> obj) : obj = jsNative
+
+        /// Parse the string text as JSON, optionally transform the produced value and its properties, 
+        /// and return the value. 
+        ///
+        /// The reviver option allows for interpreting what the replacer has used to stand in for other datatypes.
+        /// A function to map each key (first parameter) and value (second parameter) pair before the end result.
+        static member inline tryParse (text: string, ?reviver: obj -> obj -> obj) =
+            try JSON.parse(text, ?reviver = reviver) |> Ok
+            with e -> Error e
+
+        /// <summary>
+        /// Parse the string text as JSON, optionally transform the produced value and its properties, 
+        /// and return the value. 
+        ///
+        /// The reviver option allows for interpreting what the replacer has used to stand in for other datatypes.
+        /// A function to map each key (first parameter) and value (second parameter) pair before the end result.
+        ///
+        /// This does not validate the returned type.
+        /// </summary>
+        /// <exception cref="System.Exception">Any violations of the JSON syntax, including those pertaining to the differences between 
+        /// JavaScript and JSON, cause a SyntaxError to be thrown. 
+        /// </exception>
         [<Emit("JSON.parse($0...)")>]
         static member parseAs<'T> (text: string, ?reviver: obj -> obj -> obj) : 'T = jsNative
-        static member stringify (value: obj, ?replacer: string -> obj -> obj, ?space: obj) : string = jsNative
-    
+
+        /// Parse the string text as JSON, optionally transform the produced value and its properties, 
+        /// and return the value. 
+        ///
+        /// The reviver option allows for interpreting what the replacer has used to stand in for other datatypes.
+        /// A function to map each key (first parameter) and value (second parameter) pair before the end result.
+        ///
+        /// This does not validate the returned type.
+        static member inline tryParseAs<'T> (text: string, ?reviver: obj -> obj -> obj) =
+            try JSON.parseAs<'T>(text, ?reviver = reviver) |> Ok
+            with e -> Error e
+        
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, space: int) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, space: string) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: string -> obj -> obj) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: seq<obj>) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: string -> obj -> obj, space: int) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: seq<obj>, space: int) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: string -> obj -> obj, space: string) : string = jsNative
+        /// Return a JSON string corresponding to the specified value, optionally including only certain properties 
+        /// or replacing property values in a user-defined manner. 
+        ///
+        /// By default, all instances of undefined are replaced with null, and other unsupported native data types 
+        /// are censored. The replacer option allows for specifying other behavior via a function taking a key (string) 
+        /// and value (obj) and returning a new value or a sequence of whitelisted values (of numbers and/or strings).
+        ///
+        /// The space option indicates how to insert white space into the output of the JSON for readability.
+        ///
+        /// If an integer it indicates the number of space characters to use as white space; this number is capped at 
+        /// 10 (if it is greater, the value is just 10). Values less than 1 indicate that no space should be used.
+        ///
+        /// If a string (or the first 10 characters of the string, if it's longer than that) is used as white space. 
+        /// 
+        /// If no space is provided, no white space is used.
+        [<Emit("JSON.stringify($0...)")>]
+        static member stringify (value: obj, replacer: seq<obj>, space: string) : string = jsNative
+
     /// Represents the eventual completion (or failure) of an asynchronous operation and its resulting value.
     [<Global>]
     type Promise<'T> (executor: ('T -> unit) -> (Exception -> unit) -> unit) =
@@ -1219,18 +1563,21 @@ module JSe =
         [<Emit("$0.then($1...)")>]
         member _.then'<'Reject,'TResult> (onfulfilled: 'T -> 'TResult, onrejected: 'Reject -> 'TResult) : Promise<'TResult> = jsNative
         
-        /// When the promise is settled, i.e either fulfilled or rejected, the specified callback function is executed.
+        /// When the promise is settled, i.e either fulfilled or rejected, the specified 
+        /// callback function is executed.
         [<Emit("$0.finally($1)")>]
         member _.finally' (handler: unit -> unit) : Promise<'T> = jsNative
         
-        /// Takes a sequence of Promises, and returns a single Promise that resolves to an array of the results 
-        /// of the input promises. This returned promise will resolve when all of the input's promises have 
-        /// resolved, or if the input iterable contains no promises. It rejects immediately upon any of the input 
-        /// promises rejecting or non-promises throwing an error, and will reject with this first rejection message / error.
+        /// Takes a sequence of Promises, and returns a single Promise that resolves to 
+        /// an array of the results of the input promises. This returned promise will 
+        /// resolve when all of the input's promises have resolved, or if the input 
+        /// iterable contains no promises. It rejects immediately upon any of the input 
+        /// promises rejecting or non-promises throwing an error, and will reject with 
+        /// this first rejection message / error.
         static member all (promises: seq<#JS.Promise<'T>>) : Promise<'T []> = jsNative
 
-        /// Returns a promise that fulfills or rejects as soon as one of the promises in an iterable fulfills or 
-        /// rejects, with the value or reason from that promise.
+        /// Returns a promise that fulfills or rejects as soon as one of the promises in 
+        /// an iterable fulfills or rejects, with the value or reason from that promise.
         static member race (values: seq<#JS.Promise<'T>>) : Promise<'T> = jsNative
 
         /// Returns a Promise object that is rejected with a given reason.
@@ -1240,17 +1587,21 @@ module JSe =
         
         /// Returns a Promise object that is resolved with a given value. 
         ///
-        /// If the value is a promise, that promise is returned; if the value is a thenable (i.e. has a "then" 
-        /// method), the returned promise will "follow" that thenable, adopting its eventual state; otherwise the 
-        /// returned promise will be fulfilled with the value. This function flattens nested layers of promise-like 
-        /// objects (e.g. a promise that resolves to a promise that resolves to something) into a single layer.
+        /// If the value is a promise, that promise is returned; if the value is a 
+        /// thenable (i.e. has a "then" method), the returned promise will "follow" 
+        /// that thenable, adopting its eventual state; otherwise the returned promise 
+        /// will be fulfilled with the value. This function flattens nested layers of 
+        /// promise-like objects (e.g. a promise that resolves to a promise that 
+        /// resolves to something) into a single layer.
         static member resolve () : Promise<unit> = jsNative
         /// Returns a Promise object that is resolved with a given value. 
         ///
-        /// If the value is a promise, that promise is returned; if the value is a thenable (i.e. has a "then" 
-        /// method), the returned promise will "follow" that thenable, adopting its eventual state; otherwise the 
-        /// returned promise will be fulfilled with the value. This function flattens nested layers of promise-like 
-        /// objects (e.g. a promise that resolves to a promise that resolves to something) into a single layer.
+        /// If the value is a promise, that promise is returned; if the value is a 
+        /// thenable (i.e. has a "then" method), the returned promise will "follow" 
+        /// that thenable, adopting its eventual state; otherwise the returned promise 
+        /// will be fulfilled with the value. This function flattens nested layers of 
+        /// promise-like objects (e.g. a promise that resolves to a promise that 
+        /// resolves to something) into a single layer.
         static member resolve (promise: #JS.Promise<'T>) : Promise<'T> = jsNative
 
         interface JS.Promise<'T> with
@@ -1277,7 +1628,7 @@ module JSe =
             
         /// Determines whether the passed value is one of the ArrayBuffer views, 
         /// such as typed array objects or a DataView.
-        static member isView (arg: obj) : bool = jsNative
+        static member isView (maybeView: obj) : bool = jsNative
     
         interface JS.ArrayBuffer with
             member this.byteLength = this.ByteLength
@@ -1288,16 +1639,16 @@ module JSe =
         /// The read-only size, in bytes, of the ArrayBuffer. 
         let inline byteLength (ab: ArrayBuffer) = ab.ByteLength
 
-        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
-        /// inclusive, up to end, exclusive.
+        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from beginning index, 
+        /// inclusive, up to end index, exclusive.
         let inline slice (begin': int) (end': int) (ab: ArrayBuffer) = ab.Slice(begin', end')
 
-        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
-        /// inclusive, up to end, exclusive.
+        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from the 
+        /// given index, inclusive to the end of the ArrayBuffer.
         let inline sliceBegin (begin': int) (ab: ArrayBuffer) = ab.Slice(begin' = begin')
         
-        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from begin, 
-        /// inclusive, up to end, exclusive.
+        /// Returns a new ArrayBuffer whose contents are a copy of this ArrayBuffer's bytes from the beginning of 
+        /// the ArrayBuffer to the given index, exclusive.
         let inline sliceEnd (end': int) (ab: ArrayBuffer) = ab.Slice(end' = end')
 
     /// Provides a low-level interface for reading and writing multiple number types in a binary 
@@ -1319,53 +1670,105 @@ module JSe =
         [<Emit("$0.byteOffset")>]
         member _.ByteOffset: int = jsNative
         
+        /// Gets a signed 32-bit float (float) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getFloat32($1...)")>]
         member _.GetFloat32 (byteOffset: int, ?littleEndian: bool) : float32 = jsNative
-
+        
+        /// Gets a signed 64-bit float (double) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getFloat64($1...)")>]
         member _.GetFloat64 (byteOffset: int, ?littleEndian: bool) : float = jsNative
-
+        
+        /// Gets a signed 8-bit integer (byte) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getInt8($1...)")>]
         member _.GetInt8 (byteOffset: int) : sbyte = jsNative
-
+        
+        /// Gets a signed 16-bit integer (short) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getInt16($1...)")>]
         member _.GetInt16 (byteOffset: int, ?littleEndian: bool) : int16 = jsNative
-
+        
+        /// Gets a signed 32-bit integer (long) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getInt32($1...)")>]
         member _.GetInt32 (byteOffset: int, ?littleEndian: bool) : int32 = jsNative
+        
+        /// Gets a signed 64-bit integer (long long) at the specified byte 
+        /// offset from the start of the view.
+        [<Emit("$0.getBigInt64($1...)")>]
+        member _.GetInt64 (byteOffset: int, ?littleEndian: bool) : int32 = jsNative
 
+        /// Gets an unsigned 8-bit integer (unsigned byte) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getUint8($1...)")>]
         member _.GetUint8 (byteOffset: int) : byte = jsNative
-
+        
+        /// Gets an unsigned 16-bit integer (unsigned short) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getUint16($1...)")>]
         member _.GetUint16 (byteOffset: int, ?littleEndian: bool) : uint16 = jsNative
-
+        
+        /// Gets an unsigned 32-bit integer (unsigned long) at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.getUint32($1...)")>]
         member _.GetUint32 (byteOffset: int, ?littleEndian: bool) : uint32 = jsNative
 
+        /// Gets an unsigned 64-bit integer (unsigned long long) at the specified byte 
+        /// offset from the start of the view.
+        [<Emit("$0.getBigUint64($1...)")>]
+        member _.GetUint64 (byteOffset: int, ?littleEndian: bool) : uint64 = jsNative
+        
+        /// Stores a signed 32-bit float (float) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setFloat32($1...)")>]
         member _.SetFloat32 (byteOffset: int, value: float32, ?littleEndian: bool) : unit = jsNative
-
+        
+        /// Stores a signed 64-bit float (double) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setFloat64($1...)")>]
         member _.SetFloat64 (byteOffset: int, value: float, ?littleEndian: bool) : unit = jsNative
-
+        
+        /// Stores a signed 8-bit integer (byte) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setInt8($1...)")>]
         member _.SetInt8 (byteOffset: int, value: sbyte) : unit = jsNative
-
+        
+        /// Stores a signed 16-bit integer (short) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setInt16($1...)")>]
         member _.SetInt16 (byteOffset: int, value: int16, ?littleEndian: bool) : unit = jsNative
-
+        
+        /// Stores a signed 32-bit integer (long) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setInt32($1...)")>]
         member _.SetInt32 (byteOffset: int, value: int32, ?littleEndian: bool) : unit = jsNative
+        
+        /// Stores a signed 64-bit integer (long long) value at the specified byte 
+        /// offset from the start of the view.
+        [<Emit("$0.setBigInt64($1...)")>]
+        member _.SetInt64 (byteOffset: int, value: int64, ?littleEndian: bool) : unit = jsNative
 
+        /// Stores an unsigned 8-bit integer (unsigned byte) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setUint8($1...)")>]
         member _.SetUint8 (byteOffset: int, value: byte) : unit = jsNative
-
+        
+        /// Stores an unsigned 16-bit integer (unsigned short) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setUint16($1...)")>]
         member _.SetUint16 (byteOffset: int, value: uint16, ?littleEndian: bool) : unit = jsNative
-
+        
+        /// Stores an unsigned 32-bit integer (unsigned long) value at the specified byte 
+        /// offset from the start of the view.
         [<Emit("$0.setUint32($1...)")>]
         member _.SetUint32 (byteOffset: int, value: uint32, ?littleEndian: bool) : unit = jsNative
+        
+        /// Stores an unsigned 64-bit integer (unsigned long long) value at the specified byte 
+        /// offset from the start of the view.
+        [<Emit("$0.setBigUint64($1...)")>]
+        member _.SetUint64 (byteOffset: int, value: uint64, ?littleEndian: bool) : unit = jsNative
 
         interface JS.ArrayBufferView with
             member this.buffer = upcast this.Buffer
@@ -1385,61 +1788,187 @@ module JSe =
         /// The offset (in bytes) of this view from the start of its ArrayBuffer.
         let inline byteOffset (dv: DataView) = dv.ByteOffset
 
-        [<Erase>]
-        module LittleEndian =
-            let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.GetFloat32(byteOffset, true)
-            
-            let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.GetFloat64(byteOffset, true)
-            
-            let inline getInt16 (byteOffset: int) (dv: DataView) = dv.GetInt16(byteOffset, true)
-            
-            let inline getInt32 (byteOffset: int) (dv: DataView) = dv.GetInt32(byteOffset, true)
-            
-            let inline getUint16 (byteOffset: int) (dv: DataView) = dv.GetUint16(byteOffset, true)
-            
-            let inline getUint32 (byteOffset: int) (dv: DataView) = dv.GetUint32(byteOffset, true)
-            
-            let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.SetFloat32(byteOffset, value, true)
-            
-            let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.SetFloat64(byteOffset, value, true)
-            
-            let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.SetInt16(byteOffset, value, true)
-            
-            let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.SetInt32(byteOffset, value, true)
-            
-            let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.SetUint16(byteOffset, value, true)
-            
-            let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.SetUint32(byteOffset, value, true)
-
+        /// Gets a signed 32-bit float (float) at the specified byte 
+        /// offset from the start of the view.
         let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.GetFloat32(byteOffset)
-
+        
+        /// Gets a signed 64-bit float (double) at the specified byte 
+        /// offset from the start of the view.
         let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.GetFloat64(byteOffset)
         
+        /// Gets a signed 8-bit integer (byte) at the specified byte 
+        /// offset from the start of the view.
         let inline getInt8 (byteOffset: int) (dv: DataView) = dv.GetInt8(byteOffset)
-
+        
+        /// Gets a signed 16-bit integer (short) at the specified byte 
+        /// offset from the start of the view.
         let inline getInt16 (byteOffset: int) (dv: DataView) = dv.GetInt16(byteOffset)
-
+        
+        /// Gets a signed 32-bit integer (long) at the specified byte 
+        /// offset from the start of the view.
         let inline getInt32 (byteOffset: int) (dv: DataView) = dv.GetInt32(byteOffset)
-
+        
+        /// Gets a signed 64-bit integer (long long) at the specified byte 
+        /// offset from the start of the view.
+        let inline getInt64 (byteOffset: int) (dv: DataView) = dv.GetInt64(byteOffset)
+        
+        /// Gets an unsigned 8-bit integer (unsigned byte) at the specified byte 
+        /// offset from the start of the view.
+        let inline getUint8 (byteOffset: int) (dv: DataView) = dv.GetUint8(byteOffset)
+        
+        /// Gets an unsigned 16-bit integer (unsigned short) at the specified byte 
+        /// offset from the start of the view.
         let inline getUint16 (byteOffset: int) (dv: DataView) = dv.GetUint16(byteOffset)
-
+        
+        /// Gets an unsigned 32-bit integer (unsigned long) at the specified byte 
+        /// offset from the start of the view.
         let inline getUint32 (byteOffset: int) (dv: DataView) = dv.GetUint32(byteOffset)
-
-        let inline setFloat32 (byteOffset: int, value: float32) (dv: DataView) = dv.SetFloat32(byteOffset, value)
-
-        let inline setFloat64 (byteOffset: int, value: float) (dv: DataView) = dv.SetFloat64(byteOffset, value)
         
-        let inline setInt8 (byteOffset: int, value: sbyte) (dv: DataView) = dv.SetInt8(byteOffset, value)
-
-        let inline setInt16 (byteOffset: int, value: int16) (dv: DataView) = dv.SetInt16(byteOffset, value)
-
-        let inline setInt32 (byteOffset: int, value: int32) (dv: DataView) = dv.SetInt32(byteOffset, value)
+        /// Gets an unsigned 64-bit integer (unsigned long long) at the specified byte 
+        /// offset from the start of the view.
+        let inline getUint64 (byteOffset: int) (dv: DataView) = dv.GetUint64(byteOffset)
         
-        let inline setUint8 (byteOffset: int, value: byte) (dv: DataView) = dv.SetUint8(byteOffset, value)
+        /// Stores a signed 32-bit float (float) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setFloat32 (byteOffset: int) (value: float32) (dv: DataView) = 
+            dv.SetFloat32(byteOffset, value)
+            dv
 
-        let inline setUint16 (byteOffset: int, value: uint16) (dv: DataView) = dv.SetUint16(byteOffset, value)
+        /// Stores a signed 64-bit float (double) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setFloat64 (byteOffset: int) ( value: float) (dv: DataView) = 
+            dv.SetFloat64(byteOffset, value)
+            dv
+        
+        /// Stores a signed 8-bit integer (byte) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setInt8 (byteOffset: int) ( value: sbyte) (dv: DataView) = 
+            dv.SetInt8(byteOffset, value)
+            dv
+        
+        /// Stores a signed 16-bit integer (short) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setInt16 (byteOffset: int) ( value: int16) (dv: DataView) = 
+            dv.SetInt16(byteOffset, value)
+            dv
+        
+        /// Stores a signed 32-bit integer (long) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setInt32 (byteOffset: int) ( value: int32) (dv: DataView) = 
+            dv.SetInt32(byteOffset, value)
+            dv
+        
+        /// Stores a signed 64-bit integer (long long) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setInt64 (byteOffset: int) ( value: int64) (dv: DataView) = 
+            dv.SetInt64(byteOffset, value)
+            dv
+        
+        /// Stores an unsigned 8-bit integer (unsigned byte) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setUint8 (byteOffset: int) ( value: byte) (dv: DataView) = 
+            dv.SetUint8(byteOffset, value)
+            dv
+        
+        /// Stores an unsigned 16-bit integer (unsigned short) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setUint16 (byteOffset: int) ( value: uint16) (dv: DataView) = 
+            dv.SetUint16(byteOffset, value)
+            dv
+        
+        /// Stores an unsigned 32-bit integer (unsigned long) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setUint32 (byteOffset: int) ( value: uint32) (dv: DataView) = 
+            dv.SetUint32(byteOffset, value)
+            dv
+        
+        /// Stores an unsigned 64-bit integer (unsigned long long) value at the specified byte 
+        /// offset from the start of the view.
+        let inline setUint64 (byteOffset: int) ( value: uint64) (dv: DataView) = 
+            dv.SetUint64(byteOffset, value)
+            dv
 
-        let inline setUint32 (byteOffset: int, value: uint32) (dv: DataView) = dv.SetUint32(byteOffset, value)
+        /// DataView getters and setters with littleEndian set to true.
+        [<Erase>]
+        module LittleEndian =
+            /// Gets a signed 32-bit float (float) at the specified byte 
+            /// offset from the start of the view.
+            let inline getFloat32 (byteOffset: int) (dv: DataView) = dv.GetFloat32(byteOffset, true)
+            
+            /// Gets a signed 64-bit float (double) at the specified byte 
+            /// offset from the start of the view.
+            let inline getFloat64 (byteOffset: int) (dv: DataView) = dv.GetFloat64(byteOffset, true)
+            
+            /// Gets a signed 16-bit integer (short) at the specified byte 
+            /// offset from the start of the view.
+            let inline getInt16 (byteOffset: int) (dv: DataView) = dv.GetInt16(byteOffset, true)
+            
+            /// Gets a signed 32-bit integer (long) at the specified byte 
+            /// offset from the start of the view.
+            let inline getInt32 (byteOffset: int) (dv: DataView) = dv.GetInt32(byteOffset, true)
+            
+            /// Gets a signed 64-bit integer (long long) at the specified byte 
+            /// offset from the start of the view.
+            let inline getInt64 (byteOffset: int) (dv: DataView) = dv.GetInt64(byteOffset, true)
+
+            /// Gets an unsigned 16-bit integer (unsigned short) at the specified byte 
+            /// offset from the start of the view.
+            let inline getUint16 (byteOffset: int) (dv: DataView) = dv.GetUint16(byteOffset, true)
+            
+            /// Gets an unsigned 32-bit integer (unsigned long) at the specified byte 
+            /// offset from the start of the view.
+            let inline getUint32 (byteOffset: int) (dv: DataView) = dv.GetUint32(byteOffset, true)
+            
+            /// Gets an unsigned 64-bit integer (unsigned long long) at the specified byte 
+            /// offset from the start of the view.
+            let inline getUint64 (byteOffset: int) (dv: DataView) = dv.GetUint64(byteOffset, true)
+
+            /// Stores a signed 32-bit float (float) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setFloat32 (byteOffset: int) ( value: float32) (dv: DataView) = 
+                dv.SetFloat32(byteOffset, value, true)
+            
+            /// Stores a signed 64-bit float (double) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setFloat64 (byteOffset: int) ( value: float) (dv: DataView) = 
+                dv.SetFloat64(byteOffset, value, true)
+                dv
+
+            /// Stores a signed 16-bit integer (short) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setInt16 (byteOffset: int) ( value: int16) (dv: DataView) = 
+                dv.SetInt16(byteOffset, value, true)
+                dv
+            
+            /// Stores a signed 32-bit integer (long) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setInt32 (byteOffset: int) ( value: int32) (dv: DataView) = 
+                dv.SetInt32(byteOffset, value, true)
+                dv
+            
+            /// Stores a signed 64-bit integer (long long) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setInt64 (byteOffset: int) ( value: int64) (dv: DataView) = 
+                dv.SetInt64(byteOffset, value, true)
+                dv
+            
+            /// Stores an unsigned 16-bit integer (unsigned short) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setUint16 (byteOffset: int) ( value: uint16) (dv: DataView) = 
+                dv.SetUint16(byteOffset, value, true)
+                dv
+            
+            /// Stores an unsigned 32-bit integer (unsigned long) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setUint32 (byteOffset: int) ( value: uint32) (dv: DataView) = 
+                dv.SetUint32(byteOffset, value, true)
+                dv
+            
+            /// Stores an unsigned 64-bit integer (unsigned long long) value at the specified byte 
+            /// offset from the start of the view.
+            let inline setUint64 (byteOffset: int) ( value: uint64) (dv: DataView) = 
+                dv.SetUint64(byteOffset, value, true)
+                dv
         
     /// Describes an array-like view of an underlying binary data buffer.
     [<Erase>]
@@ -1495,10 +2024,14 @@ module JSe =
         member _.Filter (f: 'T -> bool) : TypedArray<'T> = jsNative
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
+        ///
+        /// Provides the element and index.
         [<Emit("$0.filter($1)")>]
         member _.Filter (f: 'T -> int -> bool) : TypedArray<'T> = jsNative
         /// Creates a new typed array with all elements that pass the test 
         /// implemented by the provided function.
+        ///
+        /// Provides the element, index, and array.
         [<Emit("$0.filter($1)")>]
         member _.Filter (f: 'T -> int -> TypedArray<'T> -> bool) : TypedArray<'T> = jsNative
         
@@ -1555,29 +2088,29 @@ module JSe =
         member _.ForEach (f: 'T -> bool) : unit = jsNative
         /// Executes a provided function once per array element.
         ///
-        /// Provides the element, index, and array.
+        /// Provides the element and index.
         [<Emit("$0.forEach($1)")>]
         member _.ForEach (f: 'T -> int -> bool) : unit = jsNative
         /// Executes a provided function once per array element.
         ///
-        /// Provides the element and index.
+        /// Provides the element, index, and array.
         [<Emit("$0.forEach($1)")>]
         member _.ForEach (f: 'T -> int -> TypedArray<'T> -> bool) : unit = jsNative
 
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
         [<Emit("$0.includes($1...)")>]
-        member _.Includes (searchElement:'T, ?fromIndex: int) : bool = jsNative
+        member _.Includes (searchElement: 'T, ?fromIndex: int) : bool = jsNative
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
         [<Emit("$0.indexOf($1...)")>]
-        member _.IndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
+        member _.IndexOf (searchElement: 'T, ?fromIndex: int) : int = jsNative
 
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
         [<Emit("$0.LastIndexOf($1...)")>]
-        member _.LastIndexOf (searchElement:'T, ?fromIndex: int) : int = jsNative
+        member _.LastIndexOf (searchElement: 'T, ?fromIndex: int) : int = jsNative
         
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
@@ -1585,10 +2118,14 @@ module JSe =
         member _.Map (f: 'T -> 'U) : TypedArray<'U> = jsNative
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
+        ///
+        /// Provides the element and index.
         [<Emit("$0.map($1)")>]
         member _.MapWithIndex (f: 'T -> int -> 'U) : TypedArray<'U> = jsNative
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
+        ///
+        /// Provides the element, index, and array.
         [<Emit("$0.map($1)")>]
         member _.MapWithIndexArray (f: 'T -> int -> TypedArray<'T> -> 'U) : TypedArray<'U> = jsNative
         
@@ -1598,10 +2135,14 @@ module JSe =
         member _.Reduce (f: 'State -> 'T -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
+        ///
+        /// Provides the element and index.
         [<Emit("$0.reduce($1,$2)")>]
         member _.Reduce (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
+        ///
+        /// Provides the element, index, and array.
         [<Emit("$0.reduce($1,$2)")>]
         member _.Reduce (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
         
@@ -1611,10 +2152,14 @@ module JSe =
         member _.ReduceRight (f: 'State -> 'T -> 'State, state:'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
+        ///
+        /// Provides the element and index.
         [<Emit("$0.reduceRight($1,$2)")>]
         member _.ReduceRight (f: 'State -> 'T -> int -> 'State, state: 'State) : 'State = jsNative
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
+        ///
+        /// Provides the element, index, and array.
         [<Emit("$0.reduceRight($1,$2)")>]
         member _.ReduceRight (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) : 'State = jsNative
 
@@ -1639,10 +2184,14 @@ module JSe =
         member _.Some (f: 'T -> bool) : bool = jsNative
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
+        ///
+        /// Provides the element and index.
         [<Emit("$0.some($1)")>]
         member _.Some (f: 'T -> int -> bool) : bool = jsNative
         /// Tests whether some element in the typed array passes the test implemented by 
         /// the provided function.
+        ///
+        /// Provides the element, index, and array.
         [<Emit("$0.some($1)")>]
         member _.Some (f: 'T -> int -> TypedArray<'T> -> bool) : bool = jsNative
         
@@ -1727,10 +2276,7 @@ module JSe =
 
     /// Describes an array-like view of an underlying binary data buffer.
     [<Erase;RequireQualifiedAccess>]
-    module TypedArray =
-        /// Returns a sequence that contains the key/value pairs for each index in the array.
-        let inline entries (ta: TypedArray<'T>) = ta.Entries()
-        
+    module TypedArray =        
         /// The ArrayBuffer referenced by a TypedArray at construction time.
         let inline buffer (ta: TypedArray<'T>) = ta.Buffer
         
@@ -1740,39 +2286,40 @@ module JSe =
         /// The offset (in bytes) of a typed array from the start of its ArrayBuffer.
         let inline byteOffset (ta: TypedArray<'T>) = ta.ByteOffset
         
-        /// The length (in elements) of a typed array.
-        let inline length (ta: TypedArray<'T>) = ta.Length
-        
         /// Copies the sequence of array elements within the array to the position 
         /// starting at target. 
         ///
         /// The copy is taken from the index positions of the second argument start.
-        let inline copyWithin (targetStartIndex: int) (start: int) (ta: TypedArray<'T>) = ta.CopyWithin(targetStartIndex, start)
-        
+        let inline copyWithin (targetStartIndex: int) (start: int) (ta: TypedArray<'T>) = 
+            ta.CopyWithin(targetStartIndex, start)
+            ta
+
         /// Copies the sequence of array elements within the array to the position 
         /// starting at target. 
         ///
         /// The copy is taken from the index positions of the second and third arguments 
         /// start and end.
-        let inline copyWithinEnd (targetStartIndex: int) (start: int) (end': int) (ta: TypedArray<'T>) = ta.CopyWithin(targetStartIndex, start, end')
+        let inline copyWithinEnd (targetStartIndex: int) (start: int) (end': int) (ta: TypedArray<'T>) = 
+            ta.CopyWithin(targetStartIndex, start, end')
+            ta
 
-        /// The keys for each index in the array.
-        let inline keys (ta: TypedArray<'T>) = ta.Keys
-        
-        /// Joins all elements of an array into a string.
-        let inline join (sep: string) (ta: TypedArray<'T>) = ta.Join(sep)
-        
+        /// Returns a sequence that contains the key/value pairs for each index in the array.
+        let inline entries (ta: TypedArray<'T>) = ta.Entries()
+
+        /// The length (in elements) of a typed array.
+        let inline length (ta: TypedArray<'T>) = ta.Length
+
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
         let inline fill (value: 'T) (ta: TypedArray<'T>) = ta.Fill(value)
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fillStart (value: 'T) (start': int) (ta: TypedArray<'T>) = ta.Fill(value, start' = start')
-        
+        let inline fillEnd (value: 'T) (end': int) (ta: TypedArray<'T>) = ta.Fill(value, end' = end')
+
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
-        let inline fillEnd (value: 'T) (end': int) (ta: TypedArray<'T>) = ta.Fill(value, end' = end')
+        let inline fillStart (value: 'T) (start': int) (ta: TypedArray<'T>) = ta.Fill(value, start' = start')
         
         /// Fills all the elements of a typed array from a start index to an end index with 
         /// a static value.
@@ -1794,12 +2341,9 @@ module JSe =
         let inline find (f: 'T -> bool) (ta: TypedArray<'T>) = ta.Find(f)
 
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
-        ///
-        /// Provides the element and index.
         let inline findWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.Find(f)
+
         /// Returns a value in the typed array, if an element satisfies the provided testing function.
-        ///
-        /// Provides the element, index, and array.
         let inline findWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.Find(f)
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
@@ -1808,14 +2352,10 @@ module JSe =
 
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
-        ///
-        /// Provides the element and index.
         let inline findIndexWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.FindIndex(f)
 
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function. Otherwise -1 is returned.
-        ///
-        /// Provides the element, index, and array.
         let inline findIndexWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.FindIndex(f)
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
@@ -1825,15 +2365,11 @@ module JSe =
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
-        ///
-        /// Provides the element and index.
         let inline tryFindIndexWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = 
             ta.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         
         /// Returns an index in the typed array, if an element in the typed array satisfies the 
         /// provided testing function.
-        ///
-        /// Provides the element, index, and array.
         let inline tryFindIndexWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = 
             ta.FindIndex(f) |> fun i -> if i < 0 then None else Some i
         
@@ -1841,39 +2377,61 @@ module JSe =
         let inline forEach (f: 'T -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Executes a provided function once per array element.
-        ///
-        /// Provides the element, index, and array.
         let inline forEachWithIndex (f: 'T -> int -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Executes a provided function once per array element.
-        ///
-        /// Provides the element and index.
         let inline forEachWithIndexArray (f: 'T -> int -> TypedArray<'T> -> bool) (ta: TypedArray<'T>) = ta.ForEach(f)
         
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
-        let inline includes (searchElement:'T) (ta: TypedArray<'T>) = ta.Includes(searchElement)
+        let inline includes (searchElement: 'T) (ta: TypedArray<'T>) = ta.Includes(searchElement)
         
         /// Determines whether a typed array includes a certain element, 
         /// returning true or false as appropriate.
-        let inline includesFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.Includes(searchElement)
+        let inline includesFromIndex (searchElement: 'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.Includes(searchElement, fromIndex)
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
-        let inline indexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.IndexOf(searchElement)
+        let inline indexOf (searchElement: 'T) (ta: TypedArray<'T>) = ta.IndexOf(searchElement)
 
         /// Returns the first index at which a given element can be found 
         /// in the typed array, or -1 if it is not present.
-        let inline indexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.IndexOf(searchElement, fromIndex)
+        let inline indexOfFromIndex (searchElement: 'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.IndexOf(searchElement, fromIndex)
+
+        /// Tries to return the first index at which a given element can be found 
+        /// in the typed array.
+        let inline tryIndexOf (searchElement: 'T) (ta: TypedArray<'T>) =
+            ta.IndexOf(searchElement) |> fun i -> if i < 0 then None else Some i
+            
+        /// Tries to return the first index at which a given element can be found 
+        /// in the typed array.
+        let inline tryIndexOfFromIndex (searchElement: 'T) (fromIndex: int) (ta: TypedArray<'T>) =
+            ta.IndexOf(searchElement, fromIndex) |> fun i -> if i < 0 then None else Some i
+
+        /// Joins all elements of an array into a string.
+        let inline join (sep: string) (ta: TypedArray<'T>) = ta.Join(sep)
+
+        /// The keys for each index in the array.
+        let inline keys (ta: TypedArray<'T>) = ta.Keys()
+
+        /// Returns the last index at which a given element can be found in 
+        /// the typed array, or -1 if it is not present.
+        let inline lastIndexOf (searchElement: 'T) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement)
         
         /// Returns the last index at which a given element can be found in 
         /// the typed array, or -1 if it is not present.
-        let inline LastIndexOf (searchElement:'T) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement)
+        let inline lastIndexOfFromIndex (searchElement: 'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement, fromIndex)
         
-        /// Returns the last index at which a given element can be found in 
-        /// the typed array, or -1 if it is not present.
-        let inline LastIndexOfFromIndex (searchElement:'T) (fromIndex: int) (ta: TypedArray<'T>) = ta.LastIndexOf(searchElement, fromIndex)
-        
+        /// Tries to return the last index at which a given element can be found 
+        /// in the typed array.
+        let inline tryLastIndexOf (searchElement: 'T) (ta: TypedArray<'T>) =
+            ta.LastIndexOf(searchElement) |> fun i -> if i < 0 then None else Some i
+            
+        /// Tries to return the last index at which a given element can be found 
+        /// in the typed array.
+        let inline tryLastIndexOfFromIndex (searchElement: 'T) (fromIndex: int) (ta: TypedArray<'T>) =
+            ta.LastIndexOf(searchElement, fromIndex) |> fun i -> if i < 0 then None else Some i
+
         /// Creates a new typed array with the results of calling a provided 
         /// function on every element in this typed array.
         let inline map (f: 'T -> 'U) (ta: TypedArray<'T>) = ta.Map(f)
@@ -1892,15 +2450,15 @@ module JSe =
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
-        let inline reduceWithIndex (f: 'State -> 'T -> int -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
+        let inline reduceWithIndex (f: 'State -> 'T -> int -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from left-to-right) has to reduce it to a single value.
-        let inline reduceWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State, state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
+        let inline reduceWithIndexArray (f: 'State -> 'T -> int -> TypedArray<'T> -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.Reduce(f, state)
         
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
-        let inline reduceRight (f: 'State -> 'T -> 'State) (state:'State) (ta: TypedArray<'T>) = ta.ReduceRight(f, state)
+        let inline reduceRight (f: 'State -> 'T -> 'State) (state: 'State) (ta: TypedArray<'T>) = ta.ReduceRight(f, state)
 
         /// Applies a function against an accumulator and each value of the typed 
         /// array (from right-to-left) has to reduce it to a single value.
@@ -1914,22 +2472,34 @@ module JSe =
         let inline reverse (ta: TypedArray<'T>) = ta.Reverse()
         
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setArray (source: System.Array) (ta: TypedArray<'T>) = ta.Set(source)
+        let inline setArray (source: System.Array) (ta: TypedArray<'T>) = 
+            ta.Set(source)
+            ta
 
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setArrayOffset (source: System.Array) (offset: int) (ta: TypedArray<'T>) = ta.Set(source, offset)
+        let inline setArrayOffset (source: System.Array) (offset: int) (ta: TypedArray<'T>) = 
+            ta.Set(source, offset)
+            ta
 
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setTypedArray (source: #JS.TypedArray) (ta: TypedArray<'T>) = ta.Set(source)
+        let inline setTypedArray (source: #JS.TypedArray) (ta: TypedArray<'T>) = 
+            ta.Set(source)
+            ta
         
         /// Stores multiple values in the typed array, reading input values from a specified array.
-        let inline setTypedArrayOffset (source: #JS.TypedArray) (offset: int) (ta: TypedArray<'T>)= ta.Set(source, offset)
+        let inline setTypedArrayOffset (source: #JS.TypedArray) (offset: int) (ta: TypedArray<'T>)= 
+            ta.Set(source, offset)
+            ta
 
         /// Stores multiple values in the typed array, reading input values from a given sequence.
-        let inline setSeq (source: seq<'T>) (ta: TypedArray<'T>) = ta.Set(unbox<System.Array> (ResizeArray source))
+        let inline setSeq (source: seq<'T>) (ta: TypedArray<'T>) = 
+            ta.Set(unbox<System.Array> (ResizeArray source))
+            ta
         
         /// Stores multiple values in the typed array, reading input values from a given sequence.
-        let inline setSeqOffset (source: seq<'T>) (offset: int) (ta: TypedArray<'T>) = ta.Set(unbox<System.Array> (ResizeArray source), offset = offset)
+        let inline setSeqOffset (source: seq<'T>) (offset: int) (ta: TypedArray<'T>) = 
+            ta.Set(unbox<System.Array> (ResizeArray source), offset = offset)
+            ta
         
         /// Returns a shallow copy of a portion of a typed array into a new typed array object. 
         let inline slice (begin': int) (end': int) (ta: TypedArray<'T>) = ta.Slice(begin', end')
@@ -1955,7 +2525,8 @@ module JSe =
         /// Sorts the elements of a typed array numerically in place and returns the typed array. 
         let inline sort (ta: TypedArray<'T>) = ta.Sort()
         
-        /// Sorts the elements of a typed array numerically in place and returns the typed array. 
+        /// Sorts the elements of a typed array numerically in place using the provided function
+        /// and returns the typed array. 
         let inline sortBy (sortFunction: 'T -> 'T -> int) (ta: TypedArray<'T>) = ta.Sort(sortFunction)
 
         /// Returns a new TypedArray on the same ArrayBuffer store and with the same element types 
@@ -2835,23 +3406,23 @@ module JSe =
             member _.GetEnumerator () = unbox<Collections.IEnumerator>()
 
     [<Erase>]
-    type BigInt64Array private () = 
-        inherit TypedArray<bigint>()
+    type Int64Array private () = 
+        inherit TypedArray<int64>()
             
         [<Emit "new BigInt64Array($0)">]
-        new (size: int) = BigInt64Array()
+        new (size: int) = Int64Array()
         [<Emit("new BigInt64Array($0)")>]
-        new (typedArray: JS.TypedArray) = BigInt64Array()
+        new (typedArray: JS.TypedArray) = Int64Array()
         [<Emit("new BigInt64Array($0)")>]
-        new (typedArray: TypedArray<bigint>) = BigInt64Array()
+        new (typedArray: TypedArray<bigint>) = Int64Array()
         [<Emit("$0")>]
-        new (typedArray: JS.TypedArray<bigint>) = BigInt64Array()
+        new (typedArray: JS.TypedArray<bigint>) = Int64Array()
         [<Emit("new BigInt64Array($0...)")>]
-        new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = BigInt64Array()
+        new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Int64Array()
         [<Emit("new BigInt64Array($0...)")>]
-        new (buffer: ArrayBuffer, ?offset: int, ?length: int) = BigInt64Array()
+        new (buffer: ArrayBuffer, ?offset: int, ?length: int) = Int64Array()
         [<Emit "new BigInt64Array($0)">]
-        new (seq: seq<bigint>) = BigInt64Array()
+        new (seq: seq<bigint>) = Int64Array()
     
         /// The size in bytes of each element in the typed array.
         [<Emit("BigInt64Array.BYTES_PER_ELEMENT")>]
@@ -2863,7 +3434,7 @@ module JSe =
         
         /// Helper function to convert (no runtime cost) a Fable.Core.JS interface 
         /// typed array to this representation.
-        static member inline cast (a: JS.BigInt64Array) = unbox<BigInt64Array> a
+        static member inline cast (a: JS.BigInt64Array) = unbox<Int64Array> a
 
         // All of the interfaces are erased, so implementation doesn't actually matter
 
@@ -2882,53 +3453,146 @@ module JSe =
             member _.keys () = box ()
             member _.join sep = ""
 
-        interface JS.TypedArray<bigint> with
+        interface JS.TypedArray<int64> with
             member this.Item
                 with get i = this.Item i
                 and set i x = this.[i] <- unbox x
 
-            member _.fill (value, begin', end') = unbox<JS.TypedArray<bigint>>()
-            member _.filter (f: bigint -> bool) = unbox<JS.TypedArray<bigint>>()
-            member _.filter (f: bigint -> int -> bool) = unbox<JS.TypedArray<bigint>>()
-            member _.filter (f: bigint -> int -> JS.TypedArray<bigint> -> bool) = unbox<JS.TypedArray<bigint>>()
-            member _.find (f: bigint -> bool) = unbox<bigint option>()
-            member _.find (f: bigint -> int -> bool) = unbox<bigint option>()
-            member _.find (f: bigint -> int -> JS.TypedArray<bigint> -> bool) = unbox<bigint option>()
-            member _.findIndex (f: bigint -> bool) = 1
-            member _.findIndex (f: bigint -> int -> bool) = 1
-            member _.findIndex (f: bigint -> int -> JS.TypedArray<bigint> -> bool) = 1
-            member _.forEach (f: bigint -> bool) = ()
-            member _.forEach (f: bigint -> int -> bool) = ()
-            member _.forEach (f: bigint -> int -> JS.TypedArray<bigint> -> bool) = ()
+            member _.fill (value, begin', end') = unbox<JS.TypedArray<int64>>()
+            member _.filter (f: int64 -> bool) = unbox<JS.TypedArray<int64>>()
+            member _.filter (f: int64 -> int -> bool) = unbox<JS.TypedArray<int64>>()
+            member _.filter (f: int64 -> int -> JS.TypedArray<int64> -> bool) = unbox<JS.TypedArray<int64>>()
+            member _.find (f: int64 -> bool) = unbox<int64 option>()
+            member _.find (f: int64 -> int -> bool) = unbox<int64 option>()
+            member _.find (f: int64 -> int -> JS.TypedArray<int64> -> bool) = unbox<int64 option>()
+            member _.findIndex (f: int64 -> bool) = 1
+            member _.findIndex (f: int64 -> int -> bool) = 1
+            member _.findIndex (f: int64 -> int -> JS.TypedArray<int64> -> bool) = 1
+            member _.forEach (f: int64 -> bool) = ()
+            member _.forEach (f: int64 -> int -> bool) = ()
+            member _.forEach (f: int64 -> int -> JS.TypedArray<int64> -> bool) = ()
             member _.includes (searchElement, ?fromIndex) = true
             member _.indexOf (searchElement, ?fromIndex) = 1
             member _.lastIndexOf (searchElement, ?fromIndex) = 1
-            member _.map (f: bigint -> 'U) = unbox<JS.TypedArray<'U>>()
-            member _.map (f: bigint -> int -> 'U) = unbox<JS.TypedArray<'U>>()
-            member _.map (f: bigint -> int -> JS.TypedArray<bigint> -> 'U) = unbox<JS.TypedArray<'U>>()
-            member _.reduce (f: 'State -> bigint -> 'State, state: 'State) = unbox<'State>()
-            member _.reduce (f: 'State -> bigint -> int -> 'State, state: 'State) = unbox<'State>()
-            member _.reduce (f: 'State -> bigint -> int -> JS.TypedArray<bigint> -> 'State, state: 'State) = unbox<'State>()
-            member _.reduceRight (f: 'State -> bigint -> 'State, state: 'State) = unbox<'State>()
-            member _.reduceRight (f: 'State -> bigint -> int -> 'State, state: 'State) = unbox<'State>()
-            member _.reduceRight (f: 'State -> bigint -> int -> JS.TypedArray<bigint> -> 'State, state: 'State) = unbox<'State>()
-            member _.reverse () = unbox<JS.TypedArray<bigint>>()
+            member _.map (f: int64 -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.map (f: int64 -> int -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.map (f: int64 -> int -> JS.TypedArray<int64> -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.reduce (f: 'State -> int64 -> 'State, state: 'State) = unbox<'State>()
+            member _.reduce (f: 'State -> int64 -> int -> 'State, state: 'State) = unbox<'State>()
+            member _.reduce (f: 'State -> int64 -> int -> JS.TypedArray<int64> -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> int64 -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> int64 -> int -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> int64 -> int -> JS.TypedArray<int64> -> 'State, state: 'State) = unbox<'State>()
+            member _.reverse () = unbox<JS.TypedArray<int64>>()
             member _.set (source: System.Array, ?offset: int) = ()
             member _.set (source: #JS.TypedArray, ?offset: int) = ()
-            member _.slice (?begin', ?end') = unbox<JS.TypedArray<bigint>>()
-            member _.some (f: bigint -> bool) = true
-            member _.some (f: bigint -> int -> bool) = true
-            member _.some (f: bigint -> int -> JS.TypedArray<bigint> -> bool) = true
+            member _.slice (?begin', ?end') = unbox<JS.TypedArray<int64>>()
+            member _.some (f: int64 -> bool) = true
+            member _.some (f: int64 -> int -> bool) = true
+            member _.some (f: int64 -> int -> JS.TypedArray<int64> -> bool) = true
             member _.sort (?sortFunction) = true
-            member _.subarray (?begin', ?end') = unbox<JS.TypedArray<bigint>>()
+            member _.subarray (?begin', ?end') = unbox<JS.TypedArray<int64>>()
             member _.values () = box ()
 
-        interface Collections.Generic.IEnumerable<bigint> with
-            member _.GetEnumerator () = unbox<Collections.Generic.IEnumerator<bigint>>()
+        interface Collections.Generic.IEnumerable<int64> with
+            member _.GetEnumerator () = unbox<Collections.Generic.IEnumerator<int64>>()
 
         interface Collections.IEnumerable with
             member _.GetEnumerator () = unbox<Collections.IEnumerator>()
 
+    [<Erase>]
+    type Uint64Array private () = 
+        inherit TypedArray<uint64>()
+        
+        [<Emit "new BigUint64Array($0)">]
+        new (size: int) = Uint64Array()
+        [<Emit("new BigUint64Array($0)")>]
+        new (typedArray: JS.TypedArray) = Uint64Array()
+        [<Emit("new BigUint64Array($0)")>]
+        new (typedArray: TypedArray<bigint>) = Uint64Array()
+        [<Emit("$0")>]
+        new (typedArray: JS.TypedArray<bigint>) = Uint64Array()
+        [<Emit("new BigUint64Array($0...)")>]
+        new (buffer: JS.ArrayBuffer, ?offset: int, ?length: int) = Uint64Array()
+        [<Emit("new BigUint64Array($0...)")>]
+        new (buffer: ArrayBuffer, ?offset: int, ?length: int) = Uint64Array()
+        [<Emit "new BigUint64Array($0)">]
+        new (seq: seq<bigint>) = Uint64Array()
+
+        /// The size in bytes of each element in the typed array.
+        [<Emit("BigUint64Array.BYTES_PER_ELEMENT")>]
+        static member bytesPerElement : int = jsNative
+    
+        /// A string value of the typed array constructor name.
+        [<Emit("BigUint64Array.name")>]
+        static member name : string = jsNative
+    
+        // All of the interfaces are erased, so implementation doesn't actually matter
+
+        interface JS.ArrayBufferView with
+            member _.buffer = unbox<JS.ArrayBuffer>()
+            member _.byteLength = 1
+            member _.byteOffset = 1
+
+        interface JS.TypedArray with
+            member _.buffer = unbox<JS.ArrayBuffer>()
+            member _.byteLength = 1
+            member _.byteOffset = 1
+            member _.length = 1
+            member _.copyWithin (targetStartIndex, start, ?end') = ()
+            member _.entries () = box ()
+            member _.keys () = box ()
+            member _.join sep = ""
+
+        interface JS.TypedArray<uint64> with
+            member this.Item
+                with get i = this.Item i
+                and set i x = this.[i] <- unbox x
+
+            member _.fill (value, begin', end') = unbox<JS.TypedArray<uint64>>()
+            member _.filter (f: uint64 -> bool) = unbox<JS.TypedArray<uint64>>()
+            member _.filter (f: uint64 -> int -> bool) = unbox<JS.TypedArray<uint64>>()
+            member _.filter (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = unbox<JS.TypedArray<uint64>>()
+            member _.find (f: uint64 -> bool) = unbox<uint64 option>()
+            member _.find (f: uint64 -> int -> bool) = unbox<uint64 option>()
+            member _.find (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = unbox<uint64 option>()
+            member _.findIndex (f: uint64 -> bool) = 1
+            member _.findIndex (f: uint64 -> int -> bool) = 1
+            member _.findIndex (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = 1
+            member _.forEach (f: uint64 -> bool) = ()
+            member _.forEach (f: uint64 -> int -> bool) = ()
+            member _.forEach (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = ()
+            member _.includes (searchElement, ?fromIndex) = true
+            member _.indexOf (searchElement, ?fromIndex) = 1
+            member _.lastIndexOf (searchElement, ?fromIndex) = 1
+            member _.map (f: uint64 -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.map (f: uint64 -> int -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.map (f: uint64 -> int -> JS.TypedArray<uint64> -> 'U) = unbox<JS.TypedArray<'U>>()
+            member _.reduce (f: 'State -> uint64 -> 'State, state: 'State) = unbox<'State>()
+            member _.reduce (f: 'State -> uint64 -> int -> 'State, state: 'State) = unbox<'State>()
+            member _.reduce (f: 'State -> uint64 -> int -> JS.TypedArray<uint64> -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> uint64 -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> uint64 -> int -> 'State, state: 'State) = unbox<'State>()
+            member _.reduceRight (f: 'State -> uint64 -> int -> JS.TypedArray<uint64> -> 'State, state: 'State) = unbox<'State>()
+            member _.reverse () = unbox<JS.TypedArray<uint64>>()
+            member _.set (source: System.Array, ?offset: int) = ()
+            member _.set (source: #JS.TypedArray, ?offset: int) = ()
+            member _.slice (?begin', ?end') = unbox<JS.TypedArray<uint64>>()
+            member _.some (f: uint64 -> bool) = true
+            member _.some (f: uint64 -> int -> bool) = true
+            member _.some (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = true
+            member _.sort (?sortFunction) = true
+            member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint64>>()
+            member _.values () = box ()
+
+        interface Collections.Generic.IEnumerable<uint64> with
+            member _.GetEnumerator () = unbox<Collections.Generic.IEnumerator<uint64>>()
+
+        interface Collections.IEnumerable with
+            member _.GetEnumerator () = unbox<Collections.IEnumerator>()
+
+    /// Provides access to the browser's debugging console. The specifics of how it works varies 
+    /// from browser to browser, but there is a de facto set of features that are typically provided.
     [<Global>]
     type console =
         /// Writes an error message to the console if the assertion is false. 
@@ -3043,7 +3707,7 @@ module JSe =
         /// This is a *Non-standard* API, DO NOT use it in production!
         static member profileEnd (?reportLabel: string) : unit = jsNative
         
-        /// takes one mandatory argument data, which must be an array or an object, 
+        /// Takes one mandatory argument data, which must be an array or an object, 
         /// and one additional optional parameter columns.
         ///
         /// It logs data as a table. Each element in the array (or enumerable property 
@@ -3098,6 +3762,7 @@ module JSe =
         /// The message is only displayed to the user if the console is configured to display warn output.
         static member warn (msg: string, [<ParamArray>] items: obj []) : unit = jsNative
 
+    /// Helper to safetly construct regex flags.
     [<Erase>]
     type RegExpFlag [<Emit("''")>] () =
         /// Global match
@@ -3190,11 +3855,13 @@ module JSe =
         /// If LastIndex is greater than the length of the string, test() and exec() fail, then 
         /// LastIndex is set to 0.
         ///
-        /// If LastIndex is equal to or less than the length of the string and if the regular expression 
-        /// matches the empty string, then the regular expression matches input starting from LastIndex.
+        /// If LastIndex is equal to or less than the length of the string and if the regular 
+        /// expression matches the empty string, then the regular expression matches input 
+        /// starting from LastIndex.
         ///
-        /// If LastIndex is equal to the length of the string and if the regular expression does not match 
-        /// the empty string, then the regular expression mismatches input, and LastIndex is reset to 0.
+        /// If LastIndex is equal to the length of the string and if the regular expression 
+        /// does not match the empty string, then the regular expression mismatches input, 
+        /// and LastIndex is reset to 0.
         ///
         /// Otherwise, LastIndex is set to the next position following the most recent match.
         member _.LastIndex
@@ -3252,7 +3919,8 @@ module JSe =
         [<Emit("$0.sticky")>]
         member _.Sticky : bool = jsNative
         
-        /// Executes a search for a match in a specified string and returns if it was successful or not.
+        /// Executes a search for a match in a specified string and returns if it was 
+        /// successful or not.
         ///
         /// Be aware that JS regular expressions are *stateful* when using the global 
         /// or sticky flags.
@@ -3318,6 +3986,21 @@ module JSe =
         /// Otherwise, LastIndex is set to the next position following the most recent match.
         let inline lastIndex (re: RegExp) = re.LastIndex
 
+        /// A mutable integer property that specifies the index at which to start the next match.
+        ///
+        /// This property is set only if the regular expression instance used the g flag to 
+        /// indicate a global search, or the y flag to indicate a sticky search.
+        ///
+        /// If LastIndex is greater than the length of the string, test() and exec() fail, then 
+        /// LastIndex is set to 0.
+        ///
+        /// If LastIndex is equal to or less than the length of the string and if the regular expression 
+        /// matches the empty string, then the regular expression matches input starting from LastIndex.
+        ///
+        /// If LastIndex is equal to the length of the string and if the regular expression does not match 
+        /// the empty string, then the regular expression mismatches input, and LastIndex is reset to 0.
+        ///
+        /// Otherwise, LastIndex is set to the next position following the most recent match.
         let inline setLastIndex (value: int) (re: RegExp) = 
             re.LastIndex <- value
             re
@@ -3353,7 +4036,7 @@ module JSe =
         let inline test (value: string) (re: RegExp) = re.Test(value)
 
         /// Returns a string representing the regular expression.
-        let inline toString () (re: RegExp) = re.ToString()
+        let inline toString (re: RegExp) = re.ToString()
 
         /// Indicates whether or not the "u" flag is used with a regular expression.
         let inline unicode (re: RegExp) = re.Unicode
@@ -3430,9 +4113,11 @@ module JSExtensions =
         /// Returns a new string with some or all matches of a pattern replaced by a replacement.
         member inline this.Replace (regex: Regex, replacer: JSe.RegExpReplacer -> string) = JSe.RegExp.fromRegex(regex).Replace(this, replacer)
         
-        /// Returns the number of matches found in a given string.
+        /// The index of the first match between the regular expression and the given string, 
+        /// or -1 if no match was found.
         member inline this.Search (regExp: JSe.RegExp) = regExp.Search(this)
-        /// Returns the number of matches found in a given string.
+        /// The index of the first match between the regular expression and the given string, 
+        /// or -1 if no match was found.
         member inline this.Search (regex: Regex) = JSe.RegExp.fromRegex(regex).Search(this)
 
         /// Splits a string into substrings based on regular expression matches.
@@ -3440,3 +4125,7 @@ module JSExtensions =
         member _.Split (regExp: JSe.RegExp) : string [] = jsNative
         /// Splits a string into substrings based on regular expression matches.
         member inline this.Split (regex: Regex) = this.Split(JSe.RegExp.fromRegex regex)
+
+[<Erase>]
+module Operators =
+    let inline (?|) l r = JSe.or' l r
