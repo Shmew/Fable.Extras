@@ -93,6 +93,18 @@ Signature:
 (f: unit -> unit) -> (delay: int) -> int<IntervalId>
 ```
 
+## instanceOf
+
+Tests to see if the prototype property of a constructor appears 
+anywhere in the prototype chain of an object.
+
+This should only be used when working with external code (like bindings).
+
+Signature:
+```fsharp
+(ctor: obj) -> (value: obj) -> bool 
+```
+
 ## isSecureContext
 
 Returns if the session is considered secure.
@@ -189,3 +201,25 @@ Signature:
 ```fsharp
 (o: obj) -> Types
 ```
+
+## is
+
+Type checking and equality helpers.
+
+Has functions to make checking aginst Javascript [types](#types) easier.
+
+* bigint
+* boolean
+* equalsButFunctions - Normal structural F# comparison, but ignores 
+    top-level functions (e.g. Elmish dispatch).
+* equalsWithReferences - Performs a memberwise comparison where value 
+    types and strings are compared by value, and other types by reference.
+* function'
+* null'
+* nonEnumerableObject - Checks if the input is both an object and has a Symbol.iterator.
+* number
+* object
+* promise
+* string
+* symbol
+* undefined

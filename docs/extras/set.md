@@ -125,6 +125,15 @@ Signature:
 (m: Set<'T>) -> 'T list
 ```
 
+## ofSet
+
+Converts a FSharp Set into a JS Set.
+
+Signature:
+```fsharp
+(m: Microsoft.FSharp.Collections.Set<'T>) -> Set<'T>
+```
+
 ## size
 
 The number of elements.

@@ -126,6 +126,15 @@ Signature:
 (m: Map<'K,'V>) -> 'K list
 ```
 
+## ofMap
+
+Converts a FSharp Map into a JS Map.
+
+Signature:
+```fsharp
+(m: Microsoft.FSharp.Collections.Map<'K,'V>) -> Map<'K,'V>
+```
+
 ## set
 
 Adds or updates an element with the specified key.

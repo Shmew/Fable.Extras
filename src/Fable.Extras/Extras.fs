@@ -35,6 +35,13 @@ module JSe =
     [<Emit("globalThis")>]
     let globalThis : obj = jsNative
     
+    /// Tests to see if the prototype property of a constructor appears 
+    /// anywhere in the prototype chain of an object.
+    ///
+    /// This should only be used when working with external code (like bindings).
+    [<Emit("$1 instanceOf $0")>]
+    let instanceOf (ctor: obj) (value: obj) : bool = jsNative
+
     /// Returns if the session is considered secure.
     [<Emit("isSecureContext")>]
     let isSecureContext : bool = jsNative
@@ -75,6 +82,42 @@ module JSe =
     /// Returns a Types union case indicating the type of the unevaluated operand.
     [<Emit("typeof $0")>]
     let typeof (o: obj) : Types = jsNative
+
+    /// Type checking and equality helpers.
+    type is =
+        [<Emit("typeof $0 === 'bigint'")>]
+        static member bigint (x: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'boolean'")>]
+        static member boolean (x: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'function'")>]
+        static member function' (value: obj) : bool = jsNative
+        
+        [<Emit("typeof $0 === null")>]
+        static member null' (value: obj) : bool = jsNative
+        
+        /// Checks if the input is both an object and has a Symbol.iterator.
+        [<Emit("typeof $0 === 'object' && !$0[Symbol.iterator]")>]
+        static member nonEnumerableObject (value: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'number'")>]
+        static member number (x: obj) : bool = jsNative
+        
+        [<Emit("typeof $0 === 'object'")>]
+        static member object (x: obj) : bool = jsNative
+        
+        [<Emit("!!$0 && typeof $0.then === 'function'")>]
+        static member promise (value: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'string'")>]
+        static member string (x: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'symbol'")>]
+        static member symbol (x: obj) : bool = jsNative
+
+        [<Emit("typeof $0 === 'undefined'")>]
+        static member undefined (x: obj) : bool = jsNative
 
     [<Measure>]
     type IntervalId
@@ -203,6 +246,10 @@ module JSe =
         /// Returns a list of keys in insertion order.
         let inline keys (m: Map<'K,'V>) = m.Keys()
         
+        /// Converts a FSharp Map into a JS Map.
+        let inline ofMap (m: Microsoft.FSharp.Collections.Map<'K,'V>) = 
+            (Map<'K,'V>(), m) ||> Map.fold (fun jsMap k v -> jsMap.Set(k, v))
+
         /// Adds or updates an element with the specified key.
         ///
         /// If a value is not provided the value will be removed, but the key will still exist.
@@ -364,6 +411,10 @@ module JSe =
         /// This is an alias for the values method.
         let inline keys (s: Set<'T>) = s.Keys()
         
+        /// Converts a FSharp Set into a JS Set.
+        let inline ofSet (s: Microsoft.FSharp.Collections.Set<'T>) =
+            (Set<'T>(), s) ||> Set.fold (fun jsSet v -> jsSet.Add v)
+
         /// The number of elements.
         let inline size (s: Set<'T>) = s.Size
         
@@ -4129,3 +4180,45 @@ module JSExtensions =
 [<Erase>]
 module Operators =
     let inline (?|) l r = JSe.or' l r
+
+[<AutoOpen>]
+module NonErasedExtensions =
+    open Fable.Core.JsInterop
+
+    type JSe.is with
+        /// Normal structural F# comparison, but ignores top-level functions (e.g. Elmish dispatch).
+        static member equalsButFunctions (x: 'a) (y: 'a) =
+            if obj.ReferenceEquals(x, y) then
+                true
+            elif JSe.is.nonEnumerableObject x && not(isNull(box y)) then
+                let keys = JS.Constructors.Object.keys x
+                let length = keys.Count
+                let mutable i = 0
+                let mutable result = true
+                while i < length && result do
+                    let key = keys.[i]
+                    i <- i + 1
+                    let xValue = x?(key)
+                    result <- JSe.is.function' xValue || xValue = y?(key)
+                result
+            else
+                (box x) = (box y)
+
+        /// Performs a memberwise comparison where value types and strings are compared by value,
+        /// and other types by reference.
+        static member equalsWithReferences (x: 'a) (y: 'a) =
+            if obj.ReferenceEquals(x, y) then
+                true
+            elif JSe.is.nonEnumerableObject x && not(isNull(box y)) then
+                let keys = JS.Constructors.Object.keys x
+                let length = keys.Count
+                let mutable i = 0
+                let mutable result = true
+                while i < length && result do
+                    let key = keys.[i]
+                    i <- i + 1
+                    let xValue = x?(key)
+                    result <- JSe.is.function' xValue || obj.ReferenceEquals(xValue, y?(key))
+                result
+            else
+                false
