@@ -39,7 +39,7 @@ module JSe =
     /// anywhere in the prototype chain of an object.
     ///
     /// This should only be used when working with external code (like bindings).
-    [<Emit("$1 instanceOf $0")>]
+    [<Emit("$1 instanceof $0")>]
     let instanceOf (ctor: obj) (value: obj) : bool = jsNative
 
     /// Returns if the session is considered secure.
