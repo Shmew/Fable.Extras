@@ -1,3 +1,6 @@
+### 0.2.2 - Wednesday, November 18th, 2020
+* Support FSharp.Core 5.0
+
 ### 0.2.1 - Saturday, November 7th, 2020
 * Fix issue with JSe.instanceOf
 

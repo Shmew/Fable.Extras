@@ -11,7 +11,7 @@ group Fable.Extras
     nuget Fable.Fetch ~> 2
     nuget Fable.Promise ~> 2
     nuget Fable.SimpleHttp ~> 3
-    nuget FSharp.Core ~> 4.7
+    nuget FSharp.Core >= 4.7.2 lowest_matching: true
 
 group Fable.Extras.Tests
     source https://nuget.org/api/v2
@@ -21,14 +21,14 @@ group Fable.Extras.Tests
     nuget Fable.Jester ~> 0
     nuget Fable.FastCheck ~> 0
     nuget Fable.FastCheck.Jest ~> 0
-    nuget FSharp.Core ~> 4.7
+    nuget FSharp.Core >= 4.7.2 lowest_matching: true
 
 group Fable.Generator.MIME
     source https://nuget.org/api/v2
 	source https://api.nuget.org/v3/index.json
     
     nuget Fake.IO.FileSystem ~> 5
-    nuget FSharp.Core ~> 4.7
+    nuget FSharp.Core >= 4.7.2 lowest_matching: true
     nuget FSharp.Data ~> 3
     
     http https://www.iana.org/assignments/media-types/application.csv
@@ -46,7 +46,7 @@ group Tooling
 	source https://api.nuget.org/v3/index.json
 
 	nuget Fake.IO.FileSystem ~> 5
-	nuget FSharp.Core ~> 4.7
+    nuget FSharp.Core >= 4.7.2 lowest_matching: true
     nuget FSharp.Json ~> 0
 	nuget FSharpLint.Core ~> 0
     nuget Yarnpkg.Yarn ~> 1
@@ -65,6 +65,7 @@ group FakeBuild
     nuget Fake.JavaScript.Yarn ~> 5
 	nuget Fake.JavaScript.Npm ~> 5
 	nuget Fake.Tools.Git ~> 5
+    nuget FSharp.Core ~> 4.7
     nuget FSharp.Json ~> 0
 	nuget FSharpLint.Core ~> 0
     nuget NuGet.Packaging 5.6
