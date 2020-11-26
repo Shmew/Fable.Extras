@@ -148,7 +148,7 @@ module JSe =
     [<Erase>]
     type Map<'K,'V> [<Emit("new Map($0...)")>] (?iterable: seq<'K * 'V>) =
         [<Emit("$0")>]
-        new (m: Map<'K,'V>) = Map()
+        new (m: JS.Map<'K,'V>) = Map()
 
         /// The number of elements.
         [<Emit("$0.size")>]
