@@ -1,3 +1,6 @@
+### 0.2.3 - Wednesday, November 25th, 2020
+* Fix constructor signature for Map
+
 ### 0.2.2 - Wednesday, November 18th, 2020
 * Support FSharp.Core 5.0
 

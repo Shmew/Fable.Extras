@@ -6,7 +6,7 @@ Any value (both objects and primitive values) may be used as either a key or a v
 
 ```fsharp
 type Map<'K,'V> (?iterable: seq<'K * 'V>) =
-    new (m: Map<'K,'V>)
+    new (m: JS.Map<'K,'V>)
 
     /// The number of elements.
     member Size: int
