@@ -207,7 +207,7 @@ module JSe =
             member this.get k = this.Get k |> Option.get
             member this.has k = this.Has k
             member this.keys () = unbox (this.Keys())
-            member this.set (key, ?value) = upcast this.Set(key, ?value = value)
+            member this.set (key, value) = upcast this.Set(key, value)
             member this.values () = unbox (this.Values())
     
     /// Holds key-value pairs and remembers the original insertion order of the keys.
@@ -290,7 +290,7 @@ module JSe =
             member this.delete k = this.Delete k
             member this.get k = this.Get k |> Option.get
             member this.has k = this.Has k
-            member this.set (key, ?value) = upcast this.Set(key, ?value = value)
+            member this.set (key, value) = upcast this.Set(key, value)
     
     /// Lets you store weakly held objects in a collection.
     [<Erase;RequireQualifiedAccess>]
@@ -2315,7 +2315,7 @@ module JSe =
             member _.some (f: 'T -> bool) = true
             member _.some (f: 'T -> int -> bool) = true
             member _.some (f: 'T -> int -> JS.TypedArray<'T> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<'T>>()
             member _.values () = box ()
 
@@ -2686,7 +2686,7 @@ module JSe =
             member _.some (f: int8 -> bool) = true
             member _.some (f: int8 -> int -> bool) = true
             member _.some (f: int8 -> int -> JS.TypedArray<int8> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<int8>>()
             member _.values () = box ()
 
@@ -2781,7 +2781,7 @@ module JSe =
             member _.some (f: uint8 -> bool) = true
             member _.some (f: uint8 -> int -> bool) = true
             member _.some (f: uint8 -> int -> JS.TypedArray<uint8> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint8>>()
             member _.values () = box ()
 
@@ -2876,7 +2876,7 @@ module JSe =
             member _.some (f: uint8 -> bool) = true
             member _.some (f: uint8 -> int -> bool) = true
             member _.some (f: uint8 -> int -> JS.TypedArray<uint8> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint8>>()
             member _.values () = box ()
 
@@ -2971,7 +2971,7 @@ module JSe =
             member _.some (f: int16 -> bool) = true
             member _.some (f: int16 -> int -> bool) = true
             member _.some (f: int16 -> int -> JS.TypedArray<int16> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<int16>>()
             member _.values () = box ()
 
@@ -3066,7 +3066,7 @@ module JSe =
             member _.some (f: uint16 -> bool) = true
             member _.some (f: uint16 -> int -> bool) = true
             member _.some (f: uint16 -> int -> JS.TypedArray<uint16> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint16>>()
             member _.values () = box ()
 
@@ -3161,7 +3161,7 @@ module JSe =
             member _.some (f: int -> bool) = true
             member _.some (f: int -> int -> bool) = true
             member _.some (f: int -> int -> JS.TypedArray<int> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<int>>()
             member _.values () = box ()
 
@@ -3256,7 +3256,7 @@ module JSe =
             member _.some (f: uint32 -> bool) = true
             member _.some (f: uint32 -> int -> bool) = true
             member _.some (f: uint32 -> int -> JS.TypedArray<uint32> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint32>>()
             member _.values () = box ()
 
@@ -3351,7 +3351,7 @@ module JSe =
             member _.some (f: float32 -> bool) = true
             member _.some (f: float32 -> int -> bool) = true
             member _.some (f: float32 -> int -> JS.TypedArray<float32> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<float32>>()
             member _.values () = box ()
 
@@ -3446,7 +3446,7 @@ module JSe =
             member _.some (f: float -> bool) = true
             member _.some (f: float -> int -> bool) = true
             member _.some (f: float -> int -> JS.TypedArray<float> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<float>>()
             member _.values () = box ()
 
@@ -3541,7 +3541,7 @@ module JSe =
             member _.some (f: int64 -> bool) = true
             member _.some (f: int64 -> int -> bool) = true
             member _.some (f: int64 -> int -> JS.TypedArray<int64> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<int64>>()
             member _.values () = box ()
 
@@ -3632,7 +3632,7 @@ module JSe =
             member _.some (f: uint64 -> bool) = true
             member _.some (f: uint64 -> int -> bool) = true
             member _.some (f: uint64 -> int -> JS.TypedArray<uint64> -> bool) = true
-            member _.sort (?sortFunction) = true
+            member this.sort (?sortFunction) = upcast this
             member _.subarray (?begin', ?end') = unbox<JS.TypedArray<uint64>>()
             member _.values () = box ()
 
