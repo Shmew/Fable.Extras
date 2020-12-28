@@ -1,6 +1,6 @@
 {
   "name": "fable.-extras",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Fable bindings for jest and friends",
   "homepage": "https://github.com/Shmew/Fable.Extras",
   "bugs": {

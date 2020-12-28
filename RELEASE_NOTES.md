@@ -1,3 +1,6 @@
+### 0.2.4 - Monday, December 28th, 2020
+* Fix type definitions for latest Fable.Core
+
 ### 0.2.3 - Wednesday, November 25th, 2020
 * Fix constructor signature for Map
 
