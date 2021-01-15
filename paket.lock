@@ -27,8 +27,8 @@ NUGET
       Fable.Browser.Event (>= 1.2.1) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.7) - restriction: >= netstandard2.0
-    Fable.Core (3.2.2)
-      FSharp.Core (>= 4.7) - restriction: >= netstandard2.0
+    Fable.Core (3.2.3)
+      FSharp.Core (>= 4.7.2) - restriction: >= netstandard2.0
     Fable.Promise (2.1)
       Fable.Core (>= 3.1.5) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.7) - restriction: >= netstandard2.0
@@ -65,8 +65,8 @@ NUGET
       Fable.Browser.Event (>= 1.0) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-    Fable.Core (3.2.2)
-      FSharp.Core (>= 4.7) - restriction: >= netstandard2.0
+    Fable.Core (3.2.3)
+      FSharp.Core (>= 4.7.2) - restriction: >= netstandard2.0
     Fable.Elmish (3.1)
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
@@ -359,7 +359,7 @@ NUGET
     Microsoft.Win32.SystemEvents (5.0) - restriction: >= netcoreapp3.0
       Microsoft.NETCore.Platforms (>= 5.0) - restriction: >= netcoreapp2.0
     Mono.Posix.NETStandard (1.0) - restriction: >= netstandard2.0
-    MSBuild.StructuredLogger (2.1.215) - restriction: >= netstandard2.0
+    MSBuild.StructuredLogger (2.1.272) - restriction: >= netstandard2.0
       Microsoft.Build (>= 16.4) - restriction: >= netstandard2.0
       Microsoft.Build.Framework (>= 16.4) - restriction: >= netstandard2.0
       Microsoft.Build.Tasks.Core (>= 16.4) - restriction: >= netstandard2.0
@@ -550,7 +550,7 @@ NUGET
       System.Runtime.CompilerServices.Unsafe (>= 5.0) - restriction: || (&& (< monoandroid) (< net46) (< netcoreapp2.0) (>= netstandard2.0) (< xamarinios) (< xamarinmac)) (>= net461) (&& (< net5.0) (>= netcoreapp2.0))
     System.Text.Encodings.Web (5.0) - restriction: || (&& (>= monoandroid) (>= netcoreapp2.1)) (&& (>= monotouch) (>= netcoreapp2.1)) (&& (>= net461) (>= netcoreapp2.1)) (>= net472) (&& (< netcoreapp2.0) (>= netcoreapp2.1)) (&& (>= netcoreapp2.1) (< netcoreapp3.0)) (&& (>= netcoreapp2.1) (>= uap10.1)) (&& (>= netcoreapp2.1) (>= xamarinios)) (&& (>= netcoreapp2.1) (>= xamarinmac)) (&& (>= netcoreapp2.1) (>= xamarintvos)) (&& (>= netcoreapp2.1) (>= xamarinwatchos))
       System.Memory (>= 4.5.4) - restriction: || (&& (< net45) (< netcoreapp2.1) (>= netstandard2.0) (< netstandard2.1)) (>= net461) (>= uap10.1)
-    System.Text.Json (5.0) - restriction: || (>= net472) (>= netcoreapp2.1)
+    System.Text.Json (5.0.1) - restriction: || (>= net472) (>= netcoreapp2.1)
       Microsoft.Bcl.AsyncInterfaces (>= 5.0) - restriction: || (>= monoandroid) (>= monotouch) (>= net461) (&& (>= netcoreapp2.0) (< netcoreapp2.1)) (&& (< netcoreapp2.0) (>= netstandard2.0)) (&& (>= netcoreapp2.1) (< netcoreapp3.0)) (>= uap10.1) (>= xamarinios) (>= xamarinmac) (>= xamarintvos) (>= xamarinwatchos)
       System.Buffers (>= 4.5.1) - restriction: || (>= monoandroid) (>= monotouch) (>= net461) (&& (< netcoreapp2.0) (>= netstandard2.0)) (>= xamarinios) (>= xamarinmac) (>= xamarintvos) (>= xamarinwatchos)
       System.Memory (>= 4.5.4) - restriction: || (&& (< monoandroid) (< netcoreapp2.0) (>= netstandard2.0) (< xamarinios) (< xamarinmac)) (>= net461) (&& (>= netcoreapp2.0) (< netcoreapp2.1)) (>= uap10.1)

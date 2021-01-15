@@ -84,6 +84,7 @@ module JSe =
     let typeof (o: obj) : Types = jsNative
 
     /// Type checking and equality helpers.
+    [<Erase>]
     type is =
         [<Emit("typeof $0 === 'bigint'")>]
         static member bigint (x: obj) : bool = jsNative

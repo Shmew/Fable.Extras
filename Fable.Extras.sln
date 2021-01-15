@@ -108,6 +108,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{FD5A1C5B-D06B-422F-940A-02DFE4970DFA}"
 	ProjectSection(SolutionItems) = preProject
 		docs\web\globals.md = docs\web\globals.md
+		docs\web\intersection-observer.md = docs\web\intersection-observer.md
 		docs\web\url-search-params.md = docs\web\url-search-params.md
 		docs\web\url.md = docs\web\url.md
 	EndProjectSection

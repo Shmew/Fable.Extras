@@ -10,7 +10,7 @@ type WA =
     /// The size of a WebAssembly page in bytes.
     static member inline bytesPerPage = 65536
 
-[<RequireQualifiedAccess>]
+[<Erase;RequireQualifiedAccess>]
 module WA =
     /// Indicates an error during WebAssembly decoding or validation.
     [<Global>]
@@ -299,6 +299,7 @@ module WA =
         | Table
 
     /// Module exports metadata.
+    [<Erase>]
     type ModuleExportDescriptor =
         /// The type of export.
         [<Emit("$0.kind")>]
@@ -318,6 +319,7 @@ module WA =
         let inline name (descriptor: ModuleExportDescriptor) = descriptor.Name
     
     /// Module imports metadata.
+    [<Erase>]
     type ModuleImportDescriptor =
         /// The type of import.
         [<Emit("$0.kind")>]
