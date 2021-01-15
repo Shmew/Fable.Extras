@@ -1,3 +1,6 @@
+### 0.3.0 - Thursday, January 14th, 2021
+* Add support for IntersectionObserver
+
 ### 0.2.4 - Monday, December 28th, 2020
 * Fix type definitions for latest Fable.Core
 
