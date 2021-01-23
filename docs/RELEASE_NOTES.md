@@ -1,3 +1,6 @@
+### 0.3.1 - Thursday, January 14th, 2021
+* Fix IntersectionObserver constructor overloading
+
 ### 0.3.0 - Thursday, January 14th, 2021
 * Add support for IntersectionObserver
 

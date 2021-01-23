@@ -265,42 +265,7 @@ module JSe =
     /// One or more of the values in threshold is outside the range 0.0 to 1.0.
     /// </exception>
     [<Erase>]
-    type IntersectionObserver<'Root when 'Root :> Node and 'Root :> NodeSelector and 'Root :> GlobalEventHandlers> private () =
-        /// <param name="callback">
-        /// A callback function to be run whenever a threshold is crossed in one direction or the other.
-        /// </param>
-        /// <param name="root">
-        /// The document or element that is used as the viewport for checking visibility of the target. 
-        ///
-        /// Must be the ancestor of the target. 
-        ///
-        /// Defaults to the browser viewport if not specified.
-        /// </param>
-        /// <param name="rootMargin">
-        /// Margin around the root. 
-        ///
-        /// Can have values similar to the CSS margin property, e.g. "10px 20px 30px 40px" (top, right, bottom, left). 
-        ///
-        /// The values can be percentages. 
-        ///
-        /// This set of values serves to grow or shrink each side of the root element's bounding box before computing 
-        /// intersections. 
-        ///
-        /// Defaults to all zeros.
-        /// </param>
-        /// <param name="threshold">
-        /// A single number which indicates at what percentage of the target's visibility the observer's callback 
-        /// should be executed. 
-        ///
-        /// If you only want to detect when visibility passes the 50% mark, you can use a value of 0.5. 
-        ///
-        /// The default is 0 (meaning as soon as even one pixel is visible, the callback will be run). 
-        ///
-        /// A value of 1.0 means that the threshold isn't considered passed until every pixel is visible.
-        /// </param>
-        [<Emit("new IntersectionObserver($0, {root: $1, rootMargin: $2, threshold: $3})")>]
-        new (callback: IntersectionObserverEntry list -> IntersectionObserver<'Root> -> unit, ?root: 'Root, ?rootMargin: string, ?threshold: float) = IntersectionObserver()
-        
+    type IntersectionObserver<'Root when 'Root :> Node and 'Root :> NodeSelector and 'Root :> GlobalEventHandlers> private () =        
         /// <param name="callback">
         /// A callback function to be run whenever a threshold is crossed in one direction or the other.
         /// </param>
@@ -326,7 +291,7 @@ module JSe =
         /// <param name="threshold">
         /// A sequence of numbers which indicate at what percentage of the target's visibility the observer's callback should be executed. 
         ///
-        // If you want the callback to run every time visibility passes another 25%, you would specify a seqeunce like: [0.; 0.25; 0.5; 0.75; 1.]. 
+        /// If you want the callback to run every time visibility passes another 25%, you would specify a seqeunce like: [0.; 0.25; 0.5; 0.75; 1.]. 
         ///
         /// The default is 0 (meaning as soon as even one pixel is visible, the callback will be run). 
         ///
