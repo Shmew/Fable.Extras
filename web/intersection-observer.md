@@ -10,8 +10,6 @@ type IntersectionObserver<'Root when 'Root :> Node and
                                      'Root :> GlobalEventHandlers> =
 
     new (callback: IntersectionObserverEntry list -> IntersectionObserver<'Root> -> unit, 
-         ?root: 'Root, ?rootMargin: string, ?threshold: float)
-    new (callback: IntersectionObserverEntry list -> IntersectionObserver<'Root> -> unit, 
          ?root: 'Root, ?rootMargin: string, ?threshold: seq<float>)
         
     /// The Element or Document whose bounds are used as the bounding box when testing for 
