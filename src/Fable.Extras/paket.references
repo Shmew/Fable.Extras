@@ -1,4 +1,6 @@
 ﻿group Fable.Extras
+    Fable.Browser.MediaQueryList
+    Fable.Browser.Navigator
     Fable.Browser.Url
     Fable.Core
     Fable.Fetch

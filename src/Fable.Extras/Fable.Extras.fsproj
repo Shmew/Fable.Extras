@@ -11,6 +11,7 @@
     <Compile Include="Events.fs" />
     <Compile Include="MIME.fs" />
     <Compile Include="Media.fs" />
+    <Compile Include="Platform.fs" />
     <Compile Include="Web.fs" />
     <Compile Include="WebAssembly.fs" />
     <None Include="paket.references" />

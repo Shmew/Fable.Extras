@@ -1,3 +1,6 @@
+### 0.4.0 - Thursday, January 28th, 2021
+* Add `Fable.Extras.Platform` namespace for environment detection
+
 ### 0.3.1 - Thursday, January 14th, 2021
 * Fix IntersectionObserver constructor overloading
 

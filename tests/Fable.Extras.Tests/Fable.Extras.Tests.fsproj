@@ -7,6 +7,7 @@
     <Compile Include="Extras.test.fs" />
     <Compile Include="Atomics.test.fs" />
     <Compile Include="Reflection.test.fs" />
+    <Compile Include="Platform.test.fs" />
     <Compile Include="Web.test.fs" />
     <Compile Include="Wasm.test.fs" />
     <None Include="paket.references" />

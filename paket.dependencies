@@ -6,6 +6,8 @@ group Fable.Extras
     source https://nuget.org/api/v2
 	source https://api.nuget.org/v3/index.json
 
+    nuget Fable.Browser.MediaQueryList ~> 1
+    nuget Fable.Browser.Navigator ~> 1
     nuget Fable.Browser.Url ~> 1
     nuget Fable.Core ~> 3
     nuget Fable.Fetch ~> 2
