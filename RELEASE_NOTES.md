@@ -1,3 +1,6 @@
+### 0.4.1 - Thursday, March 4th, 2021
+* Remove unnecessary interface implementations
+
 ### 0.4.0 - Thursday, January 28th, 2021
 * Add `Fable.Extras.Platform` namespace for environment detection
 

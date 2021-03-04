@@ -616,17 +616,11 @@ module JSe =
     type Array =
         /// Determines whether the passed value is an Array.
         static member isArray (maybeArray: obj) : bool = jsNative
-
-        interface JS.ArrayConstructor with
-            member _.isArray x = Array.isArray x
     
     [<Global>]
     type Number =
         /// Determines whether the passed value is NaN and its type is Number.
         static member isNaN (maybeNumber: obj) : bool = jsNative
-    
-        interface JS.NumberConstructor with
-            member _.isNaN x = Number.isNaN x
 
     [<Global>]
     type Object =
