@@ -331,19 +331,19 @@ module JSe =
         member _.Thresholds : seq<float> = jsNative
 
         /// Stops the IntersectionObserver object from observing any target.
-        [<Emit("$0.disconnect")>]
+        [<Emit("$0.disconnect()")>]
         member _.Disconnect () : unit = jsNative
 
         /// Tells the IntersectionObserver a target element to observe.
-        [<Emit("$0.observe")>]
+        [<Emit("$0.observe($1)")>]
         member _.Observe (element: #Element) : unit = jsNative
 
         /// Returns an array of IntersectionObserverEntry objects for all observed targets.
-        [<Emit("$0.takeRecords")>]
+        [<Emit("$0.takeRecords()")>]
         member _.TakeRecords () : seq<IntersectionObserverEntry> = jsNative
 
         /// Tells the IntersectionObserver to stop observing a particular target element.
-        [<Emit("$0.unobserve")>]
+        [<Emit("$0.unobserve($1)")>]
         member _.Unobserve (element: #Element) : unit = jsNative
 
         /// Creates an IDisposable that disconnects the IntersectionObserver when disposed.
