@@ -1,3 +1,6 @@
+### 0.4.2 - Friday, March 19th, 2021
+* Fix IntersectionObserver emits
+
 ### 0.4.1 - Thursday, March 4th, 2021
 * Remove unnecessary interface implementations
 
