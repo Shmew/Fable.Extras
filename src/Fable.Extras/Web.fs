@@ -298,7 +298,7 @@ module JSe =
         /// A value of 1.0 means that the threshold isn't considered passed until every pixel is visible.
         /// </param>
         [<Emit("new IntersectionObserver($0, {root: $1, rootMargin: $2, threshold: $3})")>]
-        new (callback: IntersectionObserverEntry array -> IntersectionObserver<'Root> -> unit, ?root: 'Root, ?rootMargin: string, ?threshold: seq<float>) = IntersectionObserver()
+        new (callback: IntersectionObserverEntry [] -> IntersectionObserver<'Root> -> unit, ?root: 'Root, ?rootMargin: string, ?threshold: seq<float>) = IntersectionObserver()
         
         /// The Element or Document whose bounds are used as the bounding box when testing for 
         /// intersection. 
