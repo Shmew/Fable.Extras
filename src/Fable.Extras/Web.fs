@@ -298,7 +298,7 @@ module JSe =
         /// A value of 1.0 means that the threshold isn't considered passed until every pixel is visible.
         /// </param>
         [<Emit("new IntersectionObserver($0, {root: $1, rootMargin: $2, threshold: $3})")>]
-        new (callback: IntersectionObserverEntry list -> IntersectionObserver<'Root> -> unit, ?root: 'Root, ?rootMargin: string, ?threshold: seq<float>) = IntersectionObserver()
+        new (callback: IntersectionObserverEntry array -> IntersectionObserver<'Root> -> unit, ?root: 'Root, ?rootMargin: string, ?threshold: seq<float>) = IntersectionObserver()
         
         /// The Element or Document whose bounds are used as the bounding box when testing for 
         /// intersection. 
@@ -331,19 +331,19 @@ module JSe =
         member _.Thresholds : seq<float> = jsNative
 
         /// Stops the IntersectionObserver object from observing any target.
-        [<Emit("$0.disconnect")>]
+        [<Emit("$0.disconnect()")>]
         member _.Disconnect () : unit = jsNative
 
         /// Tells the IntersectionObserver a target element to observe.
-        [<Emit("$0.observe")>]
+        [<Emit("$0.observe($1)")>]
         member _.Observe (element: #Element) : unit = jsNative
 
         /// Returns an array of IntersectionObserverEntry objects for all observed targets.
-        [<Emit("$0.takeRecords")>]
+        [<Emit("$0.takeRecords()")>]
         member _.TakeRecords () : seq<IntersectionObserverEntry> = jsNative
 
         /// Tells the IntersectionObserver to stop observing a particular target element.
-        [<Emit("$0.unobserve")>]
+        [<Emit("$0.unobserve($1)")>]
         member _.Unobserve (element: #Element) : unit = jsNative
 
         /// Creates an IDisposable that disconnects the IntersectionObserver when disposed.
