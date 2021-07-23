@@ -276,9 +276,20 @@ module JSe =
 
         /// Indicates if the given MIME type is supported by the current user agent — this is, 
         /// if it can successfully create SourceBuffer objects for that MIME type.
-        [<Emit("MediaSource.isTypeSupported()")>]
+        [<Emit("MediaSource.isTypeSupported($0)")>]
         let inline isTypeSupported (mimeType: string) : bool = jsNative
 
         /// Checks if the browser supports MediaSource.
         [<Emit("'MediaSource' in window")>]
         let inline isMediaSourceSupported () : bool = jsNative
+        
+    [<Erase;RequireQualifiedAccess>]
+    module MediaRecorder =
+
+        /// A static method which returns a true or false value indicating if the given MIME media type is supported by the current user agent.
+        [<Emit("MediaRecorder.isTypeSupported($0)")>]
+        let inline isTypeSupported (mimeType: string) : bool = jsNative
+
+        /// Checks if the browser supports MediaRecorder.
+        [<Emit("'MediaRecorder' in window")>]
+        let inline isMediaRecorderSupported () : bool = jsNative
