@@ -976,8 +976,8 @@ module JSe =
     [<Global>]
     type Date private (?inp: obj) =
         new () = Date()
-        new (ticks: int) = Date(unbox<int> ticks)
-        new (ticks: int64) = Date(unbox<int> ticks)
+        new (ticks: int) = Date(box ticks)
+        new (ticks: int64) = Date(box ticks)
         new (value: string) = Date(value)
         new (year: float, month: float, ?date: float, ?hours: float, ?minutes: float, ?seconds: float, ?ms: float) = 
             Date(box (year, month, date, hours, minutes, seconds, ms))
