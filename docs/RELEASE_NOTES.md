@@ -1,3 +1,6 @@
+### 0.4.3 - Tuesday, November 16th, 2021
+* Support Fable 3.6
+
 ### 0.4.2 - Friday, March 19th, 2021
 * Fix IntersectionObserver emits
 
